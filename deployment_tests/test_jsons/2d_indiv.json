@@ -1,0 +1,13 @@
+{ 
+    "personal": "nrezaee",  
+ 
+    "experiment_name": "test1-2d",
+    
+    "alignment": "mean squares 2d",
+    
+    "dot detection":"biggest jump",
+
+    "decoding": {"individual": ["1"]},
+ 
+    "strictness":"1"
+}

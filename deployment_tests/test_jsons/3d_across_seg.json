@@ -1,0 +1,16 @@
+{ "personal": "nrezaee", 
+
+  "experiment_name": "test1",
+  
+  "alignment": "no align",
+  
+  "alignment errors": "true",
+  
+  "dot detection": "top 1000 dots",
+  
+  "decoding": "across", 
+  
+  "allowed_diff":"0",
+  
+  "segmentation":"roi"
+}

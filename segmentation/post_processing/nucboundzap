@@ -1,0 +1,107 @@
+#!/bin/bash
+#
+# nucboundzap <labels> [distance]
+#
+
+errcode=1
+quiet=false
+
+function msg()
+{
+    if [ $quiet == false ]; then
+        printf "\t$(basename "$0"): %s\n" "$1" >&2
+    fi
+}
+
+function errmsg()
+{
+    printf "\t[$(basename "$0")]: error ($errcode): %s\n" "$1" >&2
+    exit $errcode
+}
+
+function usage()
+{
+    local msg=""
+
+    msg="$msg \n\t\033[1m usage: "$(basename "$0")" <labels> [distance ($gsize)] \033[0m  \n\n"
+    msg="$msg removes connected components in 'labels' which are 'distance' pixels away from image border.\n"
+    msg="$msg 'labels' must be a labeled image with segmented connected components either in 2D or 3D.\n\n"
+
+    printf "%b\n" "$msg"
+}
+
+function check_programs()
+{
+    # make sure needed programs are available
+
+    err=0
+    
+    command -v gmic >/dev/null 2>&1 || { msg "gmic not found. make sure gmic is installed."; ((err |= 1)); }
+    
+    if [ $err -eq 1 ]; then
+        errcode=127
+        errmsg "one or more essential programs are missing."
+    fi
+}
+
+# make sure needed programs are available
+check_programs
+
+labels=${1:-""}
+gsize=${2:-3}
+esize=$((gsize+1))
+
+#
+# interpret command line
+#
+if [[ "$#" -lt 1 ]]; then
+    usage
+    exit 1
+fi
+
+if [[ ! -r "${labels}" ]]; then
+  errcode=1
+  errmsg "cannot read stack $labels"
+fi
+
+if [[ $gsize -lt 0 ]]; then
+  errcode=1
+  errmsg "invalid gap size $gsize."
+fi
+
+#
+# output file name: input appended with _bzap_gX.tif
+#
+outname="${labels%.*}"_bzap_d$gsize.tif
+
+#
+# process input labels
+#
+gmic -v -1 "${labels}" \
+  append z \
+  \
+  `# create frame image containing labeled regions within 'gsize' pixels from boundary` \
+  \
+  {w},{h},{d},1,0 \
+  frame_xy. 1,1,1,1 \
+  distance. 1,2 \
+  shrink_xy. 1 \
+  lt. $gsize \
+  mul. [0] \
+  \
+  `# send 'boundary' regions to background` \
+  \
+  repeat {iM#1} \
+    "c={1,iM}" \
+    if '$c'==0 break fi \
+    replace[0,1] '$c',0 \
+  done \
+  rm[1] \
+  \
+  `# write out remaining labels` \
+  \
+  if {iM#0}\>255 \
+    output[0] "${outname}",ushort,lzw \
+  else \
+    output[0] "${outname}",uchar,lzw \
+  fi \

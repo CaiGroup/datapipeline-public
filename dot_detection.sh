@@ -1,0 +1,2 @@
+#!/bin/bash 
+python /central/home/nrezaee/test_cronjob_multi_dot/dot_detection/dot_detectors_3d/get_top_1000_dots.py --offset [0, 0, 0] --analysis_name dot_big_multi --vis_dots False --back_subtract False --tiff_src /groups/CaiLab/personal/nrezaee/raw/intron_pos0/HybCycle_19/MMStack_Pos0.ome.tif --norm False --channels all --chromatic False --rand /groups/CaiLab/personal/nrezaee/temp_dots/RhVn6CLN

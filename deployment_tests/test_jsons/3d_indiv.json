@@ -1,0 +1,13 @@
+{ 
+    "personal": "nrezaee",  
+ 
+    "experiment_name": "test1-indiv",
+    
+    "alignment": "no align",
+    
+    "alignment errors":"true",
+    
+    "dot detection":"top 1000 dots",
+    
+    "decoding": {"individual": ["1"]}
+}

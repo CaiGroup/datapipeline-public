@@ -1,0 +1,159 @@
+#!/bin/bash
+#
+# nuccytomatch <nuclei_labels> <cyto_labels> <output_prefix> [nucleus erode size] [cytoplasm erode size]
+#
+#
+
+errcode=0
+quiet=false
+
+function msg()
+{
+    if [ $quiet == false ]; then
+        printf "\t$(basename "$0"): %s\n" "$1" >&2
+    fi
+}
+
+function errmsg()
+{
+    printf "\t[$(basename "$0")]: error ($errcode): %s\n" "$1" >&2
+    exit $errcode
+}
+
+function usage()
+{
+    local msg=""
+
+    msg="$msg \n\t\033[1m usage: "$(basename "$0")" <nuclei_labels> <cyto_labels> <output_prefix> [nucleus erode size] [cytoplasm erode size] \033[0m  \n\n"
+    msg="$msg Cleans up and matches nuclei and cytoplasm label ids. Cytoplasm having none or more than one nucleus are removed \n"
+    msg="$msg as well as nuclei not in a single or crossing multiple cytoplasms. Matching labels come from nuclei. \n\n"
+    msg="$msg 'nuclei_labels' must be a single slice labeled image with segmented connected components.\n"
+    msg="$msg 'cyto_labels' must be a single slice labeled image with segmented connected components.\n\n"
+    msg="$msg Nuclei can be eroded to reduce their masks so to avoid eliminating those failing the tests above - use your judgment!\n"
+    msg="$msg Cytoplasms can also be eroded to reduce their masks so to avoid elmininating those failing the tests above - use your judgment!\n\n"
+    msg="$msg Common image formats (tif, png, bmp, etc.) are accepted. Error handling is limited.\n"
+
+    printf "%b\n" "$msg"
+}
+
+function check_programs()
+{
+    # make sure needed programs are available
+
+    err=0
+    
+    command -v gmic >/dev/null 2>&1 || { msg "gmic not found. make sure gmic is installed."; ((err |= 1)); }
+    
+    if [ $err -eq 1 ]; then
+        errcode=127
+        errmsg "one or more essential programs are missing."
+    fi
+}
+
+# make sure needed programs are available
+check_programs
+
+nuclei=${1:-""}
+cyto=${2:-""}
+outprefix=${3:-""}
+nsize=${4:-16}			# size of erosion for nuclei
+csize=${5:-0}			# size of erosion for cytoplasms
+
+#
+# interpret command line
+#
+if [[ "$#" -lt 3 ]]; then
+    usage
+    exit 1
+fi
+
+if [[ ! -r "${nuclei}" || ! -r "${cyto}" ]]; then
+  errcode=1
+  errmsg "cannot read one or more label files ($nuclei, $cyto)"
+fi
+
+if [[ "${#outprefix}" -eq 0 ]]; then
+    errcode=1
+    errmsg "Need to provide an output file name prefix"
+fi
+
+if [[ $nsize -lt 0 || $csize -lt 0 ]]; then
+  errcode=1
+  errmsg "invalid erosion size ($nsize, $csize)."
+fi
+
+#
+# output file name
+#
+outname="${outprefix}"_ncmatch
+
+
+#
+# process input labels
+#
+
+gmic -v -1 $cyto $nuclei \
++erode_circ[0] $csize \
++erode_circ[1] $nsize \
+name[0] cyto \
+name[1] nuclei \
+name[2] ecyto \
+name[3] enuclei \
+srand 177 \
+\
+`# erase those cytoplasms containing none or more than one nuclei` \
+\
+repeat {iM#0} \
+  c={\$\>+1} 			`# index of segmented cytoplasm` \
+  +eq[ecyto] {\$c}		`# mask of k-th cytoplasm` \
+  +mul. [enuclei]		`# get nuclei in this mask, if any` \
+  label_fg. 0			`# find out how many nuclei in this mask` \
+  if {iM#-1}!=1 \
+    replace[cyto,ecyto] \$c,0		`# remove cytoplasm if found none or more than one nuclei in it` \
+  endif \
+  rm[-1,-2] \
+done \
+\
+`# remove those nuclei not in a single or crossing multiple cytoplasms` \
+\
+repeat {iM#1} \
+  n={\$\>+1} 			`# index of segmented nucleus` \
+  +eq[enuclei] {\$n}		`# mask of n-th nucleus` \
+  if {iM#-1}\>0 \
+    +mul. [ecyto]		`# get cytoplasms corresponding to this nucleus, if any` \
+    label_fg. 0 \
+    if {iM#-1}==0 \
+      replace[nuclei] \$n,0 \
+    endif \
+    rm[-1] \
+  endif \
+  rm[-1] \
+done \
+\
+`# match cytoplasm and nuclei label ids` \
+\
+mul[cyto] -1			`# negate values of cytoplasms so we can change them without label conflicts` \
+repeat {iM#1} \
+  n={\$\>+1}			`# index of segmented nucleus` \
+  +eq[nuclei] {\$n}		`# mask of n-th nucleus, if exists` \
+  if {iM#-1}\>0 \
+    barycenter[-1]		`# (x,y) coordinates of nucleus barycenter` \
+    x={'@0'} \
+    y={'@1'} \
+    v="{i(#0,\$x,\$y,0,0)}" \
+    replace[cyto] \$v,\$n \
+  endif \
+  rm[-1] \
+done \
+\
+\
+rm[2,3] \
+append z \
+if {iM}\>255 \
+    output. "${outname}".tif,ushort,lzw \
+else \
+    output. "${outname}".tif,uchar,lzw \
+endif
+
+#gmic -v -1 "${outname}".tif srand 177 -add "i==0?0:u(1,{iM})" -o "${outname}"_composite.png
+#tocolor "${outname}"_composite.png > "${outname}"_composite_color.png

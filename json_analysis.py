@@ -1,0 +1,335 @@
+"""
+This script is where the magic happens. It loads the json file and 
+uses the parameters in the json file to set parameters for the analysis
+
+After this script is done setting the parameters it runs the analysis with
+the parameters. It uses analysis_class.py heavily to do this.
+"""
+
+import os 
+import json 
+import argparse
+import shutil
+import sys
+
+
+
+main_dir = os.environ['DATA_PIPELINE_MAIN_DIR']
+
+#Import Analysis Class
+#----------------------------------------------------------
+from analysis_class import Analysis
+#----------------------------------------------------------
+
+#Set Arguments
+#----------------------------------------------------------
+parser = argparse.ArgumentParser()
+parser.add_argument("--json", help="json for analysis")
+parser.add_argument("--position", help="position to be processed")
+parser.add_argument("--personal", help="personal directory")
+parser.add_argument("--experiment_name", help="experiment name")
+parser.add_argument("--slurm", help="Determine script is run on slurm to direct output to file in analyses/")
+args = parser.parse_args()
+#----------------------------------------------------------
+
+
+#Runs analysis by setting parameters for Analysis Class
+#=========================================================================
+def run_analysis(json_name, position):
+    
+    
+    #Get Json Path
+    #----------------------------------------------------------
+    analysis_name = json_name.split('.json')[0]
+
+    json_path = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, \
+                            analysis_name, json_name)
+    
+    print("Json Path:", json_path)
+    #----------------------------------------------------------
+    
+    
+    #Open json
+    #----------------------------------------------------------
+    with open(json_path) as json_file: 
+        non_lowercase_data = json.load(json_file) 
+        
+    data = {}
+    for key, value in non_lowercase_data.items():
+        if type(value) == str:
+            
+            if key.lower() == 'personal' or key.lower() == 'experiment_name':
+
+                data[key.lower()] = value
+                
+            else:
+            
+                data[key.lower()] = value.lower()
+            
+        else:
+            data[key.lower()] = value
+
+    print("Parameters set:", data)
+    #----------------------------------------------------------
+
+
+    #Output print statements to file if running slurm
+    #----------------------------------------------------------
+    if args.slurm == 'True':
+    
+        #Change print output to file    
+        #----------------------------------------------------------
+        orig_stdout = sys.stdout
+        
+        output_dir = os.path.join(main_dir, 'analyses', data['personal'], data['experiment_name'], \
+                                   analysis_name, 'Output')
+
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        
+        output_file = os.path.join(main_dir, 'analyses', data['personal'], data['experiment_name'], \
+                                   analysis_name, 'Output', 'output.txt')
+                                   
+        print("Print statements outputted to", output_file)
+        
+        redirected_output = open(output_file, 'w')
+        
+        sys.stdout = redirected_output
+        #----------------------------------------------------------
+    #----------------------------------------------------------
+
+
+    #Declare Analysis Class
+    #---------------------------------------------------------
+    analysis = Analysis(experiment_name=data['experiment_name'], \
+                analysis_name=json_name.split('.json')[0], \
+                personal = data['personal'], \
+                position = args.position)
+    #----------------------------------------------------------
+    
+
+    #Alignment
+    #----------------------------------------------------------
+    if 'alignment' in data.keys():
+        if not data['alignment'] == 'none':
+            hi = 'hello'
+            print('---------------------------------', flush = True)
+            print(f"{data['alignment']=}", flush=True)
+            analysis.set_alignment_arg(data['alignment'])
+    #----------------------------------------------------------
+    
+    
+    #Align Errors
+    #----------------------------------------------------------
+    if 'alignment errors' in data.keys():
+        if data['alignment errors'] == 'true':
+            analysis.set_align_errors_true()
+    #----------------------------------------------------------   
+    
+
+    
+    #background subtraction
+    #----------------------------------------------------------
+    if 'background subtraction' in data.keys():
+        if data['background subtraction'] == 'true':
+            analysis.set_background_subtraction_true()
+    #----------------------------------------------------------  
+   
+   
+    #Chromatic Abberration
+    #----------------------------------------------------------
+    if 'chromatic aberration' in data.keys():
+        if data['chromatic aberration'] == 'true':
+            analysis.set_chromatic_abberration_true()
+    #----------------------------------------------------------
+    
+    
+    #Normalization
+    #----------------------------------------------------------
+    if 'normalization' in data.keys():
+        if data['normalization'] == 'true':
+            analysis.set_normalization_true()
+    #----------------------------------------------------------
+    
+
+    #Deconvolution
+    #----------------------------------------------------------
+    if 'deconvolution' in data.keys():
+        if data['deconvolution'] == 'true':
+            analysis.set_deconvolution_true()
+    #----------------------------------------------------------
+    
+    
+    #Dot Detection
+    #----------------------------------------------------------
+    if 'dot detection' in data.keys():
+        analysis.set_dot_detection_arg(data['dot detection'])   
+    #----------------------------------------------------------     
+
+
+    #Decoding
+    #----------------------------------------------------------
+    if 'decoding' in data.keys():
+        if 'across' in data['decoding']:
+            analysis.set_decoding_across_true()   
+        elif 'individual' in data['decoding'].keys(): 
+            analysis.set_decoding_individual(data['decoding']['individual'])
+    #----------------------------------------------------------  
+    
+    
+    #Visualize Dots
+    #----------------------------------------------------------
+    if 'visualize dot detection' in data.keys():
+        if data['visualize dot detection'] == 'true':
+            analysis.set_visual_dot_detection_true()
+    #----------------------------------------------------------
+    
+    
+    #Colocalize
+    #----------------------------------------------------------
+    if 'colocalize' in data.keys():
+        if data['colocalize'] == 'true':
+            analysis.set_colocalize_true()   
+    #----------------------------------------------------------  
+ 
+    #Decoding with Previous
+    #----------------------------------------------------------
+    if 'decoding with previous points variable' in data.keys():
+        if data['decoding with previous points variable'] == 'true':
+            analysis.set_decoding_with_previous_dots_true()   
+    #----------------------------------------------------------  
+    
+    #Decoding with Previous Locations
+    #----------------------------------------------------------
+    if 'decoding with previous locations variable' in data.keys():
+        if data['decoding with previous locations variable'] == 'true':
+            analysis.set_decoding_with_previous_locations_true()   
+    #----------------------------------------------------------  
+    
+    #Segmentation
+    #----------------------------------------------------------
+    if 'segmentation' in data.keys():
+        if not data['segmentation'] == 'none':
+            analysis.set_segmentation_arg(data['segmentation'])
+    #----------------------------------------------------------   
+    
+    #Add Fake Barcodes
+    #----------------------------------------------------------
+    if 'add fake barcodes' in data.keys():
+        if data['add fake barcodes'] == 'true':
+            analysis.set_fake_barcodes_true()
+    #----------------------------------------------------------   
+    
+    #Generate Analysis of Segmentation
+    #----------------------------------------------------------
+    if 'on/off barcode analysis' in data.keys():
+        if data['on/off barcode analysis'] == 'true':
+            analysis.set_on_off_barcode_analysis_true()
+    #----------------------------------------------------------   
+    
+    #Generate Analysis of Segmentation
+    #----------------------------------------------------------
+    if 'false positive rate analysis' in data.keys():
+        if data['false positive rate analysis'] == 'true':
+            analysis.set_false_positive_rate_analysis_true()
+    #----------------------------------------------------------
+    
+    #Generate Analysis of Segmentation
+    #----------------------------------------------------------
+    if 'gaussian fitting' in data.keys():
+        if data['gaussian fitting'] == 'true':
+            analysis.set_gaussian_fitting_true()
+    #----------------------------------------------------------
+    
+
+    #Generate Analysis of Segmentation
+    #----------------------------------------------------------
+    if 'radial center' in data.keys():
+        if data['radial center'] == 'true':
+            analysis.set_radial_center_true()
+    #----------------------------------------------------------
+    
+    #Set Allowed Diff
+    #----------------------------------------------------------
+    if 'allowed_diff' in data.keys():
+        if not data['allowed_diff'] == 'none':
+            analysis.set_allowed_diff_arg(data['allowed_diff'])
+    #----------------------------------------------------------
+    
+    #Set Dot Detection Strictness
+    #----------------------------------------------------
+    if 'strictness' in data.keys():
+        if not data['strictness'] == 'none':
+            analysis.set_strictness_arg(data['strictness'])
+    #----------------------------------------------------------
+    
+    #Set Min Seeds
+    #----------------------------------------------------
+    if 'min seeds' in data.keys():
+        if not data['min seeds'] == 'none':
+            analysis.set_min_seeds_arg(data['min seeds'])
+    #----------------------------------------------------------
+    
+    #Set Hamming Distance Analysis
+    #----------------------------------------------------
+    if 'hamming analysis' in data.keys():
+        if not data['hamming analysis'] == 'none':
+            analysis.set_hamming_analysis_true()
+    #----------------------------------------------------------
+    
+    
+    #Set All Post Analyses
+    #----------------------------------------------------
+    if 'all post analyses' in data.keys():
+        if data['all post analyses'] == 'true':
+            analysis.set_all_post_analyses_true()
+    #----------------------------------------------------------
+    
+    #Set Distance Between Nuclei
+    #----------------------------------------------------
+    if 'distance between nuclei' in data.keys():
+        if data['distance between nuclei'] != 'none':
+            analysis.set_dist_between_nuclei_arg(data['distance between nuclei'])
+    #----------------------------------------------------------
+
+    #Set Edges to Delete
+    #----------------------------------------------------
+    if 'edge deletion' in data.keys():
+        if data['edge deletion'] != 'none':
+            analysis.set_edge_deletion_arg(data['edge deletion'])
+    #----------------------------------------------------------
+
+    
+    #Writ
+    #----------------------------------------------------------
+    analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)
+    
+    position_dir = os.path.join(analyses_dir, args.position.split('.ome')[0])
+    
+    analysis.write_results(position_dir)
+    #----------------------------------------------------------
+    
+    if args.slurm == 'True':
+        
+        #Change output back to normal
+        #----------------------------------------------------------
+        sys.stdout = orig_stdout
+        redirected_output.close()
+        #----------------------------------------------------------
+        
+    return None
+#=========================================================================    
+    
+    
+run_analysis(args.json, args.position)
+    
+        
+    
+    
+    
+        
+        
+    
+        
+        
+    
