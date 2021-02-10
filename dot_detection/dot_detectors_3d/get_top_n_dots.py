@@ -20,6 +20,8 @@ import json
 import warnings
 import sys
 import ast
+import pandas as pd
+
 
 
 sys.path.append(os.getcwd())
@@ -66,8 +68,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
     tiff_shape = tiff.shape
     #---------------------------------------------------------------------
 
-    
-    
+    df_tiff = pd.DataFrame(columns = ['hyb','ch', 'x', 'y', 'z'])
 
         
     #Loops through channels for Dot Detection
@@ -138,23 +139,6 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             dot_analysis[0][:,[0,1]] = dot_analysis[0][:,[1,0]]
             #---------------------------------------------------------------------
             
-            
-            # #Gaussian Fit the dots
-            # #---------------------------------------------------------------------
-            # print(f'{bool_gaussian_fitting=}')
-            # if bool_gaussian_fitting == True:
-            #     dot_analysis = get_gaussian_fitted_dots(tiff_src, channel, dot_analysis[0])
-            # #---------------------------------------------------------------------
-            
-            
-            # #Center the dots
-            # #---------------------------------------------------------------------
-            # print(f'{bool_radial_center=}')
-            # if bool_radial_center == True:
-            #     dot_analysis = get_radial_centered_dots(tiff_src, channel, dot_analysis[0])
-            # #---------------------------------------------------------------------
-
-            #print(f'{dot_analysis[0].shape=}')
   
             #Visualize Dots
             #---------------------------------------------------------------------
@@ -178,78 +162,79 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
         #---------------------------------------------------------------------
         assert dots_in_channel != None
         
-        # def assertions_for_dot_analysis(dot_analysis):
-        #     assert type(dot_analysis) == list
-        #     assert type(dot_analysis[0]) == list
-        #     assert type(dot_analysis[1]) == list
-        #     assert len(dot_analysis[0][0]) == 3
-        #     assert type(dot_analysis[1][0]]) == int
-        #     assert len(dot_analysis[0]) == len(dot_analysis[1])
-            
-            
-        # assertions_for_dot_analysis(dots_in_channel) 
-            
         
-        # print(f'{len(dots_in_channel[0])=}')
-        # print(f'{len(dots_in_channel[1])=}')
-        # print(f'{len(dots_in_channel[0][0])=}')
-        # print(f'{dots_in_channel[1]=}')
-        # print(f'{type(dots_in_channel[0])=}')
-        # print(f'{type(dots_in_channel[1][1])=}')
-        # print(f'{type(dots_in_channel[0][1][1])=}')
+        channel_array = np.full((len(dots_in_channel[1])), channel + 1)
+        
+        hyb = int(tiff_src.split('HybCycle_')[1].split('/MMStack')[0])
+        
+        hyb_array = np.full((len(dots_in_channel[1])), hyb)
+
+        df = pd.DataFrame(data = dots_in_channel[0], columns=['x', 'y', 'z'])
+        df['ch'] = channel_array
+        df['hyb'] = hyb_array
+        df['int'] = dots_in_channel[1]
+        
+        df = df.reindex(columns=['hyb', 'ch', 'x','y','z','int'])
+        df_tiff = df_tiff.append(df)
+        print(f'{df_tiff.shape=}')
         
         
-        dots_in_tiff.append(dots_in_channel)
-        
-        
-                
-        import pickle
-        with open(rand_dir+'/locs.pkl', 'wb') as f:
-            pickle.dump(dots_in_tiff, f)
+        csv_path = rand_dir +'/locs.csv'
+        print(f'{csv_path=}')
+        df_tiff.to_csv(csv_path, index=False)
+
+  
+print(f'{sys.argv[1]=}')
+if sys.argv[1] != 'debug':
+    print('Running')
+    def str2bool(v):
+      return v.lower() == "true"
+      
+    import argparse
     
-    #---------------------------------------------------------------------
-    #-----------------------------------------------------------------
-     
-  
- 
-def str2bool(v):
-  return v.lower() == "true"
-  
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--tiff_src")
-parser.add_argument("--offset0")
-parser.add_argument("--offset1")
-parser.add_argument("--offset2")
-parser.add_argument("--analysis_name")
-parser.add_argument("--vis_dots")
-parser.add_argument("--norm")
-parser.add_argument("--back_subtract")
-parser.add_argument("--channels", nargs = '+')
-parser.add_argument("--chromatic")
-parser.add_argument("--n_dots")
-parser.add_argument("--rand")
-
-
-args, unknown = parser.parse_known_args()
-
-
-if args.offset2 == 'None':
-    offset = [float(args.offset0), float(args.offset1)]
-else:    
-    offset = [float(args.offset0), float(args.offset1), float(args.offset2)]
-
-
-if args.channels[0] == 'all':
-    channels = 'all'
-else:
-    channels = [int(i.replace('[', '').replace(']','').replace(',','')) for i in args.channels]
-
-
-
-get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), args.norm, \
-                      args.back_subtract, channels, args.chromatic, int(args.n_dots), args.rand)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--tiff_src")
+    parser.add_argument("--offset0")
+    parser.add_argument("--offset1")
+    parser.add_argument("--offset2")
+    parser.add_argument("--analysis_name")
+    parser.add_argument("--vis_dots")
+    parser.add_argument("--norm")
+    parser.add_argument("--back_subtract")
+    parser.add_argument("--channels", nargs = '+')
+    parser.add_argument("--chromatic")
+    parser.add_argument("--n_dots")
+    parser.add_argument("--rand")
+    
+    
+    args, unknown = parser.parse_known_args()
+    
+    
+    if args.offset2 == 'None':
+        offset = [float(args.offset0), float(args.offset1)]
+    else:    
+        offset = [float(args.offset0), float(args.offset1), float(args.offset2)]
+    
+    
+    if args.channels[0] == 'all':
+        channels = 'all'
+    else:
+        channels = [int(i.replace('[', '').replace(']','').replace(',','')) for i in args.channels]
+    
+    
+    
+    get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), args.norm, \
+                          args.back_subtract, channels, args.chromatic, int(args.n_dots), args.rand)
+                          
+else:                        
+    print('Debugging')
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_2/MMStack_Pos0.ome.tif'
+    offset = [0,0,0]
+    channels = 'all' #[1]
+    analysis_name = None
+    n_dots = 10
+    rand_dir = '/home/nrezaee/temp'
+    get_dots_for_tiff(tiff_src, offset, analysis_name, False, False, False, channels, False, 10, rand_dir)
     
     
 

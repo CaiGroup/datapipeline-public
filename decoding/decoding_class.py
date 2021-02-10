@@ -150,7 +150,7 @@ class Decoding:
         
         #Set Directory for locations
         #--------------------------------------------------------------------
-        locations_path = os.path.join(self.locations_dir, 'locations.mat')
+        locations_path = os.path.join(self.locations_dir, 'locations.csv')
         #--------------------------------------------------------------------
         
         #Set Directory for Decoding
@@ -209,7 +209,7 @@ class Decoding:
         
         #Set Directory for locations
         #--------------------------------------------------------------------
-        locations_path = os.path.join(self.locations_dir, 'locations.mat')
+        locations_path = os.path.join(self.locations_dir, 'locations.csv')
         #--------------------------------------------------------------------
         
         #Set Directory for Decoding
@@ -237,7 +237,7 @@ class Decoding:
             #--------------------------------------------------------------------
             locations_dir = os.path.join(self.position_dir, 'Dot_Locations')
                         
-            locations_file_name = 'locations_z_' + str(z) +'.mat'
+            locations_file_name = 'locations_z_' + str(z) +'.csv'
             
             locations_path_z = os.path.join(locations_dir, locations_file_name)
             #--------------------------------------------------------------------
@@ -319,7 +319,7 @@ class Decoding:
                 #--------------------------------------------------------------------
                 locations_dir = os.path.join(self.position_dir, 'Dot_Locations')
                             
-                locations_file_name = 'locations_z_' + str(z) +'.mat'
+                locations_file_name = 'locations_z_' + str(z) +'.csv'
                 
                 locations_path_z = os.path.join(locations_dir, locations_file_name)
                 #--------------------------------------------------------------------
@@ -392,7 +392,7 @@ class Decoding:
         
             #Set file path for locations
             #--------------------------------------------------------------------
-            locations_path = os.path.join(self.locations_dir, 'locations.mat')
+            locations_path = os.path.join(self.locations_dir, 'locations.csv')
             #--------------------------------------------------------------------
         
             

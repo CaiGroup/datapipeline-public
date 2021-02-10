@@ -17,6 +17,7 @@ import multiprocessing
 import subprocess
 import time
 import shutil
+import pandas as pd
 
 
 
@@ -127,7 +128,7 @@ class Dot_Detection:
         #Run Dot Detection
         #--------------------------------------------------------------------
             
-        points, intensities = self.get_dot_locations()
+        df_locs = self.get_dot_locations()
 
         #--------------------------------------------------------------------
         
@@ -138,7 +139,7 @@ class Dot_Detection:
             os.makedirs(self.locations_dir)
         
     
-        locations_path = os.path.join(self.locations_dir, 'locations.mat')
+        locations_path = os.path.join(self.locations_dir, 'locations.csv')
         #--------------------------------------------------------------------
     
         
@@ -147,8 +148,9 @@ class Dot_Detection:
         print("        Saving Locations to", locations_path, flush=True)
         
 
-        sio.savemat(locations_path,{'points': points, 'intensity': intensities}, oned_as = 'column')
-        self.save_locs_shape(locations_path)
+        df_locs.to_csv(locations_path, index = False)
+        
+        #self.save_locs_shape(locations_path)
         #--------------------------------------------------------------------
         
     def get_dot_locations(self, z_slice= 'all'):
@@ -281,7 +283,7 @@ class Dot_Detection:
             time.sleep(2)
         
 
-        locations = np.array(combine_locs(rand_list))
+        df_locs = combine_locs(rand_list)
         
         #Delete the rand dirs
         #----------------------------------------------
@@ -290,10 +292,7 @@ class Dot_Detection:
         #     shutil.rmtree(rand_dir)
         #----------------------------------------------
         
-        points = locations[:,0]
-        intensities = locations[:,1]
-        
-        return points, intensities
+        return df_locs
         
         
             

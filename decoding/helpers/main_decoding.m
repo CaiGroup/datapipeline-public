@@ -10,18 +10,12 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
     %Loading .mats
     %-----------------------
     [filepath,name,ext] = fileparts(locations_src);
-    isfile(locations_src);
-    exist(filepath, 'dir');
-    
-    %locations_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/Dot_Locations/locations.mat'
-    location_var = load(locations_src);
-    pwd
-    %location_info = location_var.locations;
-    points = location_var.points;
-    intensities = location_var.intensity;
+    locations_src
+    [points, intensities] = read_locs_csv(locations_src);
+
     
     
-    barcodekey_info = load(barcode_src)
+    barcodekey_info = load(barcode_src);
     barcodekey = barcodekey_info.barcodekey.barcode;
     %-----------------------
     

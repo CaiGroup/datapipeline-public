@@ -60,14 +60,6 @@ function [T, T_unfiltered] = dotlocations2table(dotlocations, barcodekeyNames, m
         end
     end
     
-    size(geneID)
-    size(x)
-    size(y)
-    size(z)
-    size(intensity)
-    size(seeds)
-    
-    
     % unfiltered
     T_unfiltered = table(geneID, x, y, z, intensity, seeds);
          
