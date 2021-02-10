@@ -61,7 +61,7 @@ function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins,
         end
     end
 
-    
+    tiff_src
     tiff= loadometiff(tiff_src);
     mat_channel = channel +1
     image = squeeze(tiff(:,mat_channel,:,:));

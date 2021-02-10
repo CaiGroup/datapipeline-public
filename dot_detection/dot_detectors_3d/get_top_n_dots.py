@@ -44,6 +44,21 @@ from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_
 from dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
 
 
+def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
+
+    channel_array = np.full((len(dots_in_channel[1])), channel + 1)
+    
+    hyb = int(tiff_src.split('HybCycle_')[1].split('/MMStack')[0])
+    
+    hyb_array = np.full((len(dots_in_channel[1])), hyb)
+
+    df = pd.DataFrame(data = dots_in_channel[0], columns=['x', 'y', 'z'])
+    df['ch'] = channel_array
+    df['hyb'] = hyb_array
+    df['int'] = dots_in_channel[1]
+    df = df.reindex(columns=['hyb', 'ch', 'x','y','z','int'])
+
+    return df
 
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool_normalization, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, n_dots, rand_dir):
@@ -68,7 +83,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
     tiff_shape = tiff.shape
     #---------------------------------------------------------------------
 
-    df_tiff = pd.DataFrame(columns = ['hyb','ch', 'x', 'y', 'z'])
+    df_tiff = pd.DataFrame(columns = ['hyb','ch', 'x', 'y', 'z', 'int'])
 
         
     #Loops through channels for Dot Detection
@@ -161,27 +176,15 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
         #Add dots to main dots in tiff
         #---------------------------------------------------------------------
         assert dots_in_channel != None
-        
-        
-        channel_array = np.full((len(dots_in_channel[1])), channel + 1)
-        
-        hyb = int(tiff_src.split('HybCycle_')[1].split('/MMStack')[0])
-        
-        hyb_array = np.full((len(dots_in_channel[1])), hyb)
 
-        df = pd.DataFrame(data = dots_in_channel[0], columns=['x', 'y', 'z'])
-        df['ch'] = channel_array
-        df['hyb'] = hyb_array
-        df['int'] = dots_in_channel[1]
-        
-        df = df.reindex(columns=['hyb', 'ch', 'x','y','z','int'])
-        df_tiff = df_tiff.append(df)
+        df_ch = add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel)
+        df_tiff = df_tiff.append(df_ch)
         print(f'{df_tiff.shape=}')
         
         
-        csv_path = rand_dir +'/locs.csv'
-        print(f'{csv_path=}')
-        df_tiff.to_csv(csv_path, index=False)
+    csv_path = rand_dir +'/locs.csv'
+    print(f'{csv_path=}')
+    df_tiff.to_csv(csv_path, index=False)
 
   
 print(f'{sys.argv[1]=}')
