@@ -69,7 +69,7 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
     %--------------------------------------------------------------------
     [consensuscell, copynumfinal ] = BarcodeNoMiji_v8( numPseudoChannels, points, num_of_rounds, barcodekey,radius,allowed_diff);
     
-    [dotlocations_unfiltered] = PointLocations(num_of_rounds, channels, points, consensuscell,copynumfinal, radius);
+    [dotlocations_unfiltered] = PointLocations_v2(num_of_rounds, channels, points, consensuscell,copynumfinal, radius);
 
 
 
@@ -84,17 +84,33 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
     
     [seeds] = numseeds(dotlocations_unfiltered);
 
-    [finalPosList, PosList, dotlocations] = filterseedsv2(seeds, dotlocations_unfiltered, minseeds);
+    [finalPosList, PosList, dotlocations] = filterseeds_v3(seeds, dotlocations_unfiltered, minseeds);
     %--------------------------------------------------------------------
     
+    
+    %Convert Dotlocations2table
+    %--------------------------------------------------------------------
+    [dotlocations_table_filtered, dotlocations_table_unfiltered] = dotlocations2table(dotlocations, barcodekey_info.barcodekey.names, minseeds);
+    %--------------------------------------------------------------------
+    
+    %dotlocations_table = table2cell(dotlocations_table)
 
     %Save results
     %--------------------------------------------------------------------
+    table_filt_file_name = strcat('pre_seg_diff_', int2str(allowed_diff),'_minseeds_', int2str(minseeds), '_filtered.csv')
+    table_unfilt_file_name = strcat('pre_seg_diff_', int2str(allowed_diff),'_minseeds_', int2str(minseeds), '_unfiltered.csv')
+    dotlocations_filt_table_path = fullfile(dest, table_filt_file_name)
+    dotlocations_unfilt_table_path = fullfile(dest, table_unfilt_file_name)
+    
     finalPosList_path = fullfile(dest, 'finalPosList.mat')
     PosList_path = fullfile(dest, 'PosList.mat')
     seeds_path = fullfile(dest, 'seeds.mat')
     dotlocations_path = fullfile(dest, 'dotlocations.mat')
     
+    
+    %writetable(dotlocations_table, dotlocations_table_path)
+    writetable(dotlocations_table_unfiltered, dotlocations_unfilt_table_path)
+    writetable(dotlocations_table_filtered, dotlocations_filt_table_path)
     save(dotlocations_path, 'dotlocations') 
     save(finalPosList_path, 'finalPosList')                                  
     save(PosList_path, 'PosList')

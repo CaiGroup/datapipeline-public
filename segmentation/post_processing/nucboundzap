@@ -48,8 +48,7 @@ function check_programs()
 check_programs
 
 labels=${1:-""}
-gsize=${2:-3}
-esize=$((gsize+1))
+gsize=${2:-0}
 
 #
 # interpret command line
@@ -70,7 +69,7 @@ if [[ $gsize -lt 0 ]]; then
 fi
 
 #
-# output file name: input appended with _bzap_gX.tif
+# output file name: input appended with _bzap_dX.tif
 #
 outname="${labels%.*}"_bzap_d$gsize.tif
 
@@ -86,7 +85,7 @@ gmic -v -1 "${labels}" \
   frame_xy. 1,1,1,1 \
   distance. 1,2 \
   shrink_xy. 1 \
-  lt. $gsize \
+  lt. {$gsize+1} \
   mul. [0] \
   \
   `# send 'boundary' regions to background` \

@@ -16,6 +16,10 @@ def get_radial_centered_dots(tiff_src, channel, points):
     
     points_saved_path = os.path.join(temp_dir.name, 'points.mat')
     #points_saved_path = 'saved_locs.mat'
+    
+    #points[:, [0, 1]] = points[:, [1, 0]] 
+    print(f'{points[:10]=}')
+    
     savemat(points_saved_path, {'points': points})
     #-------------------------------------------------------------------
     
@@ -62,7 +66,14 @@ def get_radial_centered_dots(tiff_src, channel, points):
     #-------------------------------------------------------------------
     mat_results = loadmat(rad_dots_path)
     rad_points = mat_results['radPoints']
+            
+
+    #rad_points[:, [1, 0]] = rad_points[:, [0, 1]] 
+    print(f'{rad_points[:10]=}')
+    
     rad_ints = mat_results['radInt']
+    
+    
     
     rad_dot_analysis = [rad_points, rad_ints]
     #-------------------------------------------------------------------
@@ -70,12 +81,23 @@ def get_radial_centered_dots(tiff_src, channel, points):
     return rad_dot_analysis
     
     
-# tiff_src = '/groups/CaiLab/personal/nrezaee/raw/intron_pos0/HybCycle_0/MMStack_Pos0.ome.tif';
-# channel = 1
-# points = np.random.randint(8,10, size=(100, 3))
+# tiff_src = '/groups/CaiLab/personal/nrezaee/raw/test1-big/HybCycle_50/MMStack_Pos0.ome.tif';
+# channel = 0
+# points=np.array([[  44,  676,    10],
+#       [ 124, 1919,    1],
+#       [ 384,  918,    1],
+#       [ 919,  178,    1],
+#       [1803, 1462,    1],
+#       [1662,  922,    2],
+#       [ 124, 1919,    3],
+#       [ 705,  882,    3],
+#       [ 716, 1063,    3],
+#       [ 736, 1020,    3]], dtype=np.uint16)
+       
 
 # gauss_dot_analysis = get_radial_centered_dots(tiff_src, channel, points)
 
 # print(f'{len(gauss_dot_analysis)=}')
 # print(f'{gauss_dot_analysis[0].shape=}')
 # print(f'{gauss_dot_analysis[1].shape=}')
+

@@ -2,6 +2,7 @@ import tempfile
 import os
 from scipy.io import loadmat
 import numpy as np
+import sys
 
 def get_dot_analysis(mat_src):
     mat_info = loadmat(mat_src)
@@ -10,7 +11,7 @@ def get_dot_analysis(mat_src):
     dot_analysis = [points, np.squeeze(intensities)]
     return dot_analysis
 
-def get_matlab_detected_dots(tiff_src, channel, strictness, threshold=300, nbins=100):
+def get_matlab_detected_dots(tiff_src, channel, strictness, nbins, threshold):
     
     
     #Create Dest
@@ -48,10 +49,11 @@ def get_matlab_detected_dots(tiff_src, channel, strictness, threshold=300, nbins
     
     return dot_analysis
     
-# tiff_src = 'MMStack_Pos0.ome.tif'
-# channel = 0
-# threshold = 1000
-# nbins = 100
-# strictness = 3
-
-# dot_analysis = get_matlab_detected_dots(tiff_src, channel, threshold, nbins, strictness)
+if sys.argv[1] == 'debug':
+    tiff_src = 'MMStack_Pos0.ome.tif'
+    channel = 0
+    threshold = 1000
+    nbins = 100
+    strictness = 3
+    
+    dot_analysis = get_matlab_detected_dots(tiff_src, channel, threshold, nbins, strictness)

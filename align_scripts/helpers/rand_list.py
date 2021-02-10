@@ -30,7 +30,7 @@ def are_jobs_finished(job_names):
     
 
 def id_generator(size=8):
-    rand_choices = string.ascii_letters + '1234567890!@#$'
+    rand_choices = string.ascii_letters + '1234567890'
     return ''.join(random.choice(rand_choices) for _ in range(size))
     
 def get_random_list(N):

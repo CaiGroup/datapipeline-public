@@ -3,6 +3,7 @@ import multiprocessing
 from numpy.core.multiarray import ndarray
 from skimage.draw import polygon
 from skimage.measure import regionprops_table
+import matplotlib.pyplot as plt
 
 import numpy as np
 import pandas as pd
@@ -35,8 +36,13 @@ def get_labeled_img(roi_src, num_z=30, upto_cell=1000000000000):
 
 def get_dot_analysis_for_channel(locs_ch, labeled_img):
     
+    # np.save('locs_ch_1000.npy', locs_ch)
+    # np.save('labeled_img_1000.npy', labeled_img)
+    print(f'{labeled_img.shape=}')
     points = locs_ch[0]
     intensities = locs_ch[1]
+    if intensities.shape[0] != 1:
+        intensities = intensities.reshape(1,-1)
     
     #Get Indexes for each Cell
     #---------------------------------------------
@@ -47,17 +53,17 @@ def get_dot_analysis_for_channel(locs_ch, labeled_img):
         y = int(points[i][1])
         z = int(points[i][2])
         #print(x,y,z)
-        if x < labeled_img.shape[0] and x >= 0 and \
-            y < labeled_img.shape[1] and y >= 0 and \
-            z < labeled_img.shape[2] and z >= 0:
-            seg_dict[labeled_img[x, y, z]].append(i)
+        if x < labeled_img.shape[1] and x >= 0 and \
+            y < labeled_img.shape[2] and y >= 0 and \
+            z < labeled_img.shape[0] and z >= 0:
+            seg_dict[labeled_img[z, x, y]].append(i)
     #---------------------------------------------
     
 
     #Get Dot Analysis for each cell
     #---------------------------------------------
     for key in seg_dict.keys():
-        #print(f'{key=}')
+                #print(f'{key=}')
         if len(seg_dict[key]) == 0:
             low_rand = labeled_img.shape[0] + 100
             high_rand = labeled_img.shape[1] + 10000
@@ -69,16 +75,44 @@ def get_dot_analysis_for_channel(locs_ch, labeled_img):
         else:
             # print(f'{points=}')
             # print(f'{intensities=}')
+            # print(f'{)
+            # points[seg_dict[key][:,[0,2]] = points[seg_dict[key][:,[2,0]]
+            # points[seg_dict[key][:,[0,1]] = points[seg_dict[key][:,[1,0]]
             seg_dict[key] = [points[seg_dict[key]], intensities[:,seg_dict[key]]]
     #---------------------------------------------a
     
     return seg_dict
 
-def get_segmentation_dict_dots(locations_src, labeled_img):
+# locs_ch = np.load('locs_ch.npy', allow_pickle =True)
+# labeled_img = np.load('labeled_img.npy', allow_pickle =True)
+# seg_dict = get_dot_analysis_for_channel(locs_ch, labeled_img)
+
+
+def save_plotted_cell(labeled_img, seg_dict_channel, fig_dest):
+    plt.figure(figsize=(30,30))
+    plt.imshow(labeled_img[labeled_img.shape[0]//2,:,:])
+    plt.xlim([0,labeled_img.shape[1]])
+    plt.ylim([0,labeled_img.shape[2]])
+    
+    for i in range(len(seg_dict_channel)):#len(seg_dict_channel)):
+        
+        points = seg_dict_channel[i][0]
+        print(f'{points.shape=}')
+        print(f'{points[:2]=}')
+        
+        plt.scatter(points[:,1][:100], points[:,0][:100], s=10)
+        print(f'{fig_dest=}')
+        
+    plt.savefig(fig_dest)
+        
+def get_segmentation_dict_dots(locations_src, labeled_img, fig_dest):
 
     #Get Locations
     #----------------------------------------------
-    locs = loadmat(locations_src)['locations']
+    locs_info = loadmat(locations_src)
+    points = locs_info['points']
+    intensities = locs_info['intensity']
+    locs = np.concatenate((points, intensities), axis =1)
     #----------------------------------------------
     
     #Get Segmented Dictionary
@@ -89,8 +123,17 @@ def get_segmentation_dict_dots(locations_src, labeled_img):
     #Go through Each Channel
     for locs_ch in locs:
         print(f'{i=}')
-        seg_dict_channel = get_dot_analysis_for_channel(locs_ch, labeled_img)
 
+        seg_dict_channel = get_dot_analysis_for_channel(locs_ch, labeled_img)
+        #print(f'{np.unique(labeled_img)=}')
+        print(f'{len(seg_dict_channel[0])=}')
+        if i == 1:
+            print('Plotting')
+            #fig_dest = 'plotted_cells.png'
+            save_plotted_cell(labeled_img, seg_dict_channel, fig_dest)
+            
+            
+     
         if check_if_first_channel == 0:
             all_seg_dict = seg_dict_channel
             for key in list(all_seg_dict.keys()):
@@ -110,8 +153,5 @@ def get_segmentation_dict_dots(locations_src, labeled_img):
 # roi_src = '/groups/CaiLab/personal/nrezaee/raw/intron_pos0/segmentation/RoiSet.zip'
 # labeled_img  = get_labeled_img(roi_src)
 
-
-
-# locations_src = '/groups/CaiLab/analyses/nrezaee/intron_pos0/decoding_intron_1000/MMStack_Pos0/locations.mat'
-# #locations_src = '/groups/CaiLab/analyses/nrezaee/test1/deployment_tests/MMStack_Pos0/Dot_Locations/locations.mat'
+# locations_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_mat_dapi_dot_rad/MMStack_Pos0/Dot_Locations/locations.mat'
 # seg_dict = get_segmentation_dict_dots(locations_src, labeled_img)

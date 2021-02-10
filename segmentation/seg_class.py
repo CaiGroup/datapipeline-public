@@ -11,6 +11,7 @@ import glob
 from segmentation.roi_segment import run_roi
 from segmentation.cellpose_segment import run_cellpose
 from segmentation.post_processing.get_post_processing import save_labeled_img
+from segmentation.visualization.visual_seg import get_label_img_visuals
 #----------------------------
 
 
@@ -24,7 +25,8 @@ else:
 #=====================================================================================
 class Segmentation:
     def __init__(self, data_dir, position, seg_dir, decoded_dir, locations_dir, barcode_dst, barcode_src, \
-                    bool_fake_barcodes, bool_decoding_individual, num_z_slices, seg_type, seg_data_dir, dimensions, num_zslices, labeled_img, edge_dist, dist_between_nuclei):
+                    bool_fake_barcodes, bool_decoding_individual, num_z_slices, seg_type, seg_data_dir, dimensions, num_zslices, \
+                    labeled_img, edge_dist, dist_between_nuclei, bool_cyto_match, nuclei_erode, cyto_erode):
 
         self.data_dir = data_dir
         self.position = position
@@ -44,6 +46,9 @@ class Segmentation:
         self.labeled_img = labeled_img
         self.edge_dist = edge_dist
         self.dist_between_nuclei = dist_between_nuclei
+        self.bool_cyto_match = bool_cyto_match
+        self.nuclei_erode = nuclei_erode
+        self.cyto_erode = cyto_erode
         
         
     def combine_seg_z_s(seg_channel_dir):
@@ -191,7 +196,13 @@ class Segmentation:
             os.makedirs(self.seg_dir)
         #----------------------------------------------
         
-        save_labeled_img(self.data_dir, self.seg_dir, self.position, self.edge_dist, self.dist_between_nuclei)
+        label_img_path = save_labeled_img(self.data_dir, self.seg_dir, self.position, self.edge_dist, self.dist_between_nuclei,  \
+            self.bool_cyto_match, self.nuclei_erode, self.cyto_erode)
+        
+        print(f'{label_img_path=}')
+        get_label_img_visuals(label_img_path, self.data_dir, self.position)
+        
+        
 
  
                 

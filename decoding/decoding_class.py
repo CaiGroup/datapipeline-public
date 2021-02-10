@@ -29,7 +29,7 @@ from decoding import previous_locations_decoding as previous_locations_decoding
 #=====================================================================================
 class Decoding:
     def __init__(self, data_dir, position, decoded_dir, locations_dir, position_dir, barcode_dst, barcode_src, bool_decoding_with_previous_dots, bool_decoding_with_previous_locations, \
-                    bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions, num_zslices, segmentation):
+                    bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions, num_zslices, segmentation, decode_only_cells):
         
         self.data_dir = data_dir
         self.position = position
@@ -47,6 +47,7 @@ class Decoding:
         self.dimensions = dimensions
         self.num_zslices = num_zslices
         self.seg = segmentation
+        self.decode_only_cells = decode_only_cells
          
     def labeled_img_from_tiff_dir(self):
         glob_me = os.path.join(self.data_dir, '*')
@@ -177,7 +178,8 @@ class Decoding:
                 print("Running Decoding Across Channels")
                 labeled_img = self.labeled_img_from_tiff_dir()
                 
-            decoding_parallel.decoding(barcode_file_path, locations_path, labeled_img, self.decoded_dir, self.allowed_diff, self.min_seeds)
+            decoding_parallel.decoding(barcode_file_path, locations_path, labeled_img, self.decoded_dir, self.allowed_diff, \
+                self.min_seeds, decode_only_cells = self.decode_only_cells)
                 
             return labeled_img
         print("Finished Decoding Across Channels")
@@ -221,7 +223,7 @@ class Decoding:
         if self.seg != False:
 
             if self.seg == "roi":
-                    labeled_img = tifffile.imread('/home/nrezaee/sandbox/multiprocessing/decoding/roi.tiff')
+                labeled_img = self.labeled_img_from_tiff_dir()
                     
             elif self.seg == "cellpose":
             
@@ -266,7 +268,8 @@ class Decoding:
             
             else:
                     
-                decoding_parallel.decoding(barcode_file_path, locations_path_z, labeled_img, decoding_dst_z, self.allowed_diff, self.min_seeds)
+                decoding_parallel.decoding(barcode_file_path, locations_path_z, labeled_img, decoding_dst_z, self.allowed_diff,  \
+                    self.min_seeds, decode_only_cells = self.decode_only_cells)
             print("Finished Decoding Across Channels")
             #--------------------------------------------------------------------
             
@@ -349,7 +352,7 @@ class Decoding:
                     #--------------------------------------------------------------------
                 else:
                     decoding_parallel.decoding(barcode_dst, locations_path_z, labeled_img, decoding_dst_for_channel_z, self.allowed_diff, self.min_seeds, \
-                        self.decoding_individual.index(channel), len(self.decoding_individual))
+                        self.decoding_individual.index(channel), len(self.decoding_individual), decode_only_cells = self.decode_only_cells)
                 #--------------------------------------------------------------------
                 
             self.combine_decode_z_s(decoding_dst_for_channel)
@@ -416,11 +419,13 @@ class Decoding:
                 #--------------------------------------------------------------------
                 print("Running Decoding Across Channels")
                 #labeled_img = self.labeled_img_from_tiff_dir()
-                labeled_img = tifffile.imread('/home/nrezaee/sandbox/multiprocessing/decoding/roi.tiff')
+                labeled_img = self.labeled_img_from_tiff_dir()
+                
                 decoding_parallel.decoding(barcode_dst, locations_path, labeled_img, decoding_dst_for_channel, self.allowed_diff, self.min_seeds, \
-                    self.decoding_individual.index(channel), len(self.decoding_individual))
+                    self.decoding_individual.index(channel), len(self.decoding_individual), decode_only_cells = self.decode_only_cells)
                     
                 return labeled_img
+                
             print("Finished Decoding Across Channels")
             #--------------------------------------------------------------------
             
@@ -480,9 +485,10 @@ class Decoding:
         
         #Get Previous Locations
         #--------------------------------------------------------------------
-        glob_me = os.path.join(self.locations_dir, '*.mat')
+        glob_me = os.path.join(self.data_dir, 'locations', '*.mat')
         
         mat_file_paths = glob.glob(glob_me)
+        print(f'{glob_me=}')
         
         assert len(mat_file_paths) == 1, "There can only be one mat file in the locations directory or \
                                          the pipeline cannot determine which mat file has the points."

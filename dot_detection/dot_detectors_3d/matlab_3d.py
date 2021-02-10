@@ -22,6 +22,11 @@ import math
 import matplotlib.pyplot as plt
 import tempfile
 from scipy.io import loadmat
+import sys
+
+import sys
+
+sys.path.insert(0, os.getcwd())
 
 from load_tiff import tiffy
 from dot_detection.helpers.visualize_dots import plot_and_save_locations, get_visuals
@@ -35,8 +40,9 @@ from dot_detection.helpers.compile_dots import add_to_dots_in_channel
 from dot_detection.helpers.hist_jump_helpers import get_hist_threshed_dots 
 from dot_detection.helpers.remove_extra_dots import take_out_extra_dots
 from dot_detection.dot_detectors_3d.matlab_dot_detection.matlab_dot_detector import get_matlab_detected_dots
-from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
 
+from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
+from dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
 
 def run_back_sub(background, tiff_3d, channel, offset):
     print(4, flush=True)    
@@ -53,13 +59,13 @@ def run_back_sub(background, tiff_3d, channel, offset):
 warnings.filterwarnings("ignore")
 
 
-def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool_normalization, \
-                      bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, strictness, z_slices, return_dict):
+def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
+                      bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
+                      bool_radial_center, strictness, z_slices, nbins, threshold, rand_dir):
     
     #Getting Background Src
     #--------------------------------------------------------------------
-    if bool_background_subtraction == True:
-            background = get_background(tiff_src)
+   # back_src = get_background(tiff_src)
     #--------------------------------------------------------------------
     
     #Reading Tiff File
@@ -95,24 +101,16 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
 
         print((channel+1), end = " ", flush =True)
         
-        #Check if 2d Dot Detection
-        #---------------------------------------------------------------------
-    #     if z_slices == 'all':
-    #         pass
-        
-    #     else:
-    #   #      tiff_3d= np.array([tiff_3d[z_slices,:,:]])
-        #---------------------------------------------------------------------
-        
+
         
         #Threshold on Biggest Jump for matlab 3d
         #---------------------------------------------------------------------
         #strictness = 5
         print(f'{strictness=}')
         print(f'{tiff_3d.shape=}')
-        dot_analysis = get_matlab_detected_dots(tiff_src, channel, strictness)
+        dot_analysis = get_matlab_detected_dots(tiff_src, channel, strictness, nbins, threshold)
         
-        print(f'{len(dot_analysis[1])=}')
+        #print(f'{len(dot_analysis[1])=}')
 
         assert len(dot_analysis[1]) >0
         #---------------------------------------------------------------------
@@ -120,11 +118,33 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
         
         #Gaussian Fit the dots
         #---------------------------------------------------------------------
-        #print(f'{bool_gaussian_fitting=}')
+        print(f'{bool_gaussian_fitting=}')
         if bool_gaussian_fitting == True:
-            print('-------------------------------------------')
             dot_analysis = get_gaussian_fitted_dots(tiff_src, channel, dot_analysis[0])
-            print('11111111111111111111111111111111')
+        #---------------------------------------------------------------------
+        
+        
+        #Center the dots
+        #---------------------------------------------------------------------
+        print(f'{bool_radial_center=}')
+        if bool_radial_center == True:
+            dot_analysis = get_radial_centered_dots(tiff_src, channel, dot_analysis[0])
+        #---------------------------------------------------------------------
+        
+        
+        #Remove Extra Dots Across Z slices
+        #---------------------------------------------------------------------
+        # if z_slices == 'all':
+        #     dot_analysis = take_out_extra_dots(dot_analysis)
+        #---------------------------------------------------------------------
+
+        
+        #Visualize Dots
+        #---------------------------------------------------------------------
+        median_z = tiff.shape[0]//2
+        print(f'{bool_visualize_dots=}')
+        if bool_visualize_dots == True:# and channel == 1 and z == median_z:
+            get_visuals(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name)
         #---------------------------------------------------------------------
         
         #Shift Locations
@@ -132,37 +152,82 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
         dot_analysis[0] = shift_locations(dot_analysis[0], np.array(offset), tiff_src, bool_chromatic)
         #---------------------------------------------------------------------
         
-        #Remove Extra Dots Across Z slices
-        #---------------------------------------------------------------------
-        if z_slices == 'all':
-            dot_analysis = take_out_extra_dots(dot_analysis)
-        #---------------------------------------------------------------------
-        print("After taking out dots")
-        print(f'{len(dot_analysis[0])=}')
         
-        #Visualize Dots
-        #---------------------------------------------------------------------
-        median_z = tiff.shape[0]//2
-        if bool_visualize_dots == True:# and channel == 1 and z == median_z:
-            get_visuals(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name)
-        #---------------------------------------------------------------------
+        dot_analysis[0] = dot_analysis[0].tolist()
+        dot_analysis[1] = dot_analysis[1].tolist()
         
-        #Convert to type objects
-        #---------------------------------------------------------------------
-        # dot_analysis[0] = dot_analysis[0].tolist()
-        # dot_analysis[1] = dot_analysis[1].tolist()
-        #---------------------------------------------------------------------
+        
+        
+        
         
         #Add dots to main dots in tiff
         #---------------------------------------------------------------------
         dots_in_tiff.append(dot_analysis)
         print(f'{len(dots_in_tiff)=}')
         #---------------------------------------------------------------------
-        
+
+        import pickle
+        with open(rand_dir+'/locs.pkl', 'wb') as f:
+            pickle.dump(dots_in_tiff, f)
      #-----------------------------------------------------------------
 
      
-    print("")
-    return_dict[tiff_src] = dots_in_tiff
-    #return dots_in_tiff
+    
 
+def str2bool(v):
+  return v.lower() == "true"
+
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--tiff_src")
+parser.add_argument("--offset0")
+parser.add_argument("--offset1")
+parser.add_argument("--offset2")
+parser.add_argument("--analysis_name")
+parser.add_argument("--vis_dots")
+parser.add_argument("--back_subtract")
+parser.add_argument("--channels", nargs = '+')
+parser.add_argument("--chromatic")
+parser.add_argument("--rand")
+parser.add_argument("--gaussian")
+parser.add_argument("--radial_center")
+parser.add_argument("--strictness")
+parser.add_argument("--z_slices")
+parser.add_argument("--nbins")
+parser.add_argument("--threshold")
+
+
+args, unknown = parser.parse_known_args()
+
+#print(f'{args.offset=}')
+
+print(f'{args=}')
+
+if args.offset2 == 'None':
+    offset = [float(args.offset0), float(args.offset1)]
+else:    
+    offset = [float(args.offset0), float(args.offset1), float(args.offset2)]
+
+
+if args.channels[0] == 'all':
+    channels = 'all'
+else:
+    channels = [int(i.replace('[', '').replace(']','').replace(',','')) for i in args.channels]
+    
+if args.z_slices != 'all':
+    args.z_slices = int(args.z_slices)
+
+print(f'{args.gaussian=}')
+print(f'{str2bool(args.gaussian)=}')
+print(f'{args.radial_center=}')
+print(f'{str2bool(args.radial_center)=}')
+
+get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
+                      args.back_subtract, channels, args.chromatic, str2bool(args.gaussian), \
+                      str2bool(args.radial_center),int(args.strictness), args.z_slices, int(args.nbins), \
+                      int(args.threshold), args.rand)
+
+# get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
+#                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
+#                       bool_radial_center, strictness, z_slices, rand_dir):

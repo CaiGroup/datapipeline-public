@@ -15,6 +15,6 @@ def get_background(tiff_src):
     tiff_split[-2] = 'background'
     background_src = (os.sep).join(tiff_split)
     
-    background = tiffy.load(background_src)
+    
 
-    return background
+    return background_src

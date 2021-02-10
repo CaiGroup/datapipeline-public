@@ -13,36 +13,23 @@ import time
 
 sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
 from helpers.rand_list import get_random_list, are_jobs_finished
-
-
 from load_tiff import tiffy
 
-def expand_img(img, size = (2048,2048)):
-    expanded = []
 
-    for i in range(img.shape[0]):
-        print("    Processing on Z Slice ", i)
-        resized = cv2.resize(img[i], dsize=size, interpolation=cv2.INTER_CUBIC)
-        expanded.append(resized)
     
-    expanded = np.array(expanded)
+def correct_labeled_img(labeled_img):
+
     
-    return expanded
+    for z in range(labeled_img.shape[0]):
+       # labeled_img[z] = ndimage.rotate(labeled_img[z], -90)
+        labeled_img[z] = cv2.flip(labeled_img[z], 0)
+        #labeled_img[z] = ndimage.rotate(labeled_img[z], -90)
+        
 
-def get_labeled_img_cellpose(tiff_path, dst=None):
-
-
-    #Getting Tiff
-    #----------------------------------------------
-    print('Reading TIff')
-    tiff = tiffy.load(tiff_path)
-    file_name = os.path.basename(tiff_path)
-    dir_name = os.path.dirname(tiff_path)
-    #----------------------------------------------
+    return labeled_img
     
-    print('Shrinking TIff')
-    #Get Shrinked Dapi Channel
-    #----------------------------------------------
+def get_shrinked(tiff):
+    
     dapi_channel = -1
     dapi_tiff = tiff[:,dapi_channel,:,:].astype(np.int16)
     
@@ -54,23 +41,21 @@ def get_labeled_img_cellpose(tiff_path, dst=None):
     for i in range(dapi_tiff.shape[0]):
         print("    Processing on Z Slice ", i)
         shrinked.append(np.array(Image.fromarray(dapi_tiff[i]).resize((512, 512))))
-    #----------------------------------------------
-    
-    
-    
-    #Save to temp directory
-    #----------------------------------------------
-    dst_dir = '/home/nrezaee'
+        
+    return shrinked
+
+def save_shrinked(shrinked):
+    dst_dir = '/home/nrezaee/temp'
     rand_list = get_random_list(1)
     rand_dir = os.path.join(dst_dir, rand_list[0])
     os.mkdir(rand_dir)
     dapi_tiff_dst = os.path.join(rand_dir,  'dapi_channel.tif')
     tifffile.imsave(dapi_tiff_dst, shrinked)
-    #----------------------------------------------
-
-
-    #Save Command to file and run
-    #----------------------------------------------
+    
+    return rand_list, rand_dir, dapi_tiff_dst
+    
+def submit_seg_job(rand_dir, rand_list):
+    
     print("Running Segmentation with SLURM GPU's")
 
     command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /home/nrezaee/sandbox/cellpose/gpu/tensorflow-20.02-tf1-py3.sif python -m cellpose  --do_3D --img_filter dapi_channel --pretrained_model cyto --diameter 0 --use_gpu --no_npy --save_tif --dir '
@@ -82,34 +67,57 @@ def get_labeled_img_cellpose(tiff_path, dst=None):
         f.write('#SBATCH --gres=gpu:1 \n')
         f.write(command_for_cellpose_with_dir)
 
-    call_me = ['sbatch', '--job-name', rand_list[0], "--time", "1:00:00", "--mem-per-cpu", "10G", script_name]
+    call_me = ['sbatch', '--job-name', rand_list[0], "--time", "0:05:00", "--mem-per-cpu", "5G", script_name]
     subprocess.call(call_me)
+    
+def expand_img(masked_file_path, tiff, dst):
+    resize_script = os.path.join('/home/nrezaee/test_cronjob_multi_dot/segmentation/cellpose_segment/helpers/nucsmoothresize')
+    
+    cmd = ' '.join(['sh', resize_script, masked_file_path, str(tiff.shape[2]), dst])
+    print(f'{cmd=}')
+    os.system(cmd)
+    labeled_img = tifffile.imread(dst)
+    return labeled_img
+    
+def get_labeled_img_cellpose(tiff_path, dst=None):
+
+
+    #Getting Tiff
+    #----------------------------------------------
+    print('Reading TIff')
+    tiff = tiffy.load(tiff_path)
+    file_name = os.path.basename(tiff_path)
+    dir_name = os.path.dirname(tiff_path)
     #----------------------------------------------
     
+    shrinked = get_shrinked(tiff)
+    #shrinked.shape = [z,x,y]
+
+    rand_list, rand_dir, dapi_tiff_dst = save_shrinked(shrinked)
+
+    submit_seg_job(rand_dir, rand_list)
+
     while not are_jobs_finished(rand_list):
         print('Waiting for Segmenation to Finish')
-        time.sleep(.1)
+        time.sleep(2)
     
-    #----------------------------------------------
-    
-    
-    #Change name of masked file
-    #----------------------------------------------
     masked_file_path = os.path.join(rand_dir, 'dapi_channel_cp_masks.tif')
     
-    labeled_img = tifffile.imread(masked_file_path)
+    resize_script = os.path.join('/home/nrezaee/test_cronjob_multi_dot/segmentation/cellpose_segment/helpers/nucsmoothresize')
     
-    labeled_img = expand_img(labeled_img)
+    if dst == None:
+        temp_path = os.path.join(rand_dir, 'expanded.tif')
+        labeled_img = expand_img(masked_file_path, tiff, temp_path)
+    else:
+        labeled_img = expand_img(masked_file_path, tiff, dst)
     
-    if dst != None:
-        tifffile.imwrite(dst, labeled_img)
-    #----------------------------------------------
-    
-    #print(f'{labelel_img=}')
+
     return labeled_img
 
-# tiff_path = '/groups/CaiLab/personal/nrezaee/raw/intron_pos0/HybCycle_0/MMStack_Pos0.ome.tif'
-# mini_tiff_path = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_1/MMStack_Pos0.ome.tif'
-# labeled_img = get_labeled_img_cellpose(tiff_path)
-# print(f'{np.unique(labeled_img)=}')
+# tiff_path = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_0/MMStack_Pos0.ome.tif'
+# dst= 'labeled_img.tif'
+# labeled_img = get_labeled_img_cellpose(tiff_path, dst)
+# print(f'{labeled_img.shape=}')
+    
+    
     

@@ -9,13 +9,17 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
     
     %Loading .mats
     %-----------------------
-    [filepath,name,ext] = fileparts(locations_src)
-    isfile(locations_src)
-    exist(filepath, 'dir')
-    pwd
+    [filepath,name,ext] = fileparts(locations_src);
+    isfile(locations_src);
+    exist(filepath, 'dir');
+    
     %locations_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/Dot_Locations/locations.mat'
     location_var = load(locations_src);
-    location_info = location_var.locations;
+    pwd
+    %location_info = location_var.locations;
+    points = location_var.points;
+    intensities = location_var.intensity;
+    
     
     barcodekey_info = load(barcode_src)
     barcodekey = barcodekey_info.barcodekey.barcode;
@@ -25,9 +29,8 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
     %--------------------------------------------------------------------
     if isempty(channel_index) & isempty(number_of_individual_channels_to_decode)
     
-        spotslocation = location_info(:, 1:1)
-        
-        spotsintensity = location_info(:, 2:2)
+        spotslocation = points;
+        spotsintensity = intensities;
     else
     
     %Get the right locations for individual decoding
@@ -37,13 +40,12 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
         disp(total_num_of_channels)
         
         
-        location_info_for_channel = location_info(channel_index:number_of_individual_channels_to_decode:end,:)
         
-        spotslocation = location_info_for_channel(:, 1:1);
+        spotslocation = points(channel_index:number_of_individual_channels_to_decode:end,:)
         
-        spotsintensity = location_info_for_channel(:, 2:2);
+        spotsintensity = intensities(channel_index:number_of_individual_channels_to_decode:end,:)
         
-        shape_locations = size(location_info);
+        shape_locations = size(spotslocation);
         
         
         %Check to see if all channels are active for decoding

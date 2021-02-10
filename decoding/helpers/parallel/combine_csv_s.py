@@ -3,19 +3,20 @@ import glob
 import os
 
 
-def get_combined_csv(rand_list, dest_unfilt, dest_filt):
+def get_combined_csv(dest, rand_list, dest_unfilt, dest_filt):
     
     #Get the Actual CSV's 
     #-------------------------------------------------
     all_unfilt_csv_s = []
     all_filt_csv_s = []
     for rand in rand_list:
-        glob_me_filt = os.path.join('/groups/CaiLab/personal/nrezaee/temp', rand, '*unfiltered.csv')
-        glob_me_unfilt = os.path.join('/groups/CaiLab/personal/nrezaee/temp', rand, '*_filtered.csv')
+        glob_me_filt = os.path.join(dest, rand, '*unfiltered.csv')
+        glob_me_unfilt = os.path.join(dest, rand, '*_filtered.csv')
         
         unfiltered_csv_s = glob.glob(glob_me_unfilt)
         filtered_csv_s = glob.glob(glob_me_filt)
         
+        print(f'{rand=}')
 
         
         assert len(unfiltered_csv_s) != 0, 'Something messed up in the decoding'
@@ -27,11 +28,6 @@ def get_combined_csv(rand_list, dest_unfilt, dest_filt):
         else:
             print('bye')
             
-        
-    #print(f'{all_unfilt_csv_s=}')
-    #-------------------------------------------------
-    print(f'{all_unfilt_csv_s=}')
-    print(f'{all_filt_csv_s=}')
     #Combine the CSV's into one
     #-------------------------------------------------
     df_comb_unfilt = pd.read_csv(all_unfilt_csv_s[0])

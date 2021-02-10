@@ -163,7 +163,8 @@ def run_analysis(json_name, position):
     #Dot Detection
     #----------------------------------------------------------
     if 'dot detection' in data.keys():
-        analysis.set_dot_detection_arg(data['dot detection'])   
+        if data['dot detection'] != 'none':
+            analysis.set_dot_detection_arg(data['dot detection'])   
     #----------------------------------------------------------     
 
 
@@ -172,6 +173,8 @@ def run_analysis(json_name, position):
     if 'decoding' in data.keys():
         if 'across' in data['decoding']:
             analysis.set_decoding_across_true()   
+        elif 'none' in data['decoding']:
+            pass
         elif 'individual' in data['decoding'].keys(): 
             analysis.set_decoding_individual(data['decoding']['individual'])
     #----------------------------------------------------------  
@@ -273,7 +276,7 @@ def run_analysis(json_name, position):
     #Set Hamming Distance Analysis
     #----------------------------------------------------
     if 'hamming analysis' in data.keys():
-        if not data['hamming analysis'] == 'none':
+        if data['hamming analysis'] == 'true':
             analysis.set_hamming_analysis_true()
     #----------------------------------------------------------
     
@@ -291,14 +294,55 @@ def run_analysis(json_name, position):
         if data['distance between nuclei'] != 'none':
             analysis.set_dist_between_nuclei_arg(data['distance between nuclei'])
     #----------------------------------------------------------
-
-    #Set Edges to Delete
+    
+    #Set Distance Between Nuclei
     #----------------------------------------------------
     if 'edge deletion' in data.keys():
         if data['edge deletion'] != 'none':
             analysis.set_edge_deletion_arg(data['edge deletion'])
     #----------------------------------------------------------
 
+    #Set Edges to Delete
+    #----------------------------------------------------
+    if 'nuclei cyto match' in data.keys():
+        if data['nuclei cyto match'] == 'true':
+             analysis.set_nuclei_cyto_match_true()
+    #----------------------------------------------------------
+    
+    #Set Distance Between Nuclei
+    #----------------------------------------------------
+    if 'nucleus erode' in data.keys():
+        if data['nucleus erode'] != 'none':
+            analysis.set_nucleus_erode_arg(data['nucleus erode'])
+    #----------------------------------------------------------
+
+    #Set Edges to Delete
+    #----------------------------------------------------
+    if 'cyto erode' in data.keys():
+        if data['cyto erode'] != 'none':
+            analysis.set_cyto_erode_arg(data['cyto erode'])
+    #----------------------------------------------------------
+    
+    #Only Decode Dots in Cells
+    #----------------------------------------------------
+    if 'only decode dots in cells' in data.keys():
+        if data['only decode dots in cells'] == 'true':
+            analysis.set_decode_only_cells_true()
+    #----------------------------------------------------------
+
+    #Set Nbins for dote detection
+    #----------------------------------------------------
+    if 'nbins' in data.keys():
+        if data['nbins'] != 'none':
+            analysis.set_nbins_arg(data['nbins'])
+    #----------------------------------------------------------
+    
+    #Set Nbins for dote detection
+    #----------------------------------------------------
+    if 'threshold' in data.keys():
+        if data['threshold'] != 'none':
+            analysis.set_threshold_arg(data['nbins'])
+    #----------------------------------------------------------
     
     #Writ
     #----------------------------------------------------------

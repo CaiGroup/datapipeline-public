@@ -117,6 +117,12 @@ class Analysis:
         self.labeled_img = None
         self.edge_dist = 0 
         self.dist_between_nuclei = 0 
+        self.bool_cyto_match= False
+        self.nuclei_erode = 0
+        self.cyto_erode = 0
+        self.decode_only_cells = False
+        self.nbins = 100
+        self.threshold = 300
         #--------------------------------------------------------------
         
         
@@ -218,6 +224,10 @@ class Analysis:
         self.false_positive_rate_analysis = True
         print("    Set False Positive Rate Analysis")
         
+    def set_hamming_analysis_true(self):
+        self.hamming_analysis = True
+        print("    Set Hamming")
+        
     def set_gaussian_fitting_true(self):
         self.gaussian_fitting= True
         print("    Set Gaussian Fitting True")
@@ -237,7 +247,7 @@ class Analysis:
     def set_strictness_arg(self, strictness_arg):
         self.strictness_dot_detection = int(strictness_arg)
         
-        assert self.strictness_dot_detection >=0, "Strictness must be greater than zero."
+     #   assert self.strictness_dot_detection >=0, "Strictness must be greater than zero."
         
         print("    Set Strictness to", str(self.strictness_dot_detection))
 
@@ -261,10 +271,40 @@ class Analysis:
         self.hamming_analysis = True
         on_off_barcode_analysis = True
         self.false_positive_rate_analysis = True
+        self.fake_barcodes = True
         
+        print("    Set Fake Barcodes")
         print("    Set Hamming Analysis True")
         print("    Set False Positive Rate Analysis")
         print("    Set On/Off Barcode Analysis")
+        
+    def set_nucleus_erode_arg(self, nucleus_erode_arg):
+        self.nucleus_erode = int(nucleus_erode_arg)
+        
+        print("    Set Nucleus Erode to", str(self.nucleus_erode))
+
+    def set_cyto_erode_arg(self, cyto_erode_arg):
+        self.cyto_erode = int(cyto_erode_arg)
+        
+        print("    Set Cytoplasm Erode to", str(self.cyto_erode))
+        
+    def set_nuclei_cyto_match_true(self):
+        self.bool_cyto_match= True
+        print("    Set Nuclei Cytoplasm Matching to True")
+        
+    def set_decode_only_cells_true(self):
+        self.decode_only_cells= True
+        print("    Set Decode Only Cells to True")
+        
+    def set_nbins_arg(self, nbins_arg):
+        self.nbins = int(nbins_arg)
+        
+        print("    Set Number of Bins to", str(self.nbins))
+    
+    def set_threshold_arg(self, threshold_arg):
+        self.threshold = int(threshold_arg)
+        
+        print("    Set Threshold to", str(self.threshold))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -280,7 +320,7 @@ class Analysis:
                                                self.analysis_name, self.visualize_dots, self.normalization, \
                                                self.background_subtraction, self.decoding_individual, self.chromatic_abberration, \
                                                self.dot_detection, self.gaussian_fitting, self.strictness_dot_detection, self.dimensions, \
-                                               self.radial_center, self.num_zslices)
+                                               self.radial_center, self.num_zslices, self.nbins, self.threshold)
                    
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 
@@ -353,6 +393,7 @@ class Analysis:
     #--------------------------------------------------------------------------------
     def write_results(self, path):
         
+        
         #Start Logging
         #--------------------------------------------------------------------------------
         self.start_time = timer_tools.start_logging(self.logging_pos)
@@ -366,21 +407,22 @@ class Analysis:
         #Get Z slices if two dimensional
         #--------------------------------------------------------------------------------
         #if self.dimensions == 2:
-        exp_dir = os.path.join(main_dir, 'personal', self.personal, 'raw', self.experiment_name)
-        
-        subdirs = os.listdir(exp_dir)
-
-        hyb_dirs = [sub_dir for sub_dir in subdirs if 'Hyb' in sub_dir]         
-        
-        assert len(hyb_dirs) > 0, "There are not HybCycle Directories in the experiment directory."
-        
-        hyb_dir = hyb_dirs[0]
-        
-        sample_tiff_src = os.path.join(exp_dir, hyb_dir, self.position)
-        
-        sample_tiff = tiffy.load(sample_tiff_src)
-        
-        self.num_zslices = sample_tiff.shape[0]
+        if not self.decoding_with_previous_locations:
+            exp_dir = os.path.join(main_dir, 'personal', self.personal, 'raw', self.experiment_name)
+            
+            subdirs = os.listdir(exp_dir)
+    
+            hyb_dirs = [sub_dir for sub_dir in subdirs if 'Hyb' in sub_dir]         
+            
+            assert len(hyb_dirs) > 0, "There are not HybCycle Directories in the experiment directory."
+            
+            hyb_dir = hyb_dirs[0]
+            
+            sample_tiff_src = os.path.join(exp_dir, hyb_dir, self.position)
+            
+            sample_tiff = tiffy.load(sample_tiff_src)
+            
+            self.num_zslices = sample_tiff.shape[0]
         #--------------------------------------------------------------------------------
         
         
@@ -448,7 +490,7 @@ class Analysis:
             
             decoder = Decoding(self.data_dir, self.position, self.decoded_dir, self.locations_dir, self.position_dir, self.barcode_dst, self.barcode_key_src, self.decoding_with_previous_dots, \
                 self.decoding_with_previous_locations, self.fake_barcodes, self.decoding_individual, self.min_seeds, self.allowed_diff, \
-                self.dimensions, self.num_zslices, self.segmentation)
+                self.dimensions, self.num_zslices, self.segmentation, self.decode_only_cells)
         #--------------------------------------------------------------------------------
         
         #Run Decoding with previous dots
@@ -503,7 +545,7 @@ class Analysis:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Segmentation')
             segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
                         self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
-                        self.labeled_img, self.edge_dist, self.dist_between_nuclei)
+                        self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.nuclei_erode, self.cyto_erode)
         
             if self.decoding_across == True or \
                 self.decoding_with_previous_dots == True or \
@@ -565,12 +607,7 @@ class Analysis:
                 post_analysis.run_hamming_analysis_indiv()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Hamming Analysis')
         #--------------------------------------------------------------------------------
-        
-        
-        #Make a plot of the logging
-        #--------------------------------------------------------------------------------
-        timer_tools.save_time_plot(self.logging_pos, self.logging_plot_dst)
-        #--------------------------------------------------------------------------------
+
     #--------------------------------------------------------------------------------
     #End of running the parameters
             

@@ -38,11 +38,13 @@ from dot_detection.helpers.compile_dots import add_to_dots_in_channel
 
 warnings.filterwarnings("ignore")
 
+from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
+from dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
 
 
 
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool_normalization, \
-                      bool_background_subtraction, channels_to_detect_dots, bool_chromatic, rand_dir):
+                      bool_background_subtraction, channels_to_detect_dots, bool_chromatic, n_dots, rand_dir):
     
     
     #Getting Background Src
@@ -114,7 +116,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
 
             #Apply 1000 threshold
             #---------------------------------------------------------------------
-            amount_of_dots_you_want_in_each_image = 20
+            amount_of_dots_you_want_in_each_image = n_dots
             number_of_dots = len(dot_analysis[1])
             
             if number_of_dots < amount_of_dots_you_want_in_each_image:
@@ -137,18 +139,34 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             #---------------------------------------------------------------------
             
             
+            # #Gaussian Fit the dots
+            # #---------------------------------------------------------------------
+            # print(f'{bool_gaussian_fitting=}')
+            # if bool_gaussian_fitting == True:
+            #     dot_analysis = get_gaussian_fitted_dots(tiff_src, channel, dot_analysis[0])
+            # #---------------------------------------------------------------------
             
-            #Shift Locations
-            #---------------------------------------------------------------------
-            dot_analysis[0] = shift_locations(dot_analysis[0], np.array(offset), tiff_src, bool_chromatic)
-            #---------------------------------------------------------------------
+            
+            # #Center the dots
+            # #---------------------------------------------------------------------
+            # print(f'{bool_radial_center=}')
+            # if bool_radial_center == True:
+            #     dot_analysis = get_radial_centered_dots(tiff_src, channel, dot_analysis[0])
+            # #---------------------------------------------------------------------
+
             #print(f'{dot_analysis[0].shape=}')
   
             #Visualize Dots
             #---------------------------------------------------------------------
+            print(f'{bool_visualize_dots=}')
             median_z = tiff.shape[0]//2
-            if bool_visualize_dots == True and channel == 1 and z == median_z:
-                get_visuals(tiff_src, dot_analysis, tiff_2d)
+            if bool_visualize_dots == True and z == median_z:
+                get_visuals(tiff_src, dot_analysis, tiff_2d*100, analysis_name)
+            #---------------------------------------------------------------------
+
+            #Shift Locations
+            #---------------------------------------------------------------------
+            dot_analysis[0] = shift_locations(dot_analysis[0], np.array(offset), tiff_src, bool_chromatic)
             #---------------------------------------------------------------------
 
             #Add to dots in one z slace to dots in channel
@@ -159,6 +177,28 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
         #Add dots to main dots in tiff
         #---------------------------------------------------------------------
         assert dots_in_channel != None
+        
+        # def assertions_for_dot_analysis(dot_analysis):
+        #     assert type(dot_analysis) == list
+        #     assert type(dot_analysis[0]) == list
+        #     assert type(dot_analysis[1]) == list
+        #     assert len(dot_analysis[0][0]) == 3
+        #     assert type(dot_analysis[1][0]]) == int
+        #     assert len(dot_analysis[0]) == len(dot_analysis[1])
+            
+            
+        # assertions_for_dot_analysis(dots_in_channel) 
+            
+        
+        # print(f'{len(dots_in_channel[0])=}')
+        # print(f'{len(dots_in_channel[1])=}')
+        # print(f'{len(dots_in_channel[0][0])=}')
+        # print(f'{dots_in_channel[1]=}')
+        # print(f'{type(dots_in_channel[0])=}')
+        # print(f'{type(dots_in_channel[1][1])=}')
+        # print(f'{type(dots_in_channel[0][1][1])=}')
+        
+        
         dots_in_tiff.append(dots_in_channel)
         
         
@@ -171,6 +211,9 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
     #-----------------------------------------------------------------
      
   
+ 
+def str2bool(v):
+  return v.lower() == "true"
   
 import argparse
 
@@ -185,6 +228,7 @@ parser.add_argument("--norm")
 parser.add_argument("--back_subtract")
 parser.add_argument("--channels", nargs = '+')
 parser.add_argument("--chromatic")
+parser.add_argument("--n_dots")
 parser.add_argument("--rand")
 
 
@@ -204,10 +248,11 @@ else:
 
 
 
-get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, args.vis_dots, args.norm, \
-                      args.back_subtract, channels, args.chromatic, args.rand)
+get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), args.norm, \
+                      args.back_subtract, channels, args.chromatic, int(args.n_dots), args.rand)
     
     
+
     
     
     

@@ -1,1 +1,2 @@
-No Json Analyses in Directory branch
+/home/nrezaee/test_cronjob_multi_dot/sync_jsons.sh: line 3: 155983 Terminated              rclone delete onedrive_caltech:Analysis_Files
+No Json Analyses in DirectorNo Json Analyses in Directory branch

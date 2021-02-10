@@ -1,6 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.patches as mpatches
+import os
+
+
 
 #Get Amount of Real and Fake
 #------------------------------------------------------
@@ -69,7 +73,47 @@ def get_false_positive_rate_info(df_genes):
     else:
         ratio = num_fakes/len(df_genes.gene)
     return num_fakes, num_reals, ratio
+    
+def get_false_pos_intensities_hist(genes_csv_src, dest):
+    
+    df = pd.read_csv(genes_csv_src)
+    
+    fake_ids = [ gene for gene in df.geneID if 'fake' in gene]
+    real_ids = [ gene for gene in df.geneID if 'fake' not in gene]
 
+    df_fake = df[df.geneID.isin(fake_ids)]
+    df_real = df[df.geneID.isin(real_ids)]
+    
+
+    pop_a = mpatches.Patch(color='b', label='On Barcodes')
+    pop_b = mpatches.Patch(color='orange', label='Off Barcodes')
+    plt.figure(figsize = (20,10))
+    plt.legend(handles=[pop_a,pop_b], prop={'size': 30})
+    plt.title('Intensity Analysis Across On/Off Barcodes', fontsize=40)
+    plt.hist([df_real.intensity, df_fake.intensity], stacked = True, \
+             rwidth=0.8, color = ['b', 'orange'])
+    plt.savefig(dest)
+
+def get_false_pos_intensities_hist(genes_csv_src, dest):
+    
+    df = pd.read_csv(genes_csv_src)
+    
+    fake_ids = [ gene for gene in df.geneID if 'fake' in gene]
+    real_ids = [ gene for gene in df.geneID if 'fake' not in gene]
+
+    df_fake = df[df.geneID.isin(fake_ids)]
+    df_real = df[df.geneID.isin(real_ids)]
+    
+
+    pop_a = mpatches.Patch(color='b', label='On Barcodes')
+    pop_b = mpatches.Patch(color='orange', label='Off Barcodes')
+    plt.figure(figsize = (20,10))
+    plt.legend(handles=[pop_a,pop_b], prop={'size': 30})
+    plt.title('Intensity Analysis Across On/Off Barcodes', fontsize=40)
+    plt.hist([df_real.intensity, df_fake.intensity], stacked = True, \
+             rwidth=0.8, color = ['b', 'orange'])
+    plt.savefig(dest)
+    
 def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto = None):
     print("Getting False Barcodes")
     
@@ -96,12 +140,16 @@ def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto =
     
     #Write to text file
     #------------------------------------------------------
-
     save_to_file(num_reals, num_fakes, ratio, num_reals_seg, num_fakes_seg, ratio_seg, dst)
     #------------------------------------------------------
     
+    fig_dest = os.path.join(os.path.basename(dst), 'On-Off-Barcode-Intensity-Analysis.png')
+    get_false_pos_intensities_hist(gene_locations_assigned_to_cell_src, fig_dest)
+    
     print("Saving False Barcodes to", dst)
+
     return num_reals, num_fakes, ratio
+    
     
 def get_false_pos_rate_pre_seg(csv_src, barcode_src, dst):
     #Get False Positive
@@ -135,5 +183,4 @@ def get_false_pos_rate_pre_seg(csv_src, barcode_src, dst):
     #--------------------------------------------------
     
     return false_pos_rate, num_on_barcodes, num_off_barcodes
-
 

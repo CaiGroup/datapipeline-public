@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import tempfile
+import sys
 
 def combine_barcodes(barcode_src1, barcode_src2):
     
@@ -27,6 +28,7 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
     #------------------------------------------------------------------
     
     
+    print(f'{bool_fake_barcodes=}')
     #Fake Barcodes
     #------------------------------------------------------------------
     if bool_fake_barcodes == True:
@@ -44,13 +46,16 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
         temp_dir = tempfile.TemporaryDirectory()
         
         comb_barcode_dst = os.path.join(temp_dir.name, 'combined_barcode.csv')
-        
+        print(f'{df_combined_barcodes.shape=}')
+        df_combined_barcodes.to_csv('foo.csv', index=False)
         df_combined_barcodes.to_csv(comb_barcode_dst, index=False)
         #df_combined_barcodes.to_csv('test.csv')
         
         print(f'{comb_barcode_dst=}')
         
         barcode_src = comb_barcode_dst
+        
+        print(f'{pd.read_csv(barcode_src).shape=}')
         #------------------------------------------------------------------
         
         
@@ -79,3 +84,11 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
     
     return None
     
+
+if sys.argv[1] == 'debug':
+    
+    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/barcode_key/channel_1.csv'
+    barcode_dst = 'foo.mat'
+    bool_fake_barcodes = True
+    
+    read_barcode(barcode_src, barcode_dst, bool_fake_barcodes)

@@ -8,7 +8,7 @@ function [radPoints, radInt] = super_wrap_wrap(tiff_path, channel_num, points_pa
     
     %Get Image
     %---------------------------------------------
-    tiff = loadometiff(tiff_path,0);
+    tiff = loadometiff(tiff_path, get_pos_from_path(tiff_path));
     
     channel_matlab = channel_num + 1;
     
@@ -20,7 +20,7 @@ function [radPoints, radInt] = super_wrap_wrap(tiff_path, channel_num, points_pa
     %Get Normal Points
     %---------------------------------------------
     points_mat = load(points_path);
-    points = double(points_mat.points) + 1;
+    points = double(points_mat.points);
     %---------------------------------------------
     
     

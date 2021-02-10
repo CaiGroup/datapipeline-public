@@ -99,11 +99,11 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
         dots_in_channel = None
         
-        n=7
+        # n=7
         tiff_3d = tiff[:, channel,:,:]
-        print(f'{tiff_3d.shape=}')
-        tiff_3d = tiff_3d[:,n:tiff_3d.shape[1]-n,n:tiff.shape[2]-n]
-        print(f'{tiff_3d.shape=}')
+        # print(f'{tiff_3d.shape=}')
+        # tiff_3d = tiff_3d[:,n:tiff_3d.shape[1]-n,n:tiff.shape[2]-n]
+        # print(f'{tiff_3d.shape=}')
         
         #Background Subtraction
         #---------------------------------------------------------------------
@@ -129,8 +129,8 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         print(f'{strictness=}')
         print(f'{tiff_3d.shape=}')
         dot_analysis = list(get_hist_threshed_dots(tiff_3d, strictness=strictness))
-        dot_analysis[0][:,0]+=n
-        dot_analysis[0][:,1]+=n
+        # dot_analysis[0][:,0]+=n
+        # dot_analysis[0][:,1]+=n
         
         print(f'{len(dot_analysis[1])=}')
 
@@ -145,13 +145,28 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             dot_analysis = get_gaussian_fitted_dots(tiff_src, channel, dot_analysis[0])
         #---------------------------------------------------------------------
         
-        
+        print(f'{len(dot_analysis)=}')
+        print(f'{len(dot_analysis[0])=}')
+        print(f'{len(dot_analysis[1])=}')
         #Center the dots
         #---------------------------------------------------------------------
         print(f'{bool_radial_center=}')
         if bool_radial_center == True:
             dot_analysis = get_radial_centered_dots(tiff_src, channel, dot_analysis[0])
         #---------------------------------------------------------------------
+        
+        print(f'{len(dot_analysis)=}')
+        print(f'{len(dot_analysis[0])=}')
+        print(f'{len(dot_analysis[1])=}')
+        
+        #Visualize Dots
+        #---------------------------------------------------------------------
+        median_z = tiff.shape[0]//2
+        print(f'{bool_visualize_dots=}')
+        if bool_visualize_dots == True:# and channel == 1 and z == median_z:
+            get_visuals(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name)
+        #---------------------------------------------------------------------
+        
         
         #Shift Locations
         #---------------------------------------------------------------------
@@ -160,18 +175,13 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
         #Remove Extra Dots Across Z slices
         #---------------------------------------------------------------------
-        if z_slices == 'all':
-            dot_analysis = take_out_extra_dots(dot_analysis)
+        # if z_slices == 'all':
+        #     dot_analysis = take_out_extra_dots(dot_analysis)
         #---------------------------------------------------------------------
         print("After taking out dots")
         print(f'{len(dot_analysis[0])=}')
         
-        #Visualize Dots
-        #---------------------------------------------------------------------
-        median_z = tiff.shape[0]//2
-        if bool_visualize_dots == True:# and channel == 1 and z == median_z:
-            get_visuals(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name)
-        #---------------------------------------------------------------------
+        
         
         #Convert to type objects
         #---------------------------------------------------------------------
@@ -237,7 +247,7 @@ print(f'{str2bool(args.gaussian)=}')
 print(f'{args.radial_center=}')
 print(f'{str2bool(args.radial_center)=}')
 
-get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, args.vis_dots, \
+get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
                       args.back_subtract, channels, args.chromatic, str2bool(args.gaussian), int(args.strictness), \
                       str2bool(args.radial_center), args.z_slices, args.rand)
                       

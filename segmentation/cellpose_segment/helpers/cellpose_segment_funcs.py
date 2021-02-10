@@ -8,9 +8,22 @@ from skimage.measure import regionprops_table
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
+def get_plotted_assigned_genes(assigned_genes_csv_src, dst, label_img):
+    plt.figure(figsize=(20,20))
+    plt.imshow(label_img[:,:,label_img.shape[2]//2])
+    df_genes = pd.read_csv(assigned_genes_csv_src)
+    cellIDs = df_genes.cellID.unique()
 
-
+    for cell in cellIDs:
+        print(cell)
+        df_genes_cell = df_genes[df_genes.cellID == cell]
+        plt.xlim((0,2048))
+        plt.ylim((0,2048))
+        plt.scatter(list(df_genes_cell.x), list(df_genes_cell.y), s = 1)
+    
+    plt.savefig(dst)
 
 def assign_to_cells(df_gene_list, label_img):
     """
@@ -43,20 +56,19 @@ def assign_to_cells(df_gene_list, label_img):
     
    # df_gene_list = df_gene_list[df_gene_list['z'] < label_img.shape[0]]
     
+    df_gene_list = df_gene_list[(df_gene_list.x < label_img.shape[0]) & (df_gene_list.x >= 0)]
+    df_gene_list = df_gene_list[(df_gene_list.y < label_img.shape[1]) & (df_gene_list.y >= 0)]
+    df_gene_list = df_gene_list[(df_gene_list.z < label_img.shape[2]) & (df_gene_list.z >= 0)]
+        
     x = df_gene_list['x'].astype(int) - 1
     y = df_gene_list['y'].astype(int) - 1
-    
-    print(f'{label_img.shape=}')
+
     if 'z' in df_gene_list:
         z = df_gene_list['z'].astype(int) - 1
-        print(f'{z=}')
-        print(f'{y=}')
-        print(f'{x=}')
         
-        
-        df_gene_list['cellID'] = label_img[z, x, y]
+        df_gene_list['cellID'] = label_img[x, y, z]
     else:
-        df_gene_list['cellID'] = label_img[y, x]
+        df_gene_list['cellID'] = label_img[x, y]
     # ---------------------------------------------------------------------
 
     return df_gene_list
@@ -64,10 +76,11 @@ def assign_to_cells(df_gene_list, label_img):
 # #Test
 # #--------------------------------------------------
 # import tifffile
-# decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/2020-11-24-takei-2ch/takei_2ch_parallel/MMStack_Pos0/Decoded/Channel_1/pre_seg_diff_1_minseeds_2_unfiltered.csv'
+# decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/test1-big/debug_parallel/MMStack_Pos0/Decoded/Channel_1/pre_seg_diff_1_minseeds_2_filtered.csv'
 # df_gene_list = pd.read_csv(decoded_genes_src)
-# label_img_src = '/groups/CaiLab/analyses/nrezaee/2020-11-24-takei-2ch/takei_2ch_parallel/MMStack_Pos0/Segmentation/Channel_1/labeled_img.tiff'
+# label_img_src = '/groups/CaiLab/analyses/nrezaee/test1-big/cellpose/MMStack_Pos0/Segmentation/Channel_1/labeled_img.tiff'
 # label_img = tifffile.imread(label_img_src)
+# print(f'{label_img.shape=}')
 # df_gene_list = assign_to_cells(df_gene_list, label_img)
 # print(df_gene_list)
 

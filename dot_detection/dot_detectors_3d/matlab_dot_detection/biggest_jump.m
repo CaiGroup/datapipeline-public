@@ -66,6 +66,9 @@ function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins,
     mat_channel = channel +1
     image = squeeze(tiff(:,mat_channel,:,:));
     image = permute(image, [3 2 1]);
+    
+    %image = illum(image);
+    
     % set defaults for optional inputs
     optargs = {'introns', false, '', 1};
     optargs(1:numvarargs) = varargin;
@@ -212,6 +215,8 @@ function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins,
         thresh_index = find(diffs==max(diffs));
         threshs = hist.BinEdges;
 
+        index = thresh_index + strictness;
+        
 
         biggest_jump_thresh = threshs(thresh_index + strictness);
         %---------------------------------------------

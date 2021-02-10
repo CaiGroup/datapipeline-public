@@ -7,6 +7,7 @@ def combine_locs(rand_list):
     check_if_first_tiff = 0
     temp_dir = '/groups/CaiLab/personal/nrezaee/temp_dots'
     for rand in rand_list:
+        print(temp_dir, rand)
         locs_src = os.path.join(temp_dir, rand, 'locs.pkl')
         
             

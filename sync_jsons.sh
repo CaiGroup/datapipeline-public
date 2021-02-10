@@ -1,6 +1,6 @@
 
-rclone sync box_caltech:Analysis_Files/ /groups/CaiLab/json_analyses
-rclone delete box_caltech:Analysis_Files
+rclone sync onedrive_caltech:Analysis_Files/ /groups/CaiLab/json_analyses
+rclone delete onedrive_caltech:Analysis_Files
 
 export DATA_PIPELINE_MAIN_DIR='/groups/CaiLab'
 

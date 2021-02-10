@@ -7,21 +7,6 @@ import time
 import shutil
 
 
-#IMporting Alignment Scripts
-#-------------------------------------------------
-# from align_scripts import ants_correlation
-# #from align_scripts import mean_squares
-# from align_scripts import mean_squares_2d
-# from align_scripts import mutual_information
-# #from align_scripts import no_align
-# from align_scripts import one_align
-# from align_scripts import phase_correlation
-# from align_scripts import mean_squares_blur
-# from align_scripts import mean_squares_blur2
-# from align_scripts import phase_correlation_blur
-# from align_scripts import matlab_dapi 
-#-------------------------------------------------
-
 #Import Multiprocessing helper
 #-------------------------------------------------
 from align_scripts.helpers.rand_list import are_jobs_finished, get_random_list
@@ -74,11 +59,8 @@ def get_and_sort_hybs(path_to_experiment_dir):
     
     return sorted_hyb_dirs
     
-
-def run_alignment(exp_name, personal, position, align_function):
+def get_fixed_and_movings(exp_name, personal, position, main_dir):
     
-    #Setting Proper Directories
-    #-----------------------------------------------------------------
     exp_dir = os.path.join(main_dir, 'personal',personal, 'raw', exp_name)
     
     #offsets = {}
@@ -87,26 +69,25 @@ def run_alignment(exp_name, personal, position, align_function):
     
     fixed_hyb = sub_dirs[0].split(os.sep)[-1]
     
-    fixed_file_path = os.path.join(exp_dir, fixed_hyb, position)
+    fixed_file_path = os.path.join(exp_dir, fixed_hyb, position)    
     
-    print(f"{fixed_file_path=}")
-    #-----------------------------------------------------------------
+    return sub_dirs, fixed_file_path
+
+def run_alignment(exp_name, personal, position, align_function):
     
-    #Set Multiprocessing
-    #-----------------------------------------------------------------
+    
+    sub_dirs, fixed_file_path = get_fixed_and_movings(exp_name, personal, position, main_dir)
+    
     rand_list = get_random_list(len(sub_dirs))
-    #-----------------------------------------------------------------
     
-    #Get CWD
-    #-------------------------------------------------------------------
+    
     cwd = os.getcwd()
     align_dir = os.path.join(cwd, 'align_scripts',)
-    #-------------------------------------------------------------------
     
-    #Declare temp_dir
-    #-------------------------------------------------------------------
     temp_dir = os.path.join(main_dir, 'personal', 'nrezaee', 'temp_align')
-    #-------------------------------------------------------------------
+    
+    if align_function == 'no_align':
+        offsets = {}
     
     #Run alignment
     #-----------------------------------------------------------------
@@ -128,39 +109,40 @@ def run_alignment(exp_name, personal, position, align_function):
         rand_dir = os.path.join(temp_dir, rand)
         os.mkdir(rand_dir)
         #-----------------------------------------------------------------
-    
-        print(f'{tiff_file_path=}')
-        list_cmd = ['python', align_dir+ '/'+align_function+ '.py', '--fixed_src', fixed_file_path, '--moving_src', tiff_file_path, '--rand', rand_dir]
-    
-
-        cmd = ' '.join(list_cmd)
-                    
-                  
-        #print(f'{cmd=}')
-        script_name = os.path.join(rand_dir, 'align.sh')
-        with open(script_name , 'w') as f:
-            f.write('#!/bin/bash \n')
-            f.write(cmd)
         
-        #os.system(cmd)
-        #'--output=/dev/null'
-        call_me = ['sbatch', '--output=/home/nrezaee/test_cronjob_multi_dot/foo.out', '--job-name', rand_list[sub_dirs.index(sub_dir)], "--time", "1:00:00", "--mem-per-cpu", "10G", script_name, ]
-        #print(" ".join(call_me))
-        subprocess.call(call_me)
+        if align_function == 'no_align':
+            key = os.path.join(hyb, position)
+            offsets[key] = [0,0,0]
+            
+        else:
+            print(f'{tiff_file_path=}')
+            list_cmd = ['python', align_dir+ '/'+align_function+ '.py', '--fixed_src', fixed_file_path, '--moving_src', tiff_file_path, '--rand', rand_dir]
+        
+    
+            cmd = ' '.join(list_cmd)
+    
+            script_name = os.path.join(rand_dir, 'align.sh')
+            with open(script_name , 'w') as f:
+                f.write('#!/bin/bash \n')
+                f.write(cmd)
+            
+    
+            call_me = ['sbatch',  '--job-name', rand_list[sub_dirs.index(sub_dir)], "--time", "0:5:00","--mem-per-cpu", "9G", "--ntasks", '1', script_name ]
+                 
+            subprocess.call(call_me)
 
-    while not are_jobs_finished(rand_list):
-        print('Waiting for Alignment Jobs to Finish')
-        time.sleep(.1)
-    
-    offsets = combine_offsets(rand_list)
-    #------------------------------------------------
-    
-    #Delete Temp files
-    #------------------------------------------------
-    for rand in rand_list:
-        rand_dir = os.path.join(temp_dir, rand)
-        shutil.rmtree(rand_dir)
-    #------------------------------------------------
+    if align_function != 'no_align':
+        while not are_jobs_finished(rand_list):
+            print('Waiting for Alignment Jobs to Finish')
+            time.sleep(2)
+        
+        offsets = combine_offsets(rand_list)
+ 
+        #Delete Temp files
+        for rand in rand_list:
+            rand_dir = os.path.join(temp_dir, rand)
+            shutil.rmtree(rand_dir)
+        
     
     return offsets
     
