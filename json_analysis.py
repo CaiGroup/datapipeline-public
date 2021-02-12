@@ -344,6 +344,27 @@ def run_analysis(json_name, position):
             analysis.set_threshold_arg(data['nbins'])
     #----------------------------------------------------------
     
+    #Set Cyto Channel Number
+    #----------------------------------------------------
+    if 'cyto channel number' in data.keys():
+        if data['cyto channel number'] != 'none':
+            analysis.set_cyto_channel_arg(data['cyto channel number'])
+    #----------------------------------------------------------
+
+    #Set Nuclei Labeled Image
+    #----------------------------------------------------
+    if 'nuclei labeled image' in data.keys():
+        if data['nuclei labeled image'] == 'true':
+             analysis.set_nuclei_labeled_img_true()
+    #----------------------------------------------------------
+    
+    #Set Cyto Labeled Image
+    #----------------------------------------------------
+    if 'cyto labeled image' in data.keys():
+        if data['cyto labeled image'] == 'true':
+             analysis.set_cyto_labeled_img_true()
+    #----------------------------------------------------------
+    
     #Writ
     #----------------------------------------------------------
     analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)

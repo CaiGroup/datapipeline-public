@@ -36,7 +36,8 @@ def get_labeled_cyto_cellpose(tiff_path, dst=None, cyto_channel = -2, debug = Fa
     print('Shrinking TIff')
     #Get Shrinked Dapi Channel
     #----------------------------------------------
-    
+    print(f'{cyto_channel=}')
+    cyto_channel = cyto_channel - 1
     cyto_3d = tiff[:, cyto_channel,:,:].astype(np.int16)
 
     max_cyto_2d = max_intensity_projection(cyto_3d)

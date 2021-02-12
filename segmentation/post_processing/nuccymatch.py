@@ -25,7 +25,7 @@ def match_3d_nuclei_img(nuclei_img, cyto_img, matched_img):
         nuclei_img = np.where(nuclei_img == uniques[i], \
                                  new_uniques[i], nuclei_img)
         
-    return nuclei_img
+    return nuclei_img, cyto_img
     
 def make_continuous_cyto(cyto_img):
     

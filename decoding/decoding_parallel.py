@@ -46,6 +46,8 @@ def get_barcode_info(barcode_src):
     
     total_number_of_channels = num_of_rounds*channels_per_round
     
+    print(f'{total_number_of_channels=}')
+    print(f'{num_of_rounds=}')
     assert total_number_of_channels % num_of_rounds == 0
     
     return total_number_of_channels, num_of_rounds

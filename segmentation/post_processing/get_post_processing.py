@@ -49,15 +49,32 @@ def get_debug():
     
     return labeled_img_path, labeled_cyto_path
     
-def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match):
+def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cyto_channel_num, get_nuclei_img, get_cyto_img):
     
-    labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
-    label_img = get_labeled_img_cellpose(tiff_for_segment, labeled_img_path)
+    
     if bool_cyto_match == True:
+        labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
+        label_img = get_labeled_img_cellpose(tiff_for_segment, labeled_img_path)
+        
         labeled_cyto_path = os.path.join(segment_results_path, 'labeled_cyto_img.tif')
-        labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, labeled_cyto_path)
+        labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, labeled_cyto_path, cyto_channel = cyto_channel_num)
+        
     else:
-        labeled_cyto_path = None
+        
+        if get_nuclei_img == True:
+            labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
+            label_img = get_labeled_img_cellpose(tiff_for_segment, labeled_img_path)
+        else:
+            labeled_img_path = None
+            
+        if get_cyto_img == True:
+            labeled_cyto_path = os.path.join(segment_results_path, 'labeled_cyto_img.tif')
+            labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, labeled_cyto_path, cyto_channel = cyto_channel_num)
+        else:
+            labeled_cyto_path = None
+        
+    
+        
         
     return labeled_img_path, labeled_cyto_path
     
@@ -98,7 +115,8 @@ def post_process(edge_delete_dist, dist_between_nuclei, label_img_src, labeled_c
     
         
     
-def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist, dist_between_nuclei, bool_cyto_match, nucleus_erode, cyto_erode, debug = False):
+def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist, dist_between_nuclei, bool_cyto_match, \
+        nucleus_erode, cyto_erode, cyto_channel_num, get_nuclei_img, get_cyto_img, debug = False):
     
     cwd = os.getcwd()
     post_process_dir = os.path.join(cwd, 'segmentation/post_processing')
@@ -111,25 +129,31 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
         labeled_img_path, labeled_cyto_path = get_debug()
         
     else:
-        labeled_img_path, labeled_cyto_path = get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match)
+        labeled_img_path, labeled_cyto_path = get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, \
+                                                cyto_channel_num, get_nuclei_img, get_cyto_img)
     
-    label_img_post_processed_dst = os.path.join(segment_results_path, 'labeled_img_post.tif')
-    post_process(edge_delete_dist, dist_between_nuclei, labeled_img_path, labeled_cyto_path, label_img_post_processed_dst)
-    
+    if labeled_img_path != None:
+        label_img_post_processed_dst = os.path.join(segment_results_path, 'labeled_img_post.tif')
+        post_process(edge_delete_dist, dist_between_nuclei, labeled_img_path, labeled_cyto_path, label_img_post_processed_dst)
+        labeled_img_path = label_img_post_processed_dst
+        
     if bool_cyto_match:
         print("Running Nuccy Match")
         nuclei_dst = os.path.join(segment_results_path, 'nuclei_labeled_img_matched.tif')
         cyto_dst = os.path.join(segment_results_path, 'cyto_labeled_img_matched.tif')
-        get_matched_3d_img(label_img_post_processed_dst, labeled_cyto_path, nucleus_erode, cyto_erode, post_process_dir, nuclei_dst, cyto_dst)
+        get_matched_3d_img(labeled_img_path, labeled_cyto_path, nucleus_erode, cyto_erode, post_process_dir, nuclei_dst, cyto_dst)
         
         return nuclei_dst
         
     else:
         
-        return label_img_post_processed_dst 
+        if labeled_img_path == None:
+            return labeled_cyto_path
+        else:
+            return labeled_img_path
 
     
-if sys.argv[1] == 'debug':
+if sys.argv[1] == 'debug_post':
     print('=---------------------------------------')
     tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei'
     segment_results_path = '/home/nrezaee/temp2'
@@ -139,8 +163,9 @@ if sys.argv[1] == 'debug':
     bool_cyto_match = True
     nucleus_erode = 20
     cyto_erode = 10
-    debug = True
-    save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, nucleus_erode, cyto_erode, debug=debug)
+    debug = False
+    cyto_channel_num = 1
+    save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, nucleus_erode, cyto_erode, cyto_channel_num, debug=debug)
 
     
     

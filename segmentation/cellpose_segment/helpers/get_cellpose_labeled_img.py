@@ -114,10 +114,11 @@ def get_labeled_img_cellpose(tiff_path, dst=None):
 
     return labeled_img
 
-# tiff_path = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_0/MMStack_Pos0.ome.tif'
-# dst= 'labeled_img.tif'
-# labeled_img = get_labeled_img_cellpose(tiff_path, dst)
-# print(f'{labeled_img.shape=}')
+if sys.argv[1] == 'debug_cellpose':
+    tiff_path = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_0/MMStack_Pos0.ome.tif'
+    dst= 'labeled_img.tif'
+    labeled_img = get_labeled_img_cellpose(tiff_path, dst)
+    print(f'{labeled_img.shape=}')
     
     
     

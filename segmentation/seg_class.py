@@ -4,6 +4,7 @@ import sys
 import scipy.io as sio
 import numpy as np
 import glob
+import tifffile as tf
 
 
 #Segmentation Script
@@ -26,7 +27,8 @@ else:
 class Segmentation:
     def __init__(self, data_dir, position, seg_dir, decoded_dir, locations_dir, barcode_dst, barcode_src, \
                     bool_fake_barcodes, bool_decoding_individual, num_z_slices, seg_type, seg_data_dir, dimensions, num_zslices, \
-                    labeled_img, edge_dist, dist_between_nuclei, bool_cyto_match, nuclei_erode, cyto_erode):
+                    labeled_img, edge_dist, dist_between_nuclei, bool_cyto_match, nuclei_erode, cyto_erode, cyto_channel_num, \
+                    get_nuclei_img, get_cyto_img):
 
         self.data_dir = data_dir
         self.position = position
@@ -49,6 +51,9 @@ class Segmentation:
         self.bool_cyto_match = bool_cyto_match
         self.nuclei_erode = nuclei_erode
         self.cyto_erode = cyto_erode
+        self.cyto_channel_num = cyto_channel_num
+        self.get_nuclei_img = get_nuclei_img
+        self.get_cyto_img = get_cyto_img
         
         
     def combine_seg_z_s(seg_channel_dir):
@@ -197,10 +202,14 @@ class Segmentation:
         #----------------------------------------------
         
         label_img_path = save_labeled_img(self.data_dir, self.seg_dir, self.position, self.edge_dist, self.dist_between_nuclei,  \
-            self.bool_cyto_match, self.nuclei_erode, self.cyto_erode)
+            self.bool_cyto_match, self.nuclei_erode, self.cyto_erode, self.cyto_channel_num, self.get_nuclei_img, self.get_cyto_img)
         
         print(f'{label_img_path=}')
         get_label_img_visuals(label_img_path, self.data_dir, self.position)
+        
+        labeled_img = tf.imread(label_img_path)
+        
+        return labeled_img
         
         
 

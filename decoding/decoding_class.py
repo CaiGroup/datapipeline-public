@@ -29,7 +29,7 @@ from decoding import previous_locations_decoding as previous_locations_decoding
 #=====================================================================================
 class Decoding:
     def __init__(self, data_dir, position, decoded_dir, locations_dir, position_dir, barcode_dst, barcode_src, bool_decoding_with_previous_dots, bool_decoding_with_previous_locations, \
-                    bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions, num_zslices, segmentation, decode_only_cells):
+                    bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions, num_zslices, segmentation, decode_only_cells, labeled_img):
         
         self.data_dir = data_dir
         self.position = position
@@ -48,6 +48,7 @@ class Decoding:
         self.num_zslices = num_zslices
         self.seg = segmentation
         self.decode_only_cells = decode_only_cells
+        self.labeled_img = labeled_img
          
     def labeled_img_from_tiff_dir(self):
         glob_me = os.path.join(self.data_dir, '*')
@@ -169,19 +170,12 @@ class Decoding:
             
         else:
             
-            if self.seg == "roi":
-                labeled_img = tifffile.imread('/home/nrezaee/sandbox/multiprocessing/decoding/roi.tiff')
-            elif self.seg == "cellpose":
-            
-                #Run Decoding Across Channels
-                #--------------------------------------------------------------------
-                print("Running Decoding Across Channels")
-                labeled_img = self.labeled_img_from_tiff_dir()
-                
-            decoding_parallel.decoding(barcode_file_path, locations_path, labeled_img, self.decoded_dir, self.allowed_diff, \
-                self.min_seeds, decode_only_cells = self.decode_only_cells)
-                
-            return labeled_img
+
+            print('Shape in Decoding Class: ' +  str(self.labeled_img.shape))
+            decoding_parallel.decoding(barcode_file_path, locations_path, self.labeled_img, self.decoded_dir, self.allowed_diff, \
+                    self.min_seeds, decode_only_cells = self.decode_only_cells)
+                    
+ 
         print("Finished Decoding Across Channels")
         #--------------------------------------------------------------------
         
@@ -220,15 +214,11 @@ class Decoding:
         
         #Get Labeled Img
         #--------------------------------------------------------------------
-        if self.seg != False:
+        # if self.seg != False:
 
-            if self.seg == "roi":
-                labeled_img = self.labeled_img_from_tiff_dir()
+        #     if self.seg == "roi":
+        #         labeled_img = self.labeled_img_from_tiff_dir()
                     
-            elif self.seg == "cellpose":
-            
-                print("Running Decoding Across Channels")
-                labeled_img = self.labeled_img_from_tiff_dir()
         #--------------------------------------------------------------------
         
         for z in range(self.num_zslices):
@@ -268,13 +258,12 @@ class Decoding:
             
             else:
                     
-                decoding_parallel.decoding(barcode_file_path, locations_path_z, labeled_img, decoding_dst_z, self.allowed_diff,  \
+                decoding_parallel.decoding(barcode_file_path, locations_path_z, self.labeled_img, decoding_dst_z, self.allowed_diff,  \
                     self.min_seeds, decode_only_cells = self.decode_only_cells)
             print("Finished Decoding Across Channels")
             #--------------------------------------------------------------------
             
         self.combine_decode_z_s(self.decoded_dir)
-        return labeled_img
         
     def run_decoding_individual_2d(self):
 
@@ -300,17 +289,6 @@ class Decoding:
             #Read barcode key into .mat file
             #--------------------------------------------------------------------
             read_barcode.read_barcode(barcode_src, barcode_dst, self.fake_barcodes)
-            #--------------------------------------------------------------------
-            
-            #Get Labeled Img
-            #--------------------------------------------------------------------
-            if self.seg != False:
-    
-                if self.seg == "roi":
-                    labeled_img = tifffile.imread('/home/nrezaee/sandbox/multiprocessing/decoding/roi.tiff')
-                elif self.seg == "cellpose":
-                    print("Running Decoding Across Channels")
-                    labeled_img = self.labeled_img_from_tiff_dir()
             #--------------------------------------------------------------------
             
             for z in range(self.num_zslices):
@@ -351,7 +329,7 @@ class Decoding:
                                       len(self.decoding_individual))
                     #--------------------------------------------------------------------
                 else:
-                    decoding_parallel.decoding(barcode_dst, locations_path_z, labeled_img, decoding_dst_for_channel_z, self.allowed_diff, self.min_seeds, \
+                    decoding_parallel.decoding(barcode_dst, locations_path_z, self.labeled_img, decoding_dst_for_channel_z, self.allowed_diff, self.min_seeds, \
                         self.decoding_individual.index(channel), len(self.decoding_individual), decode_only_cells = self.decode_only_cells)
                 #--------------------------------------------------------------------
                 
@@ -417,14 +395,9 @@ class Decoding:
                 
                 #Run Decoding Across Channels
                 #--------------------------------------------------------------------
-                print("Running Decoding Across Channels")
-                #labeled_img = self.labeled_img_from_tiff_dir()
-                labeled_img = self.labeled_img_from_tiff_dir()
-                
-                decoding_parallel.decoding(barcode_dst, locations_path, labeled_img, decoding_dst_for_channel, self.allowed_diff, self.min_seeds, \
+                print('Shape in Decoding Class: ' +  str(self.labeled_img.shape))
+                decoding_parallel.decoding(barcode_dst, locations_path, self.labeled_img, decoding_dst_for_channel, self.allowed_diff, self.min_seeds, \
                     self.decoding_individual.index(channel), len(self.decoding_individual), decode_only_cells = self.decode_only_cells)
-                    
-                return labeled_img
                 
             print("Finished Decoding Across Channels")
             #--------------------------------------------------------------------

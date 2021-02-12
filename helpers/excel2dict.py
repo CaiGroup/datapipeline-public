@@ -14,7 +14,8 @@ def delete_unneeded(data):
 def correct_bools(data):
     change_bools = ['radial center ', 'alignment errors', 'visualize dots', 'gaussian fitting', \
                     'nuclei cyto match', 'fake barcodes', 'on/off barcode plot', \
-                    'false positive analysis', 'hamming analysis']
+                    'false positive analysis', 'hamming analysis', 'cyto labeled image', \
+                    'nuclei labeled image']
     
     for key in change_bools:
         if data[key] == 0:
@@ -42,7 +43,7 @@ def get_lowercase(analysis_dict):
 def change_false_to_0(data):
     
     change_me = ['edge deletion', 'distance between nuclei', 'nucleus erode',  \
-                 'cyto erode', 'positions']
+                 'cyto erode', 'positions', 'cyto channel number']
     
     for key in change_me:
         if data[key] == 'False':

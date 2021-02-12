@@ -225,11 +225,12 @@ if sys.argv[1] != 'debug_main':
     
 else:
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_2/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei-preprocessed/HybCycle_0/MMStack_Pos0.ome.tif'
     offset = [0,0,0]
     channels = 'all'
     analysis_name = None
     n_dots = 10
     rand_dir = '/home/nrezaee/temp'
-    get_dots_for_tiff(tiff_src, offset, analysis_name, False, False, channels, False, False, False, 10, None, 100, \
+    radial_center = True
+    get_dots_for_tiff(tiff_src, offset, analysis_name, False, False, channels, False, False, radial_center, 8, None, 100, \
                     300, rand_dir)
