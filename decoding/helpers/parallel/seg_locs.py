@@ -4,10 +4,12 @@ from numpy.core.multiarray import ndarray
 from skimage.draw import polygon
 from skimage.measure import regionprops_table
 import matplotlib.pyplot as plt
+import sys
 
 import numpy as np
 import pandas as pd
 from read_roi import read_roi_zip
+
 
 def get_labeled_img(roi_src, num_z=30, upto_cell=1000000000000):
     roi = read_roi_zip(roi_src)
@@ -105,16 +107,28 @@ def save_plotted_cell(labeled_img, seg_dict_channel, fig_dest):
         
     plt.savefig(fig_dest)
         
+
+def get_points_from_csv(locs_csv_src):
+    my_points = pd.read_csv(locs_csv_src)
+    hybs = my_points.hyb.unique()
+    print(f'{hybs=}')
+    chs = my_points.ch.unique()
+    print(f'{chs=}')
+
+    locs = []
+    for hyb in hybs:
+        for ch in chs:
+            locs_ch = my_points[(my_points.hyb == hyb) & (my_points.ch == ch)]
+            # all_points.append(np.array(locs_ch[['x','y','z']]))
+            # all_intensities.append(np.array(locs_ch[['int']]))
+            locs.append([ np.array(locs_ch[['x','y','z']]), np.array(locs_ch[['int']])])
+            
+    return locs
+    
 def get_segmentation_dict_dots(locations_src, labeled_img, fig_dest):
 
-    #Get Locations
-    #----------------------------------------------
-    locs_info = loadmat(locations_src)
-    points = locs_info['points']
-    intensities = locs_info['intensity']
-    locs = np.concatenate((points, intensities), axis =1)
-    #----------------------------------------------
-    
+    locs = get_points_from_csv(locations_src)
+
     #Get Segmented Dictionary
     #----------------------------------------------
     all_seg_dict = {}
@@ -149,9 +163,12 @@ def get_segmentation_dict_dots(locations_src, labeled_img, fig_dest):
     #----------------------------------------------
     
     return all_seg_dict
-    
-# roi_src = '/groups/CaiLab/personal/nrezaee/raw/intron_pos0/segmentation/RoiSet.zip'
-# labeled_img  = get_labeled_img(roi_src)
 
-# locations_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_mat_dapi_dot_rad/MMStack_Pos0/Dot_Locations/locations.mat'
-# seg_dict = get_segmentation_dict_dots(locations_src, labeled_img)
+
+if sys.argv[1] == 'debug_seg_dict':    
+    roi_src = '/groups/CaiLab/personal/nrezaee/raw/intron_pos0/segmentation/RoiSet.zip'
+    labeled_img  = get_labeled_img(roi_src)
+    
+    locations_src = '/groups/CaiLab/analyses/nrezaee/test1-big/cellpose/MMStack_Pos0/Dot_Locations/locations.csv'
+    fig_dst = '/tmp/fig.png'
+    seg_dict = get_segmentation_dict_dots(locations_src, labeled_img, fig_dst)

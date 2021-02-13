@@ -13,7 +13,7 @@ import tifffile
 import cv2
 import pickle
 import matplotlib.pyplot as plt
-import sys
+import pandas as pd
 
 import sys
 sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
@@ -22,7 +22,7 @@ debug = False
 
 print(f'{sys.argv=}')
 
-if sys.argv[1] == 'debug':
+if sys.argv[1] == 'debug_parallel':
     os.chdir('decoding')
     from helpers.parallel.seg_locs import get_segmentation_dict_dots, get_labeled_img
     from helpers.parallel.rand_list import are_jobs_finished, get_random_list
@@ -46,27 +46,13 @@ def get_barcode_info(barcode_src):
     
     total_number_of_channels = num_of_rounds*channels_per_round
     
+    print(f'{channels_per_round=}')
     print(f'{total_number_of_channels=}')
     print(f'{num_of_rounds=}')
     assert total_number_of_channels % num_of_rounds == 0
     
     return total_number_of_channels, num_of_rounds
-    
-def save_plotted_cell(labeled_img, points, fig_dest):
-    plt.figure(figsize=(30,30))
 
-    #print(f'{points=}')
-    print(f'{points.shape=}')
-
-    ave_z = int((np.max(points[:,0]) + np.min(points[:,0]))//2)
-    if ave_z < labeled_img.shape[0]:
-        print(f'{ave_z=}')
-        plt.imshow(labeled_img[ave_z,:,:])
-        plt.scatter(points[:,1][:100], points[:,2][:100], s=10, color='red')
-        print(f'{fig_dest=}')
-        plt.savefig(fig_dest)
-
-    
 
 def run_matlab_decoding(rand, barcode_src, locations_cell_path, dest, num_of_rounds, allowed_diff, min_seeds, total_number_of_channels, channel_index, number_of_individual_channels_for_decoding):           
     #Create Matlab Command
@@ -122,6 +108,23 @@ def run_matlab_decoding(rand, barcode_src, locations_cell_path, dest, num_of_rou
     print(" ".join(call_me))
     subprocess.call(call_me)
     
+def save_points_int_to_csv(points, intensities, csv_dst):
+    df = pd.DataFrame(columns = ['hyb', 'ch', 'x', 'y', 'z', 'int'])
+
+    for i in range(points.shape[0]):
+        hyb_array = np.full((points[i].shape[0]), i)
+        ch_array = np.full((points[i].shape[0]), 1)
+        data_for_df = {'hyb':hyb_array, 'ch':ch_array, \
+                       'x':np.squeeze(points[i][:,0]), 'y':np.squeeze(points[i][:,1]), \
+                        'z':np.squeeze(points[i][:,2]), 'int': np.squeeze(intensities[i])}
+        df_ch = pd.DataFrame(data_for_df)
+
+        df = df.append(df_ch)
+        
+    df.to_csv(csv_dst, index =False)
+    
+    return None
+    
 def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_seeds, channel_index = None, \
         number_of_individual_channels_for_decoding=None, roi_path=None, bool_cellpose=False, decode_only_cells = False):
     
@@ -151,9 +154,11 @@ def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_se
         cell_dirs.append('cell_' +str(i))
         temp_dir = os.path.join(dest, 'cell_' + str(i)) 
         os.mkdir(temp_dir)
-        locations_cell_path = os.path.join(temp_dir, 'locations_for_cell.mat')
+        locations_cell_path = os.path.join(temp_dir, 'locations_for_cell.csv')
+        
+        save_points_int_to_csv(locations_for_cell[:,0], locations_for_cell[:,1], locations_cell_path)
 
-        savemat(locations_cell_path, {'points':locations_for_cell[:,0], 'intensity':locations_for_cell[:,1]})
+        # savemat(locations_cell_path, {'points':locations_for_cell[:,0], 'intensity':locations_for_cell[:,1]})
         temp_dest =temp_dir
         #-------------------------------------------------------------------
         
@@ -178,18 +183,18 @@ def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_se
     return rand_list
     
 
-# if sys.argv[1] == 'debug':
-#     import tifffile 
+if sys.argv[1] == 'debug_parallel':
+    import tifffile 
     
-#     labeled_img_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_mat_dapi/MMStack_Pos0/Segmentation/Channel_1/labeled_img.tiff'
-#     barcode_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_1000/BarcodeKey/channel_1.mat'
-#     locations_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_1000/MMStack_Pos0/Dot_Locations/locations.mat'
+    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_mat_dapi/MMStack_Pos0/Segmentation/Channel_1/labeled_img.tiff'
+    barcode_src = '/groups/CaiLab/analyses/nrezaee/test1-big/cellpose/BarcodeKey/channel_1.mat'
+    locations_src = '/groups/CaiLab/analyses/nrezaee/test1-big/cellpose/MMStack_Pos0/Dot_Locations/locations.csv'
     
-#     dest = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/temp/'
-#     allowed_diff = 0
-#     min_seeds = 3
+    dest = '/home/nrezaee/temp/'
+    allowed_diff = 0
+    min_seeds = 3
     
-#     labeled_img = tifffile.imread(labeled_img_src)
-#     decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_seeds)
+    labeled_img = tifffile.imread(labeled_img_src)
+    decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_seeds)
 
 

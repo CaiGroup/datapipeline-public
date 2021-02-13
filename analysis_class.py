@@ -513,9 +513,6 @@ class Analysis:
         #--------------------------------------------------------------------------------
         if self.decoding_across == True or self.decoding_individual != 'all' \
         or self.decoding_with_previous_dots == True or self.decoding_with_previous_locations == True:
-            
-            print('Shape before decoding in Analysis Class: ' +  str(self.labeled_img.shape))
-            
             decoder = Decoding(self.data_dir, self.position, self.decoded_dir, self.locations_dir, self.position_dir, self.barcode_dst, \
                 self.barcode_key_src, self.decoding_with_previous_dots, self.decoding_with_previous_locations, self.fake_barcodes, \
                 self.decoding_individual, self.min_seeds, self.allowed_diff, self.dimensions, self.num_zslices, self.segmentation, \
@@ -568,30 +565,30 @@ class Analysis:
         #--------------------------------------------------------------------------------
         
         
-        # #Declare Segmentation
-        # #--------------------------------------------------------------------------------
-        # if self.segmentation != False:
-        #     timer_tools.logg_elapsed_time(self.start_time, 'Starting Segmentation')
-        #     segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
-        #                 self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
-        #                 self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.nuclei_erode, self.cyto_erode)
+        #Declare Segmentation
+        #--------------------------------------------------------------------------------
+        if self.segmentation != False:
+            timer_tools.logg_elapsed_time(self.start_time, 'Starting Segmentation')
+            segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
+                        self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
+                        self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.nuclei_erode, self.cyto_erode)
         
-        #     if self.decoding_across == True or \
-        #         self.decoding_with_previous_dots == True or \
-        #         self.decoding_with_previous_locations == True:
+            if self.decoding_across == True or \
+                self.decoding_with_previous_dots == True or \
+                self.decoding_with_previous_locations == True:
                 
-        #         segmenter.run_segmentation_across()      
+                segmenter.run_segmentation_across()      
 
-        #     elif not self.decoding_individual == 'all':
+            elif not self.decoding_individual == 'all':
                 
-        #         print('Running Segmentation Individual')
-        #         segmenter.run_segmentation_individually()
+                print('Running Segmentation Individual')
+                segmenter.run_segmentation_individually()
                 
-        #     elif self.segmentation == 'cellpose':
-        #         segmenter.retrieve_labeled_img()
+            elif self.segmentation == 'cellpose':
+                segmenter.retrieve_labeled_img()
              
-        #     timer_tools.logg_elapsed_time(self.start_time, 'Ending Segmentation')
-        # #--------------------------------------------------------------------------------
+            timer_tools.logg_elapsed_time(self.start_time, 'Ending Segmentation')
+        #--------------------------------------------------------------------------------
     
         
         #Make Post Analysis

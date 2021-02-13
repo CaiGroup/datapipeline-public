@@ -58,7 +58,7 @@ def submit_seg_job(rand_dir, rand_list):
     
     print("Running Segmentation with SLURM GPU's")
 
-    command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /home/nrezaee/sandbox/cellpose/gpu/tensorflow-20.02-tf1-py3.sif python -m cellpose  --do_3D --img_filter dapi_channel --pretrained_model cyto --diameter 0 --use_gpu --no_npy --save_tif --dir '
+    command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /home/nrezaee/sandbox/cellpose/gpu/tensorflow-20.02-tf1-py3.sif python -m cellpose  --do_3D --cellprob_threshold=3 --img_filter dapi_channel --pretrained_model cyto --diameter 0 --use_gpu --no_npy --save_tif --dir '
     command_for_cellpose_with_dir = command_for_cellpose + rand_dir
     print(f'{command_for_cellpose_with_dir=}')
     script_name = os.path.join(rand_dir, 'seg.sh')
@@ -115,9 +115,10 @@ def get_labeled_img_cellpose(tiff_path, dst=None):
     return labeled_img
 
 if sys.argv[1] == 'debug_cellpose':
-    tiff_path = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_0/MMStack_Pos0.ome.tif'
-    dst= 'labeled_img.tif'
+    tiff_path = '/groups/CaiLab/personal/ytakei/raw/2021-01-05-E14mDuxCA4-RNAIFfull-rep2-rRNA-test/HybCycle_0/MMStack_Pos0.ome.tif'
+    dst= '/home/nrezaee/temp/labeled_img_thresh_3.tif'
     labeled_img = get_labeled_img_cellpose(tiff_path, dst)
+    print(f'{dst=}')
     print(f'{labeled_img.shape=}')
     
     

@@ -105,10 +105,10 @@ def post_process(edge_delete_dist, dist_between_nuclei, label_img_src, labeled_c
     else:
         label_img_src = delete_edges(label_img_src, edge_delete_dist, post_process_dir)
         
-        if labeled_cyto_path != None:
-            print(2)
-            labeled_cyto_src = delete_edges(labeled_cyto_path, edge_delete_dist, post_process_dir)
-            copyfile(labeled_cyto_src, labeled_cyto_path)
+        # if labeled_cyto_path != None:
+        #     print(2)
+        #     labeled_cyto_src = delete_edges(labeled_cyto_path, edge_delete_dist, post_process_dir)
+        #     copyfile(labeled_cyto_src, labeled_cyto_path)
         
     print(f'{label_img_dst=}')
     copyfile(label_img_src, label_img_dst)

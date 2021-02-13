@@ -93,7 +93,7 @@ class Dot_Detection:
             
             #Run Dot Detection
             #--------------------------------------------------------------------
-            points, intensities = self.get_dot_locations()
+            df_locs = self.get_dot_locations()
             #--------------------------------------------------------------------
             
             
@@ -102,7 +102,7 @@ class Dot_Detection:
             if not os.path.exists(self.locations_dir ):
                 os.makedirs(self.locations_dir )
             
-            locations_file_name = 'locations_z_' + str(z) +'.mat'
+            locations_file_name = 'locations_z_' + str(z) +'.csv'
         
             locations_path = os.path.join(self.locations_dir , locations_file_name)
             #--------------------------------------------------------------------
@@ -113,8 +113,7 @@ class Dot_Detection:
             print("        Saving Locations to", locations_path, flush=True)
             
     
-            sio.savemat(locations_path,{'points': points, 'intensity': intensities}, oned_as = 'column')
-            self.save_locs_shape(locations_path)
+            df_locs.to_csv(locations_path, index = False)
             #--------------------------------------------------------------------
 
     def run_dot_detection(self):

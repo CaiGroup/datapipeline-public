@@ -54,7 +54,7 @@ class Segmentation:
         self.cyto_channel_num = cyto_channel_num
         self.get_nuclei_img = get_nuclei_img
         self.get_cyto_img = get_cyto_img
-        
+        self.labeled_img = labeled_img
         
     def combine_seg_z_s(seg_channel_dir):
     
@@ -128,7 +128,7 @@ class Segmentation:
         elif "cellpose" in self.seg_type:
             
                 
-            run_cellpose.run_me(self.data_dir, self.seg_dir, decoded_genes_path, self.position, self.fake_barcodes)
+            run_cellpose.run_me(self.data_dir, self.seg_dir, decoded_genes_path, self.position, self.labeled_img)
             #----------------------------------------------
     
     
@@ -189,7 +189,7 @@ class Segmentation:
         
             elif "cellpose" in self.seg_type:
                 
-                run_cellpose.run_me(self.data_dir, segmented_dir, decoded_genes_path, self.position, self.fake_barcodes)
+                run_cellpose.run_me(self.data_dir, segmented_dir, decoded_genes_path, self.position, self.labeled_img)
                 #----------------------------------------------
                 
     
