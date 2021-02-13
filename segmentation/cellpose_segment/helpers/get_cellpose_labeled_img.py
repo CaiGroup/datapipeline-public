@@ -10,6 +10,7 @@ import tempfile
 import cv2
 import sys
 import time
+import tifffile as tf
 
 sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
 from helpers.rand_list import get_random_list, are_jobs_finished
@@ -54,11 +55,15 @@ def save_shrinked(shrinked):
     
     return rand_list, rand_dir, dapi_tiff_dst
     
-def submit_seg_job(rand_dir, rand_list):
+def submit_seg_job(rand_dir, rand_list, num_z):
     
     print("Running Segmentation with SLURM GPU's")
-
-    command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /home/nrezaee/sandbox/cellpose/gpu/tensorflow-20.02-tf1-py3.sif python -m cellpose  --do_3D --cellprob_threshold=3 --img_filter dapi_channel --pretrained_model cyto --diameter 0 --use_gpu --no_npy --save_tif --dir '
+    
+    if num_z >= 4:
+        command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /home/nrezaee/sandbox/cellpose/gpu/tensorflow-20.02-tf1-py3.sif python -m cellpose  --do_3D --img_filter dapi_channel --pretrained_model cyto --diameter 0 --use_gpu --no_npy --save_tif --dir '
+    if num_z < 4:
+        command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /home/nrezaee/sandbox/cellpose/gpu/tensorflow-20.02-tf1-py3.sif python -m cellpose   --img_filter dapi_channel --pretrained_model cyto --diameter 0 --use_gpu --no_npy --save_tif --dir '
+    
     command_for_cellpose_with_dir = command_for_cellpose + rand_dir
     print(f'{command_for_cellpose_with_dir=}')
     script_name = os.path.join(rand_dir, 'seg.sh')
@@ -79,6 +84,15 @@ def expand_img(masked_file_path, tiff, dst):
     labeled_img = tifffile.imread(dst)
     return labeled_img
     
+def get_3d_from_2d(src, num_z):
+    tiff_2d = tf.imread(src)
+
+    tiff_3d = []
+    for z in range(num_z):
+        tiff_3d.append(tiff_2d)
+
+    tf.imwrite(src, tiff_3d)
+    
 def get_labeled_img_cellpose(tiff_path, dst=None):
 
 
@@ -93,9 +107,11 @@ def get_labeled_img_cellpose(tiff_path, dst=None):
     shrinked = get_shrinked(tiff)
     #shrinked.shape = [z,x,y]
 
+    
     rand_list, rand_dir, dapi_tiff_dst = save_shrinked(shrinked)
-
-    submit_seg_job(rand_dir, rand_list)
+    
+    num_z = len(shrinked)
+    submit_seg_job(rand_dir, rand_list, num_z)
 
     while not are_jobs_finished(rand_list):
         print('Waiting for Segmenation to Finish')
@@ -103,6 +119,10 @@ def get_labeled_img_cellpose(tiff_path, dst=None):
     
     masked_file_path = os.path.join(rand_dir, 'dapi_channel_cp_masks.tif')
     
+    if num_z < 4:
+        get_3d_from_2d(masked_file_path, num_z)
+        
+        
     resize_script = os.path.join('/home/nrezaee/test_cronjob_multi_dot/segmentation/cellpose_segment/helpers/nucsmoothresize')
     
     if dst == None:
@@ -115,7 +135,7 @@ def get_labeled_img_cellpose(tiff_path, dst=None):
     return labeled_img
 
 if sys.argv[1] == 'debug_cellpose':
-    tiff_path = '/groups/CaiLab/personal/ytakei/raw/2021-01-05-E14mDuxCA4-RNAIFfull-rep2-rRNA-test/HybCycle_0/MMStack_Pos0.ome.tif'
+    tiff_path = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_1/MMStack_Pos0.ome.tif'
     dst= '/home/nrezaee/temp/labeled_img_thresh_3.tif'
     labeled_img = get_labeled_img_cellpose(tiff_path, dst)
     print(f'{dst=}')
