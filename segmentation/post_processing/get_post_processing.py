@@ -116,7 +116,7 @@ def post_process(edge_delete_dist, dist_between_nuclei, label_img_src, labeled_c
         
     
 def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist, dist_between_nuclei, bool_cyto_match, \
-        nucleus_erode, cyto_erode, cyto_channel_num, get_nuclei_img, get_cyto_img, debug = False):
+        area_tol, cyto_channel_num, get_nuclei_img, get_cyto_img, debug = False):
     
     cwd = os.getcwd()
     post_process_dir = os.path.join(cwd, 'segmentation/post_processing')
@@ -141,7 +141,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
         print("Running Nuccy Match")
         nuclei_dst = os.path.join(segment_results_path, 'nuclei_labeled_img_matched.tif')
         cyto_dst = os.path.join(segment_results_path, 'cyto_labeled_img_matched.tif')
-        get_matched_3d_img(labeled_img_path, labeled_cyto_path, nucleus_erode, cyto_erode, post_process_dir, nuclei_dst, cyto_dst)
+        get_matched_3d_img(labeled_img_path, labeled_cyto_path, area_tol, post_process_dir, nuclei_dst, cyto_dst)
         
         return nuclei_dst
         
@@ -161,11 +161,10 @@ if sys.argv[1] == 'debug_post':
     edge = 0
     dist = 0
     bool_cyto_match = True
-    nucleus_erode = 20
-    cyto_erode = 10
-    debug = False
+    area_tol = 1
+    debug = True
     cyto_channel_num = 1
-    save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, nucleus_erode, cyto_erode, cyto_channel_num, debug=debug)
+    save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol, cyto_channel_num, debug=debug)
 
     
     

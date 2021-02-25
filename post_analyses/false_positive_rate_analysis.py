@@ -78,11 +78,14 @@ def get_false_pos_intensities_hist(genes_csv_src, dest):
     
     df = pd.read_csv(genes_csv_src)
     
+    if 'geneID' in df.columns:
+        df.rename(columns = {'geneID':'gene'}, inplace=True)
+        
     fake_ids = [ gene for gene in df.geneID if 'fake' in gene]
     real_ids = [ gene for gene in df.geneID if 'fake' not in gene]
 
-    df_fake = df[df.geneID.isin(fake_ids)]
-    df_real = df[df.geneID.isin(real_ids)]
+    df_fake = df[df.gene.isin(fake_ids)]
+    df_real = df[df.gene.isin(real_ids)]
     
 
     pop_a = mpatches.Patch(color='b', label='On Barcodes')
@@ -98,11 +101,14 @@ def get_false_pos_intensities_hist(genes_csv_src, dest):
     
     df = pd.read_csv(genes_csv_src)
     
-    fake_ids = [ gene for gene in df.geneID if 'fake' in gene]
-    real_ids = [ gene for gene in df.geneID if 'fake' not in gene]
+    if 'geneID' in df.columns:
+        df.rename(columns = {'geneID':'gene'}, inplace=True)
+    
+    fake_ids = [ gene for gene in df.gene if 'fake' in gene]
+    real_ids = [ gene for gene in df.gene if 'fake' not in gene]
 
-    df_fake = df[df.geneID.isin(fake_ids)]
-    df_real = df[df.geneID.isin(real_ids)]
+    df_fake = df[df.gene.isin(fake_ids)]
+    df_real = df[df.gene.isin(real_ids)]
     
 
     pop_a = mpatches.Patch(color='b', label='On Barcodes')
@@ -143,7 +149,7 @@ def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto =
     save_to_file(num_reals, num_fakes, ratio, num_reals_seg, num_fakes_seg, ratio_seg, dst)
     #------------------------------------------------------
     
-    fig_dest = os.path.join(os.path.basename(dst), 'On-Off-Barcode-Intensity-Analysis.png')
+    fig_dest = os.path.join(os.path.dirname(dst), 'On-Off-Barcode-Intensity-Analysis.png')
     get_false_pos_intensities_hist(gene_locations_assigned_to_cell_src, fig_dest)
     
     print("Saving False Barcodes to", dst)

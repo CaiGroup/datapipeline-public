@@ -30,6 +30,7 @@ from dot_detection.dot_detectors_2d.dot_detector_2d import find_dots
 from dot_detection.helpers.multiprocessed_points import combine_multiprocessed_points
 from dot_detection.rand_list import are_jobs_finished, get_random_list
 from dot_detection.helpers.combine_multi_dots import combine_locs
+from timer import timer_tools
 #--------------------------------------------------------------------------------
 
 
@@ -67,6 +68,7 @@ class Dot_Detection:
         self.num_zslices = num_zslices
         self.nbins = nbins
         self.threshold = threshold
+        
         
         #Set Directories
         #--------------------------------------------------------------
@@ -187,6 +189,7 @@ class Dot_Detection:
         dot_detection_dir = os.path.join(cwd, 'dot_detection', 'dot_detectors_3d')
         #-------------------------------------------------------------------
 
+
         #Run alignment
         #-----------------------------------------------------------------
         print(f'{sub_dirs=}')
@@ -231,6 +234,8 @@ class Dot_Detection:
                     
                     list_cmd = [str(i) for i in list_cmd]
                
+                    time_for_slurm = "0:10:00"
+               
                 elif self.dot_detection == "biggest jump":
                     
 
@@ -241,7 +246,9 @@ class Dot_Detection:
                             '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--z_slices', z_slice]
                     
                     list_cmd = [str(i) for i in list_cmd]
-                
+                    
+                    time_for_slurm = "0:10:00"            
+                        
                 elif self.dot_detection == "matlab 3d":
                     
 
@@ -253,6 +260,21 @@ class Dot_Detection:
                             self.nbins, '--threshold', self.threshold]
                     
                     list_cmd = [str(i) for i in list_cmd]
+                    
+                    time_for_slurm = "0:10:00"
+                    
+                elif self.dot_detection == "adcg 2d":
+                    
+
+                    list_cmd = ['python', dot_detection_dir+ '/adcg_2d.py', '--offset0', offset[0], '--offset1', offset[1], '--offset2', offset[2], \
+                    '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
+                            '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
+                            '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
+                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--z_slices', z_slice]
+                    
+                    list_cmd = [str(i) for i in list_cmd]
+                    
+                    time_for_slurm = "1:00:00"
                 
                 else:
                     
@@ -271,7 +293,7 @@ class Dot_Detection:
                 
                 #os.system(cmd)
                 out_path = os.path.join(rand_dir, 'slurm.out')
-                call_me = ['sbatch', '--job-name', rand_list[sub_dirs.index(sub_dir)], '--output', out_path, "--time", "0:10:00", "--mem-per-cpu", "5G", '--ntasks', '1', script_name]
+                call_me = ['sbatch', '--job-name', rand_list[sub_dirs.index(sub_dir)], '--output', out_path, "--time", time_for_slurm, "--mem-per-cpu", "5G", '--ntasks', '1', script_name]
                 print(" ".join(call_me))
                 subprocess.call(call_me)
                 #------------------------------------------------

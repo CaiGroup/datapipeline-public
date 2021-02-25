@@ -10,6 +10,7 @@ import tempfile
 import cv2
 import sys
 import time
+import shutil
 import tifffile as tf
 
 sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
@@ -131,6 +132,7 @@ def get_labeled_img_cellpose(tiff_path, dst=None):
     else:
         labeled_img = expand_img(masked_file_path, tiff, dst)
     
+    shutil.rmtree(rand_dir)
 
     return labeled_img
 

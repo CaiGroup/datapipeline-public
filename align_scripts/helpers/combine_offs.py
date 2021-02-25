@@ -10,16 +10,8 @@ def combine_offsets(rand_list):
     for rand in rand_list:
         glob_rand_dir = os.path.join(temp_dir, rand, 'Hyb*')
         
-        try:
-            off_pkl = glob.glob(glob_rand_dir)[0]
-        
-        except:
-            
-            prev_rand = rand_list[rand_list.index(rand) -1]
-            files = os.listdir(os.path.join(temp_dir, prev_rand))
-            
-            print(f'{files=}')
-            
+        off_pkl = glob.glob(glob_rand_dir)[0]
+
             
         with open(off_pkl, 'rb') as fp:
             offset = pickle.load(fp)

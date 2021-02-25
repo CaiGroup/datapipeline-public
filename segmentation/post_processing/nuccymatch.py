@@ -41,16 +41,16 @@ def make_continuous_cyto(cyto_img):
     return cyto_img
     
 def run_nuccymatch(post_process_dir, temp_nuclei_path, cyto_2d_src, \
-        temp_match_path, nuclei_erode, cyto_erode):
+        temp_match_path, area_tol):
     
     nuccy_path = os.path.join(post_process_dir, 'nuccytomatch')
-    cmd = 'sh ' + nuccy_path + ' ' + temp_nuclei_path + ' ' + cyto_2d_src + ' ' + temp_match_path + ' ' + str(nuclei_erode) + ' ' + str(cyto_erode)
+    cmd = 'sh ' + nuccy_path + ' ' + temp_nuclei_path + ' ' + cyto_2d_src + ' ' + temp_match_path + ' ' + str(area_tol)
     print(f'{cmd=}')
     os.system(cmd)
     
             
 
-def get_matched_3d_img(nuclei_3d_src, cyto_2d_src, nuclei_erode, cyto_erode, post_process_dir, nuclei_dst = None, cyto_dst = None):
+def get_matched_3d_img(nuclei_3d_src, cyto_2d_src, area_tol, post_process_dir, nuclei_dst = None, cyto_dst = None):
 
     rand = ''.join(random.choice(string.ascii_lowercase) for i in range(10)) 
     temp_dir = os.path.join('/home/nrezaee/temp', rand)
@@ -66,11 +66,11 @@ def get_matched_3d_img(nuclei_3d_src, cyto_2d_src, nuclei_erode, cyto_erode, pos
     tifffile.imwrite(temp_nuclei_path, nuclei_2d_img)
     
     run_nuccymatch(post_process_dir, temp_nuclei_path, cyto_2d_src, \
-            temp_match_path, nuclei_erode, cyto_erode)
+            temp_match_path, area_tol)
     
     matched_img = tifffile.imread(temp_match_dst)
-    nuclei_labeled_img = matched_img[1,:,:]
-    cyto_labeled_img = matched_img[0,:,:]
+    nuclei_labeled_img = matched_img[0,:,:]
+    cyto_labeled_img = matched_img[1,:,:]
     
     nuclei_matched_3d, cyto_matched = match_3d_nuclei_img(nuclei_3d_img, cyto_labeled_img, matched_img)
     
@@ -87,16 +87,19 @@ def get_matched_3d_img(nuclei_3d_src, cyto_2d_src, nuclei_erode, cyto_erode, pos
    
 
 import sys
-if sys.argv == 'debug':
-    nuclei_3d_src = 'labeled_nuclei_img.tif'
-    cyto_2d_src = 'labeled_cyto_img.tif'
+print('hello')
+print(sys.argv)
+if sys.argv[1] == 'debug_nuccy':
+    print('hi')
+    nuclei_3d_src = '/groups/CaiLab/analyses/nrezaee/test1-seg/post_seg_match/MMStack_Pos0/Segmentation/labeled_img.tif'
+    cyto_2d_src = '/groups/CaiLab/analyses/nrezaee/test1-seg/post_seg_match/MMStack_Pos0/Segmentation/labeled_cyto_img.tif'
     
-    nuclei_erode = 0
-    cyto_erode = 0
+    area_tol = 1
+    
     post_process_dir = '/home/nrezaee/sandbox/gmic_testing/nuccy_results/'
     
     nuclei_dst = 'nuclei_matched.tif'
     cyto_dst = 'cyto_matched.png'
     
-    get_matched_3d_img(nuclei_3d_src, cyto_2d_src, nuclei_erode, cyto_erode, \
+    get_matched_3d_img(nuclei_3d_src, cyto_2d_src, area_tol, \
             post_process_dir, nuclei_dst = nuclei_dst, cyto_dst = cyto_dst)

@@ -128,10 +128,12 @@ def run_alignment(exp_name, personal, position, align_function):
             
     
             call_me = ['sbatch',  '--job-name', rand_list[sub_dirs.index(sub_dir)], "--time", "0:5:00","--mem-per-cpu", "9G", "--ntasks", '1', script_name ]
-                 
+            print(f'{" ".join(call_me)=}')
             subprocess.call(call_me)
 
     if align_function != 'no_align':
+        print(f'{rand_list=}')
+        
         while not are_jobs_finished(rand_list):
             print('Waiting for Alignment Jobs to Finish')
             time.sleep(2)

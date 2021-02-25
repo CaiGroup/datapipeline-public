@@ -10,7 +10,7 @@ def are_jobs_finished(job_names):
     #Get User and Output
     #---------------------------------
     user = getpass.getuser()
-    slurm_out = str(subprocess.check_output(['squeue', '-u', user]))
+    slurm_out = str(subprocess.check_output(['squeue', '--Format=Name', '--me']))
     #---------------------------------
 
     
@@ -28,7 +28,7 @@ def are_jobs_finished(job_names):
     return bool_jobs_finished
     
 
-def id_generator(size=8):
+def id_generator(size=20):
     rand_choices = string.ascii_letters + '1234567890'
     return ''.join(random.choice(rand_choices) for _ in range(size))
     

@@ -126,6 +126,7 @@ class Analysis:
         self.cyto_channel_num = -2
         self.get_nuclei_seg = False
         self.get_cyto_seg = False
+        self.area_tol = 0
         #--------------------------------------------------------------
         
         
@@ -272,7 +273,7 @@ class Analysis:
         
     def set_all_post_analyses_true(self):
         self.hamming_analysis = True
-        on_off_barcode_analysis = True
+        self.on_off_barcode_analysis = True
         self.false_positive_rate_analysis = True
         self.fake_barcodes = True
         
@@ -323,6 +324,11 @@ class Analysis:
         self.get_cyto_seg = True
         
         print("    Set to Get Cyto Labeled Image")
+        
+    def set_area_tol_arg(self, area_tol):
+        self.area_tol = float(area_tol)
+        
+        print("    Set Matching Area Tolerance to", str(self.area_tol))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -421,7 +427,7 @@ class Analysis:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Segmentation')
             segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
                         self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
-                        self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.nuclei_erode, self.cyto_erode, self.cyto_channel_num, \
+                        self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
                         self.get_nuclei_seg, self.get_cyto_seg)
         
             self.labeled_img = segmenter.retrieve_labeled_img()
@@ -504,10 +510,6 @@ class Analysis:
             self.run_dot_detection()
         #--------------------------------------------------------------------------------
         
-        #While labeled img is not finished
-        
-        #labeled_img = fucntion
-        
             
         #Declare Decoding Class if needed
         #--------------------------------------------------------------------------------
@@ -546,7 +548,7 @@ class Analysis:
                 timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
                 
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Individual')
-            self.labeled_img = decoder.run_decoding_individual()
+            decoder.run_decoding_individual()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Individual')
         #--------------------------------------------------------------------------------
 
@@ -560,7 +562,7 @@ class Analysis:
                 
             
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Across')
-            self.labeled_img = decoder.run_decoding_across()
+            decoder.run_decoding_across()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Across')
         #--------------------------------------------------------------------------------
         
@@ -570,9 +572,11 @@ class Analysis:
         if self.segmentation != False:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Segmentation')
             segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
-                        self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
-                        self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.nuclei_erode, self.cyto_erode)
-        
+                self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
+                self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
+                self.get_nuclei_seg, self.get_cyto_seg)
+                
+            print(f'{self.labeled_img.shape=}')
             if self.decoding_across == True or \
                 self.decoding_with_previous_dots == True or \
                 self.decoding_with_previous_locations == True:
@@ -581,12 +585,10 @@ class Analysis:
 
             elif not self.decoding_individual == 'all':
                 
+                print(f'{self.labeled_img.shape=}')
                 print('Running Segmentation Individual')
                 segmenter.run_segmentation_individually()
-                
-            elif self.segmentation == 'cellpose':
-                segmenter.retrieve_labeled_img()
-             
+     
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Segmentation')
         #--------------------------------------------------------------------------------
     
@@ -605,7 +607,7 @@ class Analysis:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting On Off Barcode Plot Analysis')
             if self.decoding_across == True:
                 post_analysis.run_on_off_barcode_analysis_across()
-            elif self.decoding_individual!=all:
+            elif self.decoding_individual!='all':
                 post_analysis.run_on_off_barcode_analysis_indiv()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending  On Off Barcode Plot Analysis')
         #--------------------------------------------------------------------------------
@@ -617,7 +619,7 @@ class Analysis:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting False Positive Rate')
             if self.decoding_across ==True:
                 post_analysis.run_false_positive_rate_analysis_across()
-            elif self.decoding_individual!=all:
+            elif self.decoding_individual!='all':
                 post_analysis.run_false_positive_rate_analysis_indiv()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending False Positive Rate')
         #--------------------------------------------------------------------------------
@@ -629,7 +631,7 @@ class Analysis:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Hamming Analysis')
             if self.decoding_across == True:
                 post_analysis.run_hamming_analysis_across()
-            elif self.decoding_individual !=all:
+            elif self.decoding_individual !='all':
                 post_analysis.run_hamming_analysis_indiv()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Hamming Analysis')
         #--------------------------------------------------------------------------------

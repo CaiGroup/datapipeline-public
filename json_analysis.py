@@ -365,6 +365,13 @@ def run_analysis(json_name, position):
              analysis.set_cyto_labeled_img_true()
     #----------------------------------------------------------
     
+    #Matching Tolerance for Segmentation
+    #----------------------------------------------------
+    if 'matching tolerance' in data.keys():
+        if data['matching tolerance'] != 'none':
+            analysis.set_area_tol_arg(data['matching tolerance'])
+    #----------------------------------------------------------
+    
     #Writ
     #----------------------------------------------------------
     analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)

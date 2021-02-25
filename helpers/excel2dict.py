@@ -42,8 +42,7 @@ def get_lowercase(analysis_dict):
 
 def change_false_to_0(data):
     
-    change_me = ['edge deletion', 'distance between nuclei', 'nucleus erode',  \
-                 'cyto erode', 'positions', 'cyto channel number']
+    change_me = ['edge deletion', 'distance between nuclei', 'positions', 'cyto channel number']
     
     for key in change_me:
         if data[key] == 'False':
