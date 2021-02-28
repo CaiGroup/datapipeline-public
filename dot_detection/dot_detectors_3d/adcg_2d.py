@@ -139,19 +139,30 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             
             df_points_2d = get_adcg_dots(tiff_2d)
             
+            if bool_visualize_dots == True and z == tiff_shape[0]//2:
+                get_visuals(tiff_src, df_points_2d, tiff_2d, analysis_name)
+            
             df_points_3d = df_points_3d.append(df_points_2d)
             
         
         channel_array = np.full((df_points_3d.shape[0]), channel + 1)
         hyb = int(tiff_src.split('HybCycle_')[1].split('/MMStack')[0])
         hyb_array = np.full((df_points_3d.shape[0]), hyb)
+        z_array = np.full((df_points_3d.shape[0]), 0)
         
+        df_points_3d['z'] = z_array
         df_points_3d['ch'] = channel_array
         df_points_3d['hyb'] = hyb_array
         
         df_tiff = df_tiff.append(df_points_3d)
         print(f'{df_tiff.shape=}')
         
+        if offset != [0,0,0]:
+            print('Shitfing Locations')
+            df_tiff['x'] = df_tiff['x'] +offset[0]
+            df_tiff['y'] = df_tiff['y'] +offset[1]
+            df_tiff['z'] = df_tiff['z'] +offset[1]
+            
             #Shift Locations
             #---------------------------------------------------------------------
             # dot_analysis[0] = shift_locations(dot_analysis[0], np.array(offset), tiff_src, bool_chromatic)
@@ -205,13 +216,14 @@ if sys.argv[1] != 'debug_adcg':
                           
 else:                        
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_2/MMStack_Pos0.ome.tif'
-    offset = [0,0,0]
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_2/MMStack_Pos1.ome.tif'
+    offset = [1,1,1]
     channels = [1]
-    analysis_name = None
+    analysis_name = 'adcg'
     n_dots = 10
     rand_dir = '/home/nrezaee/temp'
-    get_dots_for_tiff(tiff_src, offset, analysis_name, False, False, False, channels, False, rand_dir)
+    visualize_dots = True
+    get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, False, False, channels, False, rand_dir)
     
     
 

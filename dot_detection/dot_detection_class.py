@@ -24,7 +24,6 @@ import pandas as pd
 #Import some helpers
 #--------------------------------------------------------------------------------
 from load_tiff import tiffy
-from dot_detection.visualize_dots.tiff_visuals import plot_and_save_locations
 from dot_detection.reorder_hybs import get_and_sort_hybs
 from dot_detection.dot_detectors_2d.dot_detector_2d import find_dots
 from dot_detection.helpers.multiprocessed_points import combine_multiprocessed_points
@@ -79,14 +78,22 @@ class Dot_Detection:
         self.locations_dir = os.path.join(self.position_dir, 'Dot_Locations')
         #--------------------------------------------------------------
         
-    def save_locs_shape(self, locations_src):
-        points = loadmat(locations_src)['points']
-        dst = os.path.join(os.path.dirname(locations_src), \
-                           os.path.basename(locations_src).replace('.mat', '') + '_Shape.txt')
-    
-        with open(dst, "w") as f:
-            for i in range(points.shape[0]):
-                f.write('Channel ' + str(i) + ' Number of Dots: ' + str(points[i][0].shape[0]) + '\n')
+    def save_locations_shape(self, locs_csv_src):
+        
+        dst = os.path.join(os.path.dirname(locs_csv_src), 'Locations_Shape.txt')
+        f = open(dst, "a")
+        df = pd.read_csv(locs_csv_src)
+        
+        hybs = df.hyb.unique()
+        chs = df.ch.unique()
+        i = 0
+        for hyb in hybs:
+            for ch in chs:
+                df_ch = df.loc[(df['hyb'] == hyb) & (df['ch'] == ch)]
+                f.write("Dots in Channel " + str(i) + ": " + str(df_ch.shape[0]) + "\n")
+                i+=1
+        
+        f.close()
     
  
     def run_dot_detection_2d(self):
@@ -116,6 +123,7 @@ class Dot_Detection:
             
     
             df_locs.to_csv(locations_path, index = False)
+            self.save_locations_shape(locations_path)
             #--------------------------------------------------------------------
 
     def run_dot_detection(self):
@@ -150,7 +158,7 @@ class Dot_Detection:
         
 
         df_locs.to_csv(locations_path, index = False)
-        
+        self.save_locations_shape(locations_path)
         #self.save_locs_shape(locations_path)
         #--------------------------------------------------------------------
         
@@ -205,8 +213,11 @@ class Dot_Detection:
                 key = os.path.join(split_up[-2], split_up[-1])
                 
                 offset = offsets[key]
+                offset = [np.round(float(off),3) for off in offset]
                 if len(offset) == 2:
                     offset.append(None)
+                    
+                
                 #------------------------------------------------
                 
                 #Print Statement
@@ -223,6 +234,10 @@ class Dot_Detection:
                 os.mkdir(rand_dir)
                 #------------------------------------------------
              
+                print('Offset in DOt Detection Class', str(offset))
+                
+                print('========================================================================')
+                
                 if 'top' in self.dot_detection:
                     
                     n_dots = int(self.dot_detection.split('top')[1].split('dots')[0])
@@ -276,7 +291,20 @@ class Dot_Detection:
                     
                     time_for_slurm = "1:00:00"
                 
+                elif self.dot_detection == "biggest jump 3d":
+                    
+
+                    list_cmd = ['python', dot_detection_dir+ '/hist_jump_3d.py', '--offset0', offset[0], '--offset1', offset[1], '--offset2', offset[2], \
+                    '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
+                            '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
+                            '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
+                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--z_slices', z_slice]
+                    
+                    list_cmd = [str(i) for i in list_cmd]
+                    
+                    time_for_slurm = "0:10:00"            
                 else:
+
                     
                     raise Exception("The dot detection argument was not valid.")    
                 
@@ -284,7 +312,7 @@ class Dot_Detection:
                 #Call Sbatch
                 #------------------------------------------------
                 cmd = ' '.join(list_cmd)
-
+                print(f'{cmd=}')
                 #print(f'{cmd=}')
                 script_name = os.path.join(rand_dir, 'dot_detection.sh')
                 with open(script_name , 'w') as f:
@@ -308,9 +336,9 @@ class Dot_Detection:
         
         #Delete the rand dirs
         #----------------------------------------------
-        # for rand in rand_list:
-        #     rand_dir = os.path.join(temp_dir, rand)
-        #     shutil.rmtree(rand_dir)
+        for rand in rand_list:
+            rand_dir = os.path.join(temp_dir, rand)
+            shutil.rmtree(rand_dir)
         #----------------------------------------------
         
         return df_locs

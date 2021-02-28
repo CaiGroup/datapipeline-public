@@ -187,8 +187,8 @@ if sys.argv[1] == 'debug_parallel':
     import tifffile 
     
     labeled_img_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_mat_dapi/MMStack_Pos0/Segmentation/Channel_1/labeled_img.tiff'
-    barcode_src = '/groups/CaiLab/analyses/nrezaee/test1-big/cellpose/BarcodeKey/channel_1.mat'
-    locations_src = '/groups/CaiLab/analyses/nrezaee/test1-big/cellpose/MMStack_Pos0/Dot_Locations/locations.csv'
+    barcode_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_mat_dapi/BarcodeKey/channel_1.mat'
+    locations_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei-adcg-locs/jonathan_locs.csv'
     
     dest = '/home/nrezaee/temp/'
     allowed_diff = 0
