@@ -159,9 +159,8 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
         
         if offset != [0,0,0]:
             print('Shitfing Locations')
-            df_tiff['x'] = df_tiff['x'] +offset[0]
-            df_tiff['y'] = df_tiff['y'] +offset[1]
-            df_tiff['z'] = df_tiff['z'] +offset[1]
+            df_tiff['x'] = df_tiff['x'] + offset[1]
+            df_tiff['y'] = df_tiff['y'] + offset[0]
             
             #Shift Locations
             #---------------------------------------------------------------------
@@ -217,7 +216,7 @@ if sys.argv[1] != 'debug_adcg':
 else:                        
     print('Debugging')
     tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_2/MMStack_Pos1.ome.tif'
-    offset = [1,1,1]
+    offset = [1,1]
     channels = [1]
     analysis_name = 'adcg'
     n_dots = 10

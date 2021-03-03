@@ -116,7 +116,6 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
         #Gaussian Fit the dots
         #---------------------------------------------------------------------
-        print(f'{bool_gaussian_fitting=}')
         if bool_gaussian_fitting == True:
             dot_analysis = get_gaussian_fitted_dots(tiff_src, channel, dot_analysis[0])
         #---------------------------------------------------------------------
@@ -124,23 +123,14 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
         #Center the dots
         #---------------------------------------------------------------------
-        print(f'{bool_radial_center=}')
         if bool_radial_center == True:
             dot_analysis = get_radial_centered_dots(tiff_src, channel, dot_analysis[0])
         #---------------------------------------------------------------------
         
         
-        #Remove Extra Dots Across Z slices
-        #---------------------------------------------------------------------
-        # if z_slices == 'all':
-        #     dot_analysis = take_out_extra_dots(dot_analysis)
-        #---------------------------------------------------------------------
-
-        
         #Visualize Dots
         #---------------------------------------------------------------------
         median_z = tiff.shape[0]//2
-        print(f'{bool_visualize_dots=}')
         if bool_visualize_dots == True:# and channel == 1 and z == median_z:
             get_visuals_3d(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name)
         #---------------------------------------------------------------------
@@ -161,39 +151,36 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
 
      
     
-
-def str2bool(v):
-  return v.lower() == "true"
-
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--tiff_src")
-parser.add_argument("--offset0")
-parser.add_argument("--offset1")
-parser.add_argument("--offset2")
-parser.add_argument("--analysis_name")
-parser.add_argument("--vis_dots")
-parser.add_argument("--back_subtract")
-parser.add_argument("--channels", nargs = '+')
-parser.add_argument("--chromatic")
-parser.add_argument("--rand")
-parser.add_argument("--gaussian")
-parser.add_argument("--radial_center")
-parser.add_argument("--strictness")
-parser.add_argument("--z_slices")
-parser.add_argument("--nbins")
-parser.add_argument("--threshold")
-
-
-args, unknown = parser.parse_known_args()
-
-#print(f'{args.offset=}')
-
-print('hello')
-print(f'{sys.argv[1]=}')
 if sys.argv[1] != 'debug_matlab_3d':
-    print(f'{args=}')
+    def str2bool(v):
+      return v.lower() == "true"
+    
+    import argparse
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--tiff_src")
+    parser.add_argument("--offset0")
+    parser.add_argument("--offset1")
+    parser.add_argument("--offset2")
+    parser.add_argument("--analysis_name")
+    parser.add_argument("--vis_dots")
+    parser.add_argument("--back_subtract")
+    parser.add_argument("--channels", nargs = '+')
+    parser.add_argument("--chromatic")
+    parser.add_argument("--rand")
+    parser.add_argument("--gaussian")
+    parser.add_argument("--radial_center")
+    parser.add_argument("--strictness")
+    parser.add_argument("--z_slices")
+    parser.add_argument("--nbins")
+    parser.add_argument("--threshold")
+    
+    
+    args, unknown = parser.parse_known_args()
+    
+    #print(f'{args.offset=}')
+    
+    print('hello')
     
     if args.offset2 == 'None':
         offset = [float(args.offset0), float(args.offset1)]
@@ -218,14 +205,14 @@ if sys.argv[1] != 'debug_matlab_3d':
                           args.back_subtract, channels, args.chromatic, str2bool(args.gaussian), \
                           str2bool(args.radial_center),int(args.strictness), args.z_slices, int(args.nbins), \
                           int(args.threshold), args.rand)
-    
+        
 else:
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_1/MMStack_Pos0.ome.tif'
-    offset = [0,0,0]
-    channels = 'all'
-    analysis_name = 'rad'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei-misaligned/HybCycle_1/MMStack_Pos0.ome.tif'
+    offset = [3,4]
+    channels = [1]
+    analysis_name = 'takei_align'
     rand_dir = '/home/nrezaee/temp'
     radial_center = False
     get_dots_for_tiff(tiff_src, offset, analysis_name, True, False, channels, False, False, radial_center, 0, None, 10, \
-                    200, rand_dir)
+                    300, rand_dir)

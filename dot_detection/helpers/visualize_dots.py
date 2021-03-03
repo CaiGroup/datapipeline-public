@@ -53,8 +53,8 @@ def get_visuals(tiff_src, df_locs_2d, tiff_2d, analysis_name):
 def plot_and_save_locations_3d(img_array, locations_2d, dest):
     
     plt.figure(figsize=(40,40))
-    plt.imshow(img_array*17, cmap='gray')
-    plt.scatter(locations_2d[:,0], locations_2d[:,1], s= 2, c='r')
+    plt.imshow(img_array*30, cmap='gray')
+    plt.scatter(np.array(locations_2d[:,0] - .5), np.array(locations_2d[:,1]) -.5 , s= 2, c='r')
     print(f'{dest=}')
     plt.savefig(dest)
     return None

@@ -154,9 +154,6 @@ class Analysis:
     #--------------------------------------------------------------------------------
     def set_alignment_arg(self, align_arg):
         self.align = align_arg.replace(" ", "_")
-        
-        if '2d' in self.align:
-            self.dimensions = 2
             
         print("    Set Alignment to", str(self.align))
 

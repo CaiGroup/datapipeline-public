@@ -8,7 +8,7 @@ using Statistics
 #parameters
 sigma = 2.2
 tau = 2.0*10^12
-final_loss_improvement = 3000.0#10.0
+final_loss_improvement = 600.0#10.0
 max_iters = 5#10000
 max_cd_iters = 2
 

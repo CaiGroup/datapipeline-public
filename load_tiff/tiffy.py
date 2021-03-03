@@ -36,6 +36,8 @@ def load(tiff_src):
 
         num_of_z = total_channels_times_z_stacks/num_of_wavelengths
 
+        print(f'{num_of_z=}')
+
         assert num_of_z == int(num_of_z), "The tiff file is not organized correctly."
 
         num_of_z = int(num_of_z)

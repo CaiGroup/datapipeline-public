@@ -44,7 +44,7 @@ def apply_thresh(dot_analysis, threshold):
     return dot_analysis
 
 def hist_jump_threshed_3d(tiff_3d, strictness):
-    res = blob_log(tiff_3d, min_sigma =1, max_sigma =2, num_sigma =2, threshold = 0.000)
+    res = blob_log(tiff_3d, min_sigma =1, max_sigma =2, num_sigma =2, threshold = 0.001)
     points = res[:,:3]
 
     intensities = []

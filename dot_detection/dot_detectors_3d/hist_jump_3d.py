@@ -131,6 +131,10 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             dot_analysis = get_radial_centered_dots(tiff_src, channel, dot_analysis[0])
         #---------------------------------------------------------------------
         
+        dot_analysis[0][:, [0,2]] = dot_analysis[0][:, [2,0]]
+        
+        print(f'{dot_analysis[0]=}')
+        
         #Visualize Dots
         #---------------------------------------------------------------------
         median_z = tiff.shape[0]//2
@@ -210,10 +214,10 @@ if sys.argv[1] != 'debug_hist_3d':
 else:
     
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_2/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_2/MMStack_Pos0.ome.tif'
     offset = [0,0,0]
-    channels = 'all' #[1]
-    analysis_name = 'rad'
+    channels = [1]
+    analysis_name = 'takei'
     n_dots = 10
     rand_dir = '/home/nrezaee/temp'
     vis_dots = True

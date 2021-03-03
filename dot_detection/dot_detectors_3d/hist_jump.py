@@ -29,7 +29,7 @@ import ast
 sys.path.append(os.getcwd())
 
 from load_tiff import tiffy
-from dot_detection.helpers.visualize_dots import plot_and_save_locations, get_visuals
+from dot_detection.helpers.visualize_dots import plot_and_save_locations, get_visuals_3d
 from dot_detection.reorder_hybs import get_and_sort_hybs
 from dot_detection.helpers.shift_locations import shift_locations
 from dot_detection.helpers.background_subtraction import apply_background_subtraction
@@ -145,9 +145,6 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             dot_analysis = get_gaussian_fitted_dots(tiff_src, channel, dot_analysis[0])
         #---------------------------------------------------------------------
         
-        print(f'{len(dot_analysis)=}')
-        print(f'{len(dot_analysis[0])=}')
-        print(f'{len(dot_analysis[1])=}')
         #Center the dots
         #---------------------------------------------------------------------
         print(f'{bool_radial_center=}')
@@ -155,38 +152,19 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             dot_analysis = get_radial_centered_dots(tiff_src, channel, dot_analysis[0])
         #---------------------------------------------------------------------
         
-        print(f'{len(dot_analysis)=}')
-        print(f'{len(dot_analysis[0])=}')
-        print(f'{len(dot_analysis[1])=}')
-        
+
         #Visualize Dots
         #---------------------------------------------------------------------
         median_z = tiff.shape[0]//2
         print(f'{bool_visualize_dots=}')
         if bool_visualize_dots == True:# and channel == 1 and z == median_z:
-            get_visuals(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name)
+            get_visuals_3d(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name)
         #---------------------------------------------------------------------
         
         
         #Shift Locations
         #---------------------------------------------------------------------
         dot_analysis[0] = shift_locations(dot_analysis[0], np.array(offset), tiff_src, bool_chromatic)
-        #---------------------------------------------------------------------
-        
-        #Remove Extra Dots Across Z slices
-        #---------------------------------------------------------------------
-        # if z_slices == 'all':
-        #     dot_analysis = take_out_extra_dots(dot_analysis)
-        #---------------------------------------------------------------------
-        print("After taking out dots")
-        print(f'{len(dot_analysis[0])=}')
-        
-        
-        
-        #Convert to type objects
-        #---------------------------------------------------------------------
-        # dot_analysis[0] = dot_analysis[0].tolist()
-        # dot_analysis[1] = dot_analysis[1].tolist()
         #---------------------------------------------------------------------
         
         #Add dots to main dots in tiff

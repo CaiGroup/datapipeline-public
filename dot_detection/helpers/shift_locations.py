@@ -49,8 +49,16 @@ def shift_locations(locations, offset, tiff_src, bool_chromatic):
         
     elif len(offset) ==2:
         
-
+        offset = np.roll(offset, 1)
+        print(f'{np.max(locations)=}')
+        print(f'{np.min(locations)=}')
+        
+        print(f'{locations[-10:]=}')
+        print(f'{offset=}')
         locations_offsetted = np.array([np.append(np.array(location[:2]) + offset, location[-1]) \
                                 for location in locations])
-    
+        print(f'{locations_offsetted[-10:]=}')
+        print(f'{np.max(locations_offsetted)=}')
+        print(f'{np.min(locations_offsetted)=}')
+        
     return locations_offsetted
