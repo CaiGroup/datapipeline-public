@@ -4,6 +4,7 @@ import os
 import warnings
 import sys
 import pandas as pd
+import scipy 
 
 sys.path.append(os.getcwd())
 
@@ -17,7 +18,9 @@ from dot_detection.radial_center.radial_center_fitting import get_radial_centere
 
 
 def run_back_sub(background, tiff_3d, channel, offset):
-    print(4, flush=True)    
+    
+    print(f'{type(offset)=}')
+    print(f'{type(offset)=}')
     background2d = scipy.ndimage.interpolation.shift(background[:,channel,:,:], np.negative(offset))[0,:,:]
     
     background3d = np.full((tiff_3d.shape[0], background2d.shape[0], background2d.shape[0]), background2d)
@@ -53,7 +56,8 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
     #Getting Background Src
     #--------------------------------------------------------------------
     if bool_background_subtraction == True:
-            background = get_background(tiff_src)
+            background_src = get_background(tiff_src)
+            background = tiffy.load(background_src)
     #--------------------------------------------------------------------
     
     #Reading Tiff File
@@ -91,7 +95,12 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         #Background Subtraction
         #---------------------------------------------------------------------
         if bool_background_subtraction == True:
-            tiff_3d = run_back_sub(background, tiff_3d, channel, offset)
+            # tiff_3d = run_back_sub(background, tiff_3d, channel, offset)
+            print(f'{background=}')
+            print(f'{background.shape=}')
+            print(f'{channel=}')
+            tiff_3d = tiff_3d - background[:, channel]
+            tiff_3d = np.where(tiff_3d < 0, 0, a)
         #---------------------------------------------------------------------
 
         print((channel+1), end = " ", flush =True)
@@ -214,14 +223,14 @@ if sys.argv[1] != 'debug_hist_3d':
 else:
     
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_2/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_1/HybCycle_10/MMStack_Pos0.ome.tif'
     offset = [0,0,0]
     channels = [1]
-    analysis_name = 'takei'
+    analysis_name = 'michal_align'
     n_dots = 10
     rand_dir = '/home/nrezaee/temp'
     vis_dots = True
-    back_sub = False
+    back_sub = True
     chromatic = False
     gauss = False
     rad = False

@@ -9,6 +9,7 @@ def combine_offsets(rand_list):
     
     for rand in rand_list:
         glob_rand_dir = os.path.join(temp_dir, rand, 'Hyb*')
+        print(f'{glob_rand_dir=}')
         
         off_pkl = glob.glob(glob_rand_dir)[0]
 

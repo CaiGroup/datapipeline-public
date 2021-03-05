@@ -11,7 +11,7 @@ import json
 import argparse
 import shutil
 import sys
-
+import math
 
 
 main_dir = os.environ['DATA_PIPELINE_MAIN_DIR']
@@ -212,7 +212,8 @@ def run_analysis(json_name, position):
     #Segmentation
     #----------------------------------------------------------
     if 'segmentation' in data.keys():
-        if not data['segmentation'] == 'none':
+        print(f'{data["segmentation"]=}')
+        if not data['segmentation'] == 'no':
             analysis.set_segmentation_arg(data['segmentation'])
     #----------------------------------------------------------   
     
@@ -291,14 +292,14 @@ def run_analysis(json_name, position):
     #Set Distance Between Nuclei
     #----------------------------------------------------
     if 'distance between nuclei' in data.keys():
-        if data['distance between nuclei'] != 'none':
+        if data['distance between nuclei'] != 'none' and not math.isnan(data['distance between nuclei']):
             analysis.set_dist_between_nuclei_arg(data['distance between nuclei'])
     #----------------------------------------------------------
     
     #Set Distance Between Nuclei
     #----------------------------------------------------
     if 'edge deletion' in data.keys():
-        if data['edge deletion'] != 'none':
+        if data['edge deletion'] != 'none' or data['distance between nuclei'] != 'NaN':
             analysis.set_edge_deletion_arg(data['edge deletion'])
     #----------------------------------------------------------
 
@@ -309,19 +310,6 @@ def run_analysis(json_name, position):
              analysis.set_nuclei_cyto_match_true()
     #----------------------------------------------------------
     
-    #Set Distance Between Nuclei
-    #----------------------------------------------------
-    if 'nucleus erode' in data.keys():
-        if data['nucleus erode'] != 'none':
-            analysis.set_nucleus_erode_arg(data['nucleus erode'])
-    #----------------------------------------------------------
-
-    #Set Edges to Delete
-    #----------------------------------------------------
-    if 'cyto erode' in data.keys():
-        if data['cyto erode'] != 'none':
-            analysis.set_cyto_erode_arg(data['cyto erode'])
-    #----------------------------------------------------------
     
     #Only Decode Dots in Cells
     #----------------------------------------------------
@@ -347,7 +335,7 @@ def run_analysis(json_name, position):
     #Set Cyto Channel Number
     #----------------------------------------------------
     if 'cyto channel number' in data.keys():
-        if data['cyto channel number'] != 'none':
+        if data['cyto channel number'] != 'none'and not math.isnan(data['cyto channel number']):
             analysis.set_cyto_channel_arg(data['cyto channel number'])
     #----------------------------------------------------------
 
@@ -367,8 +355,8 @@ def run_analysis(json_name, position):
     
     #Matching Tolerance for Segmentation
     #----------------------------------------------------
-    if 'matching tolerance' in data.keys():
-        if data['matching tolerance'] != 'none':
+    if 'area_tol' in data.keys():
+        if data['area_tol'] != 'none' and not math.isnan(data['area_tol']):
             analysis.set_area_tol_arg(data['matching tolerance'])
     #----------------------------------------------------------
     

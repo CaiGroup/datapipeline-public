@@ -38,7 +38,10 @@ def get_visuals(tiff_src, df_locs_2d, tiff_2d, analysis_name):
                         analysis_name, position, 'Visualize_Dots')
                         
     if not os.path.exists(visualize_dots_dir):
-        os.mkdir(visualize_dots_dir)
+        try:
+            os.mkdir(visualize_dots_dir)
+        except:
+            pass
     
     dest = os.path.join('/groups/CaiLab/analyses', personal, exp_name, \
                         analysis_name, position, 'Visualize_Dots', hyb + 'test.png')
@@ -76,11 +79,13 @@ def get_visuals_3d(tiff_src, dot_analysis, tiff_2d, analysis_name):
                         analysis_name, position, 'Visualize_Dots')
                         
     if not os.path.exists(visualize_dots_dir):
-        os.mkdir(visualize_dots_dir)
+        try:
+            os.mkdir(visualize_dots_dir)
+        except:
+            pass
+        
     
     dest = os.path.join('/groups/CaiLab/analyses', personal, exp_name, \
                         analysis_name, position, 'Visualize_Dots', hyb + 'test.png')
-    
-    #dest = os.path.join('/home/nrezaee/sandbox/', 'channel_' + str(channel) + '_Z_' + str(z) + '.tiff')
     
     plot_and_save_locations_3d(tiff_2d, dot_analysis[0], dest)

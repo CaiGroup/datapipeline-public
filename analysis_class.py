@@ -8,6 +8,7 @@ import logging
 import time
 from datetime import datetime
 from load_tiff import tiffy
+from helpers.send_email_notif import send_finished_notif
 
 #Alignment Scripts
 #----------------------------
@@ -632,6 +633,10 @@ class Analysis:
                 post_analysis.run_hamming_analysis_indiv()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Hamming Analysis')
         #--------------------------------------------------------------------------------
+        
+        timer_tools.logg_elapsed_time(self.start_time, 'Finished with Analysis of Position')
+        
+        #send_finished_notif(self.analysis_dir, 'resace3@gmail.com')
 
     #--------------------------------------------------------------------------------
     #End of running the parameters

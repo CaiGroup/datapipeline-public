@@ -28,7 +28,7 @@ sys.path.append(os.getcwd())
 
 
 from load_tiff import tiffy
-from dot_detection.helpers.visualize_dots import plot_and_save_locations, get_visuals
+from dot_detection.helpers.visualize_dots import plot_and_save_locations, get_visuals_3d
 from dot_detection.reorder_hybs import get_and_sort_hybs
 from dot_detection.dot_detectors_2d.dot_detector_2d import find_dots
 from dot_detection.helpers.shift_locations import shift_locations
@@ -160,7 +160,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             print(f'{bool_visualize_dots=}')
             median_z = tiff.shape[0]//2
             if bool_visualize_dots == True and z == median_z:
-                get_visuals(tiff_src, dot_analysis, tiff_2d*100, analysis_name)
+                get_visuals_3d(tiff_src, dot_analysis, tiff_2d*100, analysis_name)
             #---------------------------------------------------------------------
 
             #Shift Locations

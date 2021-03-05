@@ -85,10 +85,13 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
     return None
     
 
-if sys.argv[1] == 'debug':
+if sys.argv[1] == 'debug_add_fakes':
     
-    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/barcode_key/channel_1.csv'
+    barcode_src = '/groups/CaiLab/personal/michalp/raw/michal_1/barcode_key/channel_1.csv'
     barcode_dst = 'foo.mat'
     bool_fake_barcodes = True
     
     read_barcode(barcode_src, barcode_dst, bool_fake_barcodes)
+    
+    
+    

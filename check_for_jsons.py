@@ -213,10 +213,11 @@ def get_positions_in_data(data, main_dir):
         positions = os.listdir(path_to_sub_dir)
         
         if 'positions' in data.keys():
-            print(f'{data["positions"]=}')
-            if data['positions'].replace(' ', '') != '':
-                if hasNumbers(data['positions']):
-                    positions = get_specific_positions(data['positions'], positions)
+            if data['positions'] != 'NaN':
+                print(f'{data["positions"]=}')
+                if data['positions'].replace(' ', '') != '':
+                    if hasNumbers(data['positions']):
+                        positions = get_specific_positions(data['positions'], positions)
 
     return positions
     

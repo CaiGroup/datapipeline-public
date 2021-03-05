@@ -2,6 +2,7 @@ import numpy as np
 import tifffile
 
 def load(tiff_src):    
+    print(f'{tiff_src=}')
     
     #Read tiff file
     #---------------------------------------------------------------------
