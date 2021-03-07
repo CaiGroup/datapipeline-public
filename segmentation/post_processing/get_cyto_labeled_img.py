@@ -22,7 +22,7 @@ def max_intensity_projection(cyto_3d):
     IM_MAX= np.max(cyto_3d, axis=0)
     return IM_MAX
 
-def get_labeled_cyto_cellpose(tiff_path, dst=None, cyto_channel = -2, debug = False):
+def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, debug = False):
 
 
     #Getting Tiff

@@ -1,7 +1,16 @@
 import numpy as np
 import tifffile
 
-def load(tiff_src):    
+def reshape_michal_tiffs(tiff):
+    new_tiff = []
+    new_tiff.append(tiff[:5])
+    new_tiff.append(tiff[5:10])
+    new_tiff.append(tiff[10:15])
+    new_tiff = np.array(new_tiff)
+    new_tiff = np.swapaxes(new_tiff, 0, 1)
+    return new_tiff
+
+def load(tiff_src, num_wav):    
     print(f'{tiff_src=}')
     
     #Read tiff file
@@ -31,7 +40,7 @@ def load(tiff_src):
         
         #Define the variables needed
         #---------------------------------------------------------------------
-        num_of_wavelengths = 4
+        num_of_wavelengths = num_wav
 
         total_channels_times_z_stacks = tiff.shape[0]
 
@@ -44,25 +53,7 @@ def load(tiff_src):
         num_of_z = int(num_of_z)
         #---------------------------------------------------------------------
         
-        #Get Indexes
-        #---------------------------------------------------------------------
-        indexes = np.zeros((tiff.shape[0]))
-        list_of_numbers = np.asarray(range(tiff.shape[0])).reshape((num_of_z, num_of_wavelengths))
-
-        for i in range(num_of_z):
-            indexes[i::num_of_z] = list_of_numbers[i]
-
-        indexes = indexes.astype(np.int32)
-        #---------------------------------------------------------------------
-        
-        #Reorder and reshape
-        #---------------------------------------------------------------------
-        reordered_tiff = tiff[indexes]
-
-        x_len =tiff.shape[1]
-        y_len = tiff.shape[2]
-
-        reshaped_tiff = reordered_tiff.reshape(num_of_z, num_of_wavelengths, x_len, y_len) 
+        reshaped_tiff = tiff.reshape(num_of_z, num_of_wavelengths, tiff.shape[1], tiff.shape[2], order = 'F') 
         #---------------------------------------------------------------------
         
         return reshaped_tiff

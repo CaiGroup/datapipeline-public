@@ -61,7 +61,7 @@ warnings.filterwarnings("ignore")
 
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
-                      strictness, bool_radial_center, z_slices, rand_dir):
+                      strictness, bool_radial_center, z_slices, num_wav, rand_dir):
     
     #Getting Background Src
     #--------------------------------------------------------------------
@@ -198,6 +198,7 @@ parser.add_argument("--gaussian")
 parser.add_argument("--radial_center")
 parser.add_argument("--strictness")
 parser.add_argument("--z_slices")
+parser.add_argument("--z_slices")
 
 
 args, unknown = parser.parse_known_args()
@@ -225,9 +226,10 @@ print(f'{str2bool(args.gaussian)=}')
 print(f'{args.radial_center=}')
 print(f'{str2bool(args.radial_center)=}')
 
+
 get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
                       args.back_subtract, channels, args.chromatic, str2bool(args.gaussian), int(args.strictness), \
-                      str2bool(args.radial_center), args.z_slices, args.rand)
+                      str2bool(args.radial_center), args.z_slices, args.num_wav, args.rand)
                       
                     #   tiff_src, offset, analysis_name, bool_visualize_dots, \
                     #   bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \

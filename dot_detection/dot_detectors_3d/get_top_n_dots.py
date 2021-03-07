@@ -61,7 +61,8 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
     return df
 
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool_normalization, \
-                      bool_background_subtraction, channels_to_detect_dots, bool_chromatic, n_dots, rand_dir):
+                      bool_background_subtraction, channels_to_detect_dots, bool_chromatic, n_dots, \
+                      num_wav, rand_dir):
     
     
     #Getting Background Src
@@ -72,7 +73,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
     
     #Reading Tiff File
     #--------------------------------------------------------------------
-    tiff = tiffy.load(tiff_src)
+    tiff = tiffy.load(tiff_src, num_wav)
     #--------------------------------------------------------------------
     
 
@@ -208,6 +209,7 @@ if sys.argv[1] != 'debug':
     parser.add_argument("--chromatic")
     parser.add_argument("--n_dots")
     parser.add_argument("--rand")
+    parser.add_argument("--num_wav")
     
     
     args, unknown = parser.parse_known_args()
@@ -227,7 +229,7 @@ if sys.argv[1] != 'debug':
     
     
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), args.norm, \
-                          args.back_subtract, channels, args.chromatic, int(args.n_dots), args.rand)
+                          args.back_subtract, channels, args.chromatic, int(args.n_dots), args.num_wav, args.rand)
                           
 else:                        
     print('Debugging')

@@ -128,6 +128,7 @@ class Analysis:
         self.get_nuclei_seg = False
         self.get_cyto_seg = False
         self.area_tol = 0
+        self.num_wav = 4
         #--------------------------------------------------------------
         
         
@@ -327,6 +328,11 @@ class Analysis:
         self.area_tol = float(area_tol)
         
         print("    Set Matching Area Tolerance to", str(self.area_tol))
+        
+    def set_num_wavelengths_arg(self, num_wav):
+        self.num_wav = float(num_wav)
+        
+        print("    Set Number of Wavelengths to", str(self.num_wav))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -339,7 +345,7 @@ class Analysis:
                                                self.analysis_name, self.visualize_dots, self.normalization, \
                                                self.background_subtraction, self.decoding_individual, self.chromatic_abberration, \
                                                self.dot_detection, self.gaussian_fitting, self.strictness_dot_detection, self.dimensions, \
-                                               self.radial_center, self.num_zslices, self.nbins, self.threshold)
+                                               self.radial_center, self.num_zslices, self.nbins, self.threshold, self.num_wav)
                    
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 
@@ -426,7 +432,7 @@ class Analysis:
             segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
                         self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
                         self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
-                        self.get_nuclei_seg, self.get_cyto_seg)
+                        self.get_nuclei_seg, self.get_cyto_seg, self.num_wav)
         
             self.labeled_img = segmenter.retrieve_labeled_img()
             print('Shape after Seg in Analysis Class: ' +  str(self.labeled_img.shape))
@@ -450,7 +456,7 @@ class Analysis:
             
             sample_tiff_src = os.path.join(exp_dir, hyb_dir, self.position)
             
-            sample_tiff = tiffy.load(sample_tiff_src)
+            sample_tiff = tiffy.load(sample_tiff_src, self.num_wav)
             
             self.num_zslices = sample_tiff.shape[0]
         #--------------------------------------------------------------------------------
@@ -465,12 +471,12 @@ class Analysis:
             if not self.decoding_with_previous_dots and not self.decoding_with_previous_locations:
                 if self.align == None:
                     
-                    offset = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, 'no_align')
+                    offset = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, 'no_align', self.num_wav)
                     offsets_path = os.path.join(path, 'offsets.json')
                 
                 else:
                     
-                    offset = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, self.align)
+                    offset = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, self.align, self.num_wav)
                     offsets_path = os.path.join(path, 'offsets.json')
                     print("        Saving to", offsets_path, flush=True)
                 
@@ -516,7 +522,7 @@ class Analysis:
             decoder = Decoding(self.data_dir, self.position, self.decoded_dir, self.locations_dir, self.position_dir, self.barcode_dst, \
                 self.barcode_key_src, self.decoding_with_previous_dots, self.decoding_with_previous_locations, self.fake_barcodes, \
                 self.decoding_individual, self.min_seeds, self.allowed_diff, self.dimensions, self.num_zslices, self.segmentation, \
-                self.decode_only_cells, self.labeled_img)
+                self.decode_only_cells, self.labeled_img, self.num_wav)
         #--------------------------------------------------------------------------------
         
         #Run Decoding with previous dots
@@ -572,7 +578,7 @@ class Analysis:
             segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
                 self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
                 self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
-                self.get_nuclei_seg, self.get_cyto_seg)
+                self.get_nuclei_seg, self.get_cyto_seg, self.num_wav)
                 
             print(f'{self.labeled_img.shape=}')
             if self.decoding_across == True or \
@@ -595,7 +601,7 @@ class Analysis:
         #--------------------------------------------------------------------------------
         if self.segmentation != False and (self.on_off_barcode_analysis == True or self.false_positive_rate_analysis == True or self.hamming_analysis == True): 
             post_analysis = Post_Analyses(self.position_dir, self.false_pos_dir, self.seg_dir, self.hamming_dir, self.fake_barcodes, self.barcode_key_src, \
-                                self.num_zslices, self.segmentation, self.decoding_individual)
+                                self.num_zslices, self.segmentation, self.decoding_individual, self.num_wav)
         #--------------------------------------------------------------------------------
         
         

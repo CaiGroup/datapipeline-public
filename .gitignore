@@ -13,3 +13,4 @@ __pycache__/
 run_test.sh
 run_test.py
 *.log
+foo.*

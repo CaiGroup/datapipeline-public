@@ -42,7 +42,7 @@ class Post_Analyses:
     #--------------------------------------------------------------------------------
     def run_on_off_barcode_analysis_across(self):
         
-        if segmentation != False:
+        if self.segmentation != False:
             genes_assigned_to_cell_src = os.path.join(self.position_dir, 'Segmentation', 'gene_locations_assigned_to_cell.csv')
                                                                 
             dst_dir = os.path.join(self.position_dir, 'On_Off_Barcode_Plot')

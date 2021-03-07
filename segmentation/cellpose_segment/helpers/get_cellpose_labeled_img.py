@@ -94,13 +94,13 @@ def get_3d_from_2d(src, num_z):
 
     tf.imwrite(src, tiff_3d)
     
-def get_labeled_img_cellpose(tiff_path, dst=None):
+def get_labeled_img_cellpose(tiff_path, num_wav, dst=None):
 
 
     #Getting Tiff
     #----------------------------------------------
     print('Reading TIff')
-    tiff = tiffy.load(tiff_path)
+    tiff = tiffy.load(tiff_path, num_wav)
     file_name = os.path.basename(tiff_path)
     dir_name = os.path.dirname(tiff_path)
     #----------------------------------------------

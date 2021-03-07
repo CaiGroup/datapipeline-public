@@ -67,6 +67,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--fixed_src")
 parser.add_argument("--moving_src")
 parser.add_argument("--rand_dir")
+parser.add_argument("--num_wav")
 
 args, unknown = parser.parse_known_args()
 

@@ -47,7 +47,7 @@ class Dot_Detection:
                    analysis_name, visualize_dots, normalization, \
                    background_subtraction, decoding_individual, chromatic_abberration, \
                    dot_detection, gaussian_fitting, strictness_dot_detection, dimensions, \
-                   radial_center, num_zslices, nbins, threshold):
+                   radial_center, num_zslices, nbins, threshold, num_wav):
 
         self.experiment_name = experiment_name
         self.personal = personal
@@ -67,6 +67,7 @@ class Dot_Detection:
         self.num_zslices = num_zslices
         self.nbins = nbins
         self.threshold = threshold
+        self.num_wav = num_wav
         
         
         #Set Directories
@@ -245,7 +246,7 @@ class Dot_Detection:
                     list_cmd = ['python', dot_detection_dir+ '/get_top_n_dots.py', '--offset0', offset[0], '--offset1', offset[1], '--offset2', offset[2], '--analysis_name', self.analysis_name, \
                             '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
-                            '--chromatic', self.chromatic_abberration, '--n_dots', n_dots, '--rand', rand_dir]
+                            '--chromatic', self.chromatic_abberration, '--n_dots', n_dots, '--num_wav', self.num_wav, '--rand', rand_dir]
                     
                     list_cmd = [str(i) for i in list_cmd]
                
@@ -258,7 +259,7 @@ class Dot_Detection:
                     '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
                             '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
-                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--z_slices', z_slice]
+                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,'--z_slices', z_slice]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
@@ -271,7 +272,7 @@ class Dot_Detection:
                     '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
                             '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
-                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--z_slices', z_slice, '--nbins',  \
+                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,'--z_slices', z_slice, '--nbins',  \
                             self.nbins, '--threshold', self.threshold]
                     
                     list_cmd = [str(i) for i in list_cmd]
@@ -285,7 +286,7 @@ class Dot_Detection:
                     '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
                             '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
-                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--z_slices', z_slice]
+                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,'--z_slices', z_slice]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
@@ -298,7 +299,7 @@ class Dot_Detection:
                     '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
                             '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
-                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--z_slices', z_slice]
+                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav, '--z_slices', z_slice]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     

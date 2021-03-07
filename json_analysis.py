@@ -360,6 +360,13 @@ def run_analysis(json_name, position):
             analysis.set_area_tol_arg(data['matching tolerance'])
     #----------------------------------------------------------
     
+    #Set Min Seeds
+    #----------------------------------------------------
+    if 'num of wavelengths' in data.keys():
+        if not data['num of wavelengths'] == 'none':
+            analysis.set_num_wavelengths_arg(data['num of wavelengths'])
+    #----------------------------------------------------------
+    
     #Writ
     #----------------------------------------------------------
     analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)

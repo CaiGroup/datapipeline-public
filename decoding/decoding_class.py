@@ -29,7 +29,7 @@ from decoding import previous_locations_decoding as previous_locations_decoding
 #=====================================================================================
 class Decoding:
     def __init__(self, data_dir, position, decoded_dir, locations_dir, position_dir, barcode_dst, barcode_src, bool_decoding_with_previous_dots, bool_decoding_with_previous_locations, \
-                    bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions, num_zslices, segmentation, decode_only_cells, labeled_img):
+                    bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions, num_zslices, segmentation, decode_only_cells, labeled_img, num_wav):
         
         self.data_dir = data_dir
         self.position = position
@@ -49,6 +49,7 @@ class Decoding:
         self.seg = segmentation
         self.decode_only_cells = decode_only_cells
         self.labeled_img = labeled_img
+        self.num_wav = num_wav
          
     def labeled_img_from_tiff_dir(self):
         glob_me = os.path.join(self.data_dir, '*')

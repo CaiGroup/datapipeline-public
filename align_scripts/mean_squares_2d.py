@@ -10,9 +10,9 @@ sys.path.append(os.getcwd())
 from load_tiff import tiffy
 from align_scripts.helpers.saving_offset import save_offset
 
-def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir):
-    fixed_np = tiffy.load(fixed_image_src)
-    moving_np = tiffy.load(moving_image_src)
+def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir, num_wav):
+    fixed_np = tiffy.load(fixed_image_src, num_wav)
+    moving_np = tiffy.load(moving_image_src, num_wav)
     
     median_z = fixed_np.shape[0]//2
 
@@ -68,7 +68,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--fixed_src")
 parser.add_argument("--moving_src")
 parser.add_argument("--rand_dir")
+parser.add_argument("--num_wav")
 
 args, unknown = parser.parse_known_args()
 
-mean_squares_2d(args.fixed_src, args.moving_src, args.rand_dir)
+mean_squares_2d(args.fixed_src, args.moving_src, args.rand_dir, float(args.num_wav))

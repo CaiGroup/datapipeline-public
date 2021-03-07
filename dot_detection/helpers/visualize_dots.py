@@ -62,6 +62,14 @@ def plot_and_save_locations_3d(img_array, locations_2d, dest):
     plt.savefig(dest)
     return None
     
+def plot_and_save_locations_3d_michal(img_array, locations_2d, dest):
+    
+    plt.figure(figsize=(40,40))
+    plt.imshow(img_array, cmap='gray', vmax =1000)
+    plt.scatter(np.array(locations_2d[:,0] - .5), np.array(locations_2d[:,1]) -.5 , s= 2, c='r')
+    print(f'{dest=}')
+    plt.savefig(dest)
+    return None
 
 def get_visuals_3d(tiff_src, dot_analysis, tiff_2d, analysis_name):
 
@@ -88,4 +96,10 @@ def get_visuals_3d(tiff_src, dot_analysis, tiff_2d, analysis_name):
     dest = os.path.join('/groups/CaiLab/analyses', personal, exp_name, \
                         analysis_name, position, 'Visualize_Dots', hyb + 'test.png')
     
-    plot_and_save_locations_3d(tiff_2d, dot_analysis[0], dest)
+    if 'michal' in tiff_src:
+        plot_and_save_locations_3d_michal(tiff_2d, dot_analysis[0], dest)
+    else:
+        plot_and_save_locations_3d(tiff_2d, dot_analysis[0], dest)
+    
+    
+    

@@ -1,5 +1,5 @@
 import numpy as np
-import tifffile
+import tifffile as tf
 import os
 import warnings
 import sys
@@ -51,18 +51,19 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
 
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
-                      strictness, bool_radial_center, z_slices, rand_dir):
+                      strictness, bool_radial_center, z_slices, num_wav, rand_dir):
     
     #Getting Background Src
     #--------------------------------------------------------------------
     if bool_background_subtraction == True:
             background_src = get_background(tiff_src)
-            background = tiffy.load(background_src)
+            print(f'{background_src=}')
+            background = tiffy.load(background_src, num_wav)
     #--------------------------------------------------------------------
     
     #Reading Tiff File
     #--------------------------------------------------------------------
-    tiff = tiffy.load(tiff_src)
+    tiff = tiffy.load(tiff_src, num_wav)
     #--------------------------------------------------------------------
     
 
@@ -96,11 +97,11 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         #---------------------------------------------------------------------
         if bool_background_subtraction == True:
             # tiff_3d = run_back_sub(background, tiff_3d, channel, offset)
-            print(f'{background=}')
             print(f'{background.shape=}')
             print(f'{channel=}')
-            tiff_3d = tiff_3d - background[:, channel]
-            tiff_3d = np.where(tiff_3d < 0, 0, a)
+            tiff_3d = tiff_3d - background[:, channel]*1.3
+            tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
+            tf.imwrite('foo.tif', tiff_3d)
         #---------------------------------------------------------------------
 
         print((channel+1), end = " ", flush =True)
@@ -189,6 +190,7 @@ if sys.argv[1] != 'debug_hist_3d':
     parser.add_argument("--radial_center")
     parser.add_argument("--strictness")
     parser.add_argument("--z_slices")
+    parser.add_argument("--num_wav")
     
     
     args, unknown = parser.parse_known_args()
@@ -210,34 +212,30 @@ if sys.argv[1] != 'debug_hist_3d':
         
     if args.z_slices != 'all':
         args.z_slices = int(args.z_slices)
-    
-    print(f'{args.gaussian=}')
-    print(f'{str2bool(args.gaussian)=}')
-    print(f'{args.radial_center=}')
-    print(f'{str2bool(args.radial_center)=}')
+
     
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
                           args.back_subtract, channels, args.chromatic, str2bool(args.gaussian), int(args.strictness), \
-                          str2bool(args.radial_center), args.z_slices, args.rand)
+                          str2bool(args.radial_center), args.z_slices, args.num_wav, args.rand)
 
 else:
     
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_1/HybCycle_10/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_1/HybCycle_30/MMStack_Pos11.ome.tif'
     offset = [0,0,0]
     channels = [1]
     analysis_name = 'michal_align'
-    n_dots = 10
     rand_dir = '/home/nrezaee/temp'
     vis_dots = True
     back_sub = True
     chromatic = False
     gauss = False
     rad = False
-    strictness = 10
+    strictness = 3
     z_slices = 'all'
+    num_wav = 3
     get_dots_for_tiff(tiff_src, offset, analysis_name, vis_dots, back_sub, channels, chromatic, gauss, \
-        strictness, rad, z_slices, rand_dir)
+        strictness, rad, z_slices, num_wav, rand_dir)
     
     
     

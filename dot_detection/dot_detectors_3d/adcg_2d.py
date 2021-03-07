@@ -90,7 +90,7 @@ def get_adcg_dots(tiff_2d):
     
     
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool_normalization, \
-                      bool_background_subtraction, channels_to_detect_dots, bool_chromatic, rand_dir):
+                      bool_background_subtraction, channels_to_detect_dots, bool_chromatic, num_wav, rand_dir):
     
     
     #Getting Background Src
@@ -101,7 +101,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
     
     #Reading Tiff File
     #--------------------------------------------------------------------
-    tiff = tiffy.load(tiff_src)
+    tiff = tiffy.load(tiff_src, num_wav)
     #--------------------------------------------------------------------
     
 
@@ -192,6 +192,7 @@ if sys.argv[1] != 'debug_adcg':
     parser.add_argument("--channels", nargs = '+')
     parser.add_argument("--chromatic")
     parser.add_argument("--rand")
+    parser.add_argument("--num_wav")
     
     
     args, unknown = parser.parse_known_args()
@@ -211,15 +212,14 @@ if sys.argv[1] != 'debug_adcg':
     
     
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), args.norm, \
-                          args.back_subtract, channels, args.chromatic, args.rand)
+                          args.back_subtract, channels, args.chromatic, args.num_wav args.rand)
                           
 else:                        
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_2/MMStack_Pos1.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_5/MMStack_Pos0.ome.tif'
     offset = [1,1]
     channels = [1]
-    analysis_name = 'adcg'
-    n_dots = 10
+    analysis_name = 'linus_decoding'
     rand_dir = '/home/nrezaee/temp'
     visualize_dots = True
     get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, False, False, channels, False, rand_dir)

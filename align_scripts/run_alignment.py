@@ -73,7 +73,7 @@ def get_fixed_and_movings(exp_name, personal, position, main_dir):
     
     return sub_dirs, fixed_file_path
 
-def run_alignment(exp_name, personal, position, align_function):
+def run_alignment(exp_name, personal, position, align_function, num_wav):
     
     
     sub_dirs, fixed_file_path = get_fixed_and_movings(exp_name, personal, position, main_dir)
@@ -116,7 +116,7 @@ def run_alignment(exp_name, personal, position, align_function):
             
         else:
             print(f'{tiff_file_path=}')
-            list_cmd = ['python', align_dir+ '/'+align_function+ '.py', '--fixed_src', fixed_file_path, '--moving_src', tiff_file_path, '--rand', rand_dir]
+            list_cmd = ['python', align_dir+ '/'+align_function+ '.py', '--fixed_src', fixed_file_path, '--moving_src', tiff_file_path, '--rand', rand_dir, '--num_wav', str(num_wav)]
         
     
             cmd = ' '.join(list_cmd)

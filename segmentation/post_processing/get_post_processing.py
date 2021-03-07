@@ -49,27 +49,27 @@ def get_debug():
     
     return labeled_img_path, labeled_cyto_path
     
-def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cyto_channel_num, get_nuclei_img, get_cyto_img):
+def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cyto_channel_num, get_nuclei_img, get_cyto_img, num_wav):
     
     
     if bool_cyto_match == True:
         labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
-        label_img = get_labeled_img_cellpose(tiff_for_segment, labeled_img_path)
+        label_img = get_labeled_img_cellpose(tiff_for_segment, dst = labeled_img_path, num_wav = num_wav)
         
         labeled_cyto_path = os.path.join(segment_results_path, 'labeled_cyto_img.tif')
-        labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, labeled_cyto_path, cyto_channel = cyto_channel_num)
+        labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, dst = labeled_cyto_path, cyto_channel = cyto_channel_num, num_wav = num_wav)
         
     else:
         
         if get_nuclei_img == True:
             labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
-            label_img = get_labeled_img_cellpose(tiff_for_segment, labeled_img_path)
+            label_img = get_labeled_img_cellpose(tiff_for_segment, dst = labeled_img_path, num_wav = num_wav)
         else:
             labeled_img_path = None
             
         if get_cyto_img == True:
             labeled_cyto_path = os.path.join(segment_results_path, 'labeled_cyto_img.tif')
-            labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, labeled_cyto_path, cyto_channel = cyto_channel_num)
+            labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, dst = labeled_cyto_path, cyto_channel = cyto_channel_num, num_wav = num_wav)
         else:
             labeled_cyto_path = None
         
@@ -116,7 +116,7 @@ def post_process(edge_delete_dist, dist_between_nuclei, label_img_src, labeled_c
         
     
 def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist, dist_between_nuclei, bool_cyto_match, \
-        area_tol, cyto_channel_num, get_nuclei_img, get_cyto_img, debug = False):
+        area_tol, cyto_channel_num, get_nuclei_img, get_cyto_img, num_wav, debug = False):
     
     cwd = os.getcwd()
     post_process_dir = os.path.join(cwd, 'segmentation/post_processing')
@@ -130,7 +130,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
         
     else:
         labeled_img_path, labeled_cyto_path = get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, \
-                                                cyto_channel_num, get_nuclei_img, get_cyto_img)
+                                                cyto_channel_num, get_nuclei_img, get_cyto_img, num_wav)
     
     if labeled_img_path != None:
         label_img_post_processed_dst = os.path.join(segment_results_path, 'labeled_img_post.tif')
@@ -162,9 +162,11 @@ if sys.argv[1] == 'debug_post':
     dist = 0
     bool_cyto_match = True
     area_tol = 1
-    debug = True
+    debug = False
     cyto_channel_num = 1
-    save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol, cyto_channel_num, debug=debug)
+    get_nuc = True
+    get_cyto = True
+    save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol, cyto_channel_num, get_nuc, get_cyto, num_wav = 4, debug=debug)
 
     
     
