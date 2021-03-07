@@ -14,3 +14,6 @@ run_test.sh
 run_test.py
 *.log
 foo.*
+*.png
+*.tif
+*.pickle
