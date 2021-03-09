@@ -54,6 +54,6 @@ def send_finished_notif(analysis_dir, rec_email):
 
 if sys.argv[1] == 'debug_email':
     analysis_dir = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_decoding_test'
-    rec_email = 'resace3@gmail.com'
+    rec_email = 'nrezaee@caltech.edu'
     
     send_finished_notif(analysis_dir, rec_email)

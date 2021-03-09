@@ -139,6 +139,11 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             
             df_points_2d = get_adcg_dots(tiff_2d)
             
+            del df_points_2d['int']
+            
+            df_points_2d = df_points_2d.rename(columns={'w': 'int'})
+            df['int'] = df['int']/1000
+            
             if bool_visualize_dots == True and z == tiff_shape[0]//2:
                 get_visuals(tiff_src, df_points_2d, tiff_2d, analysis_name)
             
@@ -212,7 +217,7 @@ if sys.argv[1] != 'debug_adcg':
     
     
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), args.norm, \
-                          args.back_subtract, channels, args.chromatic, args.num_wav args.rand)
+                          args.back_subtract, channels, args.chromatic, args.num_wav, args.rand)
                           
 else:                        
     print('Debugging')

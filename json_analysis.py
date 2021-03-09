@@ -29,6 +29,7 @@ parser.add_argument("--position", help="position to be processed")
 parser.add_argument("--personal", help="personal directory")
 parser.add_argument("--experiment_name", help="experiment name")
 parser.add_argument("--slurm", help="Determine script is run on slurm to direct output to file in analyses/")
+parser.add_argument("--email", help="Determine script is run on slurm to direct output to file in analyses/")
 args = parser.parse_args()
 #----------------------------------------------------------
 
@@ -82,13 +83,12 @@ def run_analysis(json_name, position):
         orig_stdout = sys.stdout
         
         output_dir = os.path.join(main_dir, 'analyses', data['personal'], data['experiment_name'], \
-                                   analysis_name, 'Output')
+                                   analysis_name, position.split('.ome')[0], 'Output')
 
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         
-        output_file = os.path.join(main_dir, 'analyses', data['personal'], data['experiment_name'], \
-                                   analysis_name, 'Output', 'output.txt')
+        output_file = os.path.join(output_dir, 'output.txt')
                                    
         print("Print statements outputted to", output_file)
         
@@ -104,7 +104,8 @@ def run_analysis(json_name, position):
     analysis = Analysis(experiment_name=data['experiment_name'], \
                 analysis_name=json_name.split('.json')[0], \
                 personal = data['personal'], \
-                position = args.position)
+                position = args.position, 
+                email = args.email)
     #----------------------------------------------------------
     
 
@@ -299,7 +300,7 @@ def run_analysis(json_name, position):
     #Set Distance Between Nuclei
     #----------------------------------------------------
     if 'edge deletion' in data.keys():
-        if data['edge deletion'] != 'none' or data['distance between nuclei'] != 'NaN':
+        if data['edge deletion'] != 'none':
             analysis.set_edge_deletion_arg(data['edge deletion'])
     #----------------------------------------------------------
 
@@ -356,8 +357,8 @@ def run_analysis(json_name, position):
     #Matching Tolerance for Segmentation
     #----------------------------------------------------
     if 'area_tol' in data.keys():
-        if data['area_tol'] != 'none' and not math.isnan(data['area_tol']):
-            analysis.set_area_tol_arg(data['matching tolerance'])
+        if data['area_tol'] != 'none':
+            analysis.set_area_tol_arg(data['area_tol'])
     #----------------------------------------------------------
     
     #Set Min Seeds
@@ -365,6 +366,13 @@ def run_analysis(json_name, position):
     if 'num of wavelengths' in data.keys():
         if not data['num of wavelengths'] == 'none':
             analysis.set_num_wavelengths_arg(data['num of wavelengths'])
+    #----------------------------------------------------------
+    
+    #Set Dimensions
+    #----------------------------------------------------
+    if 'dimensions' in data.keys():
+        if not data['dimensions'] == 'none':
+            analysis.set_dimensions_arg(data['dimensions'])
     #----------------------------------------------------------
     
     #Writ

@@ -65,7 +65,7 @@ def plot_and_save_locations_3d(img_array, locations_2d, dest):
 def plot_and_save_locations_3d_michal(img_array, locations_2d, dest):
     
     plt.figure(figsize=(40,40))
-    plt.imshow(img_array, cmap='gray', vmax =1000)
+    plt.imshow(img_array*20, cmap='gray')
     plt.scatter(np.array(locations_2d[:,0] - .5), np.array(locations_2d[:,1]) -.5 , s= 2, c='r')
     print(f'{dest=}')
     plt.savefig(dest)

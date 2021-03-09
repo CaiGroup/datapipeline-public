@@ -19,5 +19,5 @@ conda activate data-pipeline
 
 #Runs script that sets parameters and runs the analysis. It imports analysis_class.py to do so.
 #----------------------------------------------
-python ${6}/json_analysis.py --json ${1} --position ${2} --personal ${3} --experiment_name ${4} --slurm ${5}
+python ${6}/json_analysis.py --json ${1} --position ${2} --personal ${3} --experiment_name ${4} --slurm ${5} --email ${7}
 #----------------------------------------------

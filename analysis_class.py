@@ -79,13 +79,14 @@ else:
 #Analysis Class to set and run parameters for analyses
 #=====================================================================================
 class Analysis:
-    def __init__(self, experiment_name, analysis_name, personal, position):
+    def __init__(self, experiment_name, analysis_name, personal, position, email):
         #Set Basic Information
         #--------------------------------------------------------------
         self.experiment_name = experiment_name
         self.personal = personal
         self.analysis_name = analysis_name
         self.position = position
+        self.email = email
         #--------------------------------------------------------------
         
         #Set Parameters
@@ -333,6 +334,11 @@ class Analysis:
         self.num_wav = float(num_wav)
         
         print("    Set Number of Wavelengths to", str(self.num_wav))
+        
+    def set_dimensions_arg(self, dims):
+        self.dimensions = int(dims)
+        
+        print("    Set Dimensions to", str(self.dimensions))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -601,7 +607,7 @@ class Analysis:
         #--------------------------------------------------------------------------------
         if self.segmentation != False and (self.on_off_barcode_analysis == True or self.false_positive_rate_analysis == True or self.hamming_analysis == True): 
             post_analysis = Post_Analyses(self.position_dir, self.false_pos_dir, self.seg_dir, self.hamming_dir, self.fake_barcodes, self.barcode_key_src, \
-                                self.num_zslices, self.segmentation, self.decoding_individual, self.num_wav)
+                                self.num_zslices, self.segmentation, self.decoding_individual)
         #--------------------------------------------------------------------------------
         
         
@@ -642,7 +648,9 @@ class Analysis:
         
         timer_tools.logg_elapsed_time(self.start_time, 'Finished with Analysis of Position')
         
-        #send_finished_notif(self.analysis_dir, 'resace3@gmail.com')
+        print(f'{self.email=}')
+        if self.email != 'none':
+            send_finished_notif(self.analysis_dir, self.email)
 
     #--------------------------------------------------------------------------------
     #End of running the parameters

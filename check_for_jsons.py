@@ -212,6 +212,7 @@ def get_positions_in_data(data, main_dir):
         
         positions = os.listdir(path_to_sub_dir)
         
+        
         if 'positions' in data.keys():
             if data['positions'] != 'NaN':
                 print(f'{data["positions"]=}')
@@ -222,15 +223,16 @@ def get_positions_in_data(data, main_dir):
     return positions
     
 
-def get_slurm_params(json_name, data):
+def get_slurm_params(json_name, data, position):
 
     #Running in Slurm Variable to True
     #--------------------------------------------------------------
     running_in_slurm = 'True'
     #--------------------------------------------------------------
-    
+
     print("Slurm Parameters:")
     
+
     #Get Name of job 
     #--------------------------------------------------------------
     analysis_name, dot_json = os.path.splitext(json_name)
@@ -295,19 +297,17 @@ def get_slurm_params(json_name, data):
     print("    time:", time, flush=True)
 
     #--------------------------------------------------------------
-    
     #Define output file
     #--------------------------------------------------------------
     output_dir = os.path.join(main_dir, 'analyses/', data['personal'], data['experiment_name'], \
-                                    json_name.split('.json')[0], 'Output')
-    
+                                    json_name.split('.json')[0], position.split('.ome')[0], 'Output')
+
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     
     output_file_path = os.path.join(output_dir, 'slurm_output.out')
     #--------------------------------------------------------------
-    
-    return batch_name, nodes, ntasks, mem_per_cpu, time, email, output_file_path, running_in_slurm 
+    return batch_name, nodes, ntasks, mem_per_cpu, time, output_file_path, running_in_slurm 
 
 
 #Set Arguments
@@ -383,6 +383,7 @@ else:
 
                 positions = get_positions_in_data(data, main_dir)
                 
+                print(f'{positions=}')
                 # Go through each position
                 #----------------------------------------------------------
                 for position in positions:
@@ -395,14 +396,19 @@ else:
                         os.mkdir(position_dir)
                     #----------------------------------------------------------
                     
+                    if 'email' in data.keys():
+                        email = data['email']
+                    else:
+                        email = 'none'
+        
                     print("Running", json_name, "for", position, flush=True)
                     
                     #Checking for SLURM commands
                     #---------------------------------------------------------------------------------
-
                     if "clusters" in data.keys():
                         
-                        batch_name, nodes, ntasks, mem_per_cpu, time, email, output_file_path, running_in_slurm = get_slurm_params(json_name, data)
+                        batch_name, nodes, ntasks, mem_per_cpu, time, output_file_path, running_in_slurm = get_slurm_params(json_name, data, position)
+                        
                         #Run slurm Command
                         #--------------------------------------------------------------
                         kickoff_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "kickoff_analysis.sh")
@@ -411,11 +417,10 @@ else:
                                          "--ntasks", ntasks, \
                                          "--mem-per-cpu", mem_per_cpu, \
                                          "--time", time, \
-                                         "--mail-user",  email, \
                                          "--mail-type=BEGIN", "--mail-type=END", "--mail-type=FAIL", \
                                          "--output", output_file_path, \
                                          kickoff_script, json_name, position, data["personal"], data["experiment_name"], \
-                                         running_in_slurm, os.path.dirname(os.path.abspath(__file__))])
+                                         running_in_slurm, os.path.dirname(os.path.abspath(__file__)), email])
                         #--------------------------------------------------------------
         
                     else:
@@ -431,7 +436,7 @@ else:
                         #Run Without Slurm
                         #--------------------------------------------------------------
                         kickoff_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "kickoff_analysis.sh")
-                        subprocess.call(["bash", kickoff_script, json_name, position, data["personal"], data["experiment_name"], running_in_slurm, os.path.dirname(os.path.abspath(__file__)) ])
+                        subprocess.call(["bash", kickoff_script, json_name, position, data["personal"], data["experiment_name"], running_in_slurm, os.path.dirname(os.path.abspath(__file__)), email ])
                         #--------------------------------------------------------------
         
             

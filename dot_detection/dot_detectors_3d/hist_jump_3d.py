@@ -231,7 +231,7 @@ else:
     chromatic = False
     gauss = False
     rad = False
-    strictness = 3
+    strictness = 4
     z_slices = 'all'
     num_wav = 3
     get_dots_for_tiff(tiff_src, offset, analysis_name, vis_dots, back_sub, channels, chromatic, gauss, \

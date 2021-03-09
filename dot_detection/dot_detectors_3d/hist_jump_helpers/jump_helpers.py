@@ -3,11 +3,12 @@ from skimage.feature import blob_log
 import matplotlib.pyplot as plt
 
 def get_hist(intense):
-    num_bins = 50
+    num_bins = 10
     plt.figure()
     print(f'{len(intense)=}')
     bins = np.arange(np.min(intense), np.max(intense), (np.max(intense) - np.min(intense))//num_bins)
     y, x, ignore = plt.hist(intense, bins=bins, cumulative=-1)
+    plt.savefig('hist_jump.png')
     return y,x
 
 def match_thresh_to_diff_stricter(y_hist, x_hist, strictness =1):

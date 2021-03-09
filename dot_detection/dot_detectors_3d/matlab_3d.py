@@ -59,7 +59,7 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
 
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
-                      bool_radial_center, strictness, z_slices, nbins, threshold, rand_dir):
+                      bool_radial_center, strictness, z_slices, nbins, threshold, num_wav, rand_dir):
     
     #Getting Background Src
     #--------------------------------------------------------------------
@@ -68,7 +68,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
     
     #Reading Tiff File
     #--------------------------------------------------------------------
-    tiff = tiffy.load(tiff_src)
+    tiff = tiffy.load(tiff_src, num_wav)
     #--------------------------------------------------------------------
     
 
@@ -172,6 +172,7 @@ if sys.argv[1] != 'debug_matlab_3d':
     parser.add_argument("--radial_center")
     parser.add_argument("--strictness")
     parser.add_argument("--z_slices")
+    parser.add_argument("--num_wav")
     parser.add_argument("--nbins")
     parser.add_argument("--threshold")
     
@@ -204,7 +205,7 @@ if sys.argv[1] != 'debug_matlab_3d':
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
                           args.back_subtract, channels, args.chromatic, str2bool(args.gaussian), \
                           str2bool(args.radial_center),int(args.strictness), args.z_slices, int(args.nbins), \
-                          int(args.threshold), args.rand)
+                          int(args.threshold), args.num_wav, args.rand)
         
 else:
     print('Debugging')
@@ -215,4 +216,4 @@ else:
     rand_dir = '/home/nrezaee/temp'
     radial_center = False
     get_dots_for_tiff(tiff_src, offset, analysis_name, True, False, channels, False, False, radial_center, 0, None, 10, \
-                    300, rand_dir)
+                    300, 4, rand_dir)
