@@ -35,14 +35,18 @@ def get_specific_positions(spec_positions, positions):
     spec_positions = spec_positions.replace(" ", "").split(',')
     while '' in spec_positions: spec_positions.remove('')
     print(f'{spec_positions=}')
-    spec_positions = [str(int(spec_position)) for spec_position in spec_positions]
+    spec_positions = [str(int(float(spec_position))) for spec_position in spec_positions]
 
     new_positions = []
-
+    print(3)
+    print(f'{spec_positions=}')
+    print(f'{positions=}')
 
     for spec_position in spec_positions:
         new_positions.append([position for position in positions \
                      if spec_position in position][0])
+        
+    print(4)
     return new_positions
     
 
@@ -219,6 +223,8 @@ def get_positions_in_data(data, main_dir):
                 if data['positions'].replace(' ', '') != '':
                     if hasNumbers(data['positions']):
                         positions = get_specific_positions(data['positions'], positions)
+                        
+        print(2)
 
     return positions
     

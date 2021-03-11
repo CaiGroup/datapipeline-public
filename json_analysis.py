@@ -293,7 +293,7 @@ def run_analysis(json_name, position):
     #Set Distance Between Nuclei
     #----------------------------------------------------
     if 'distance between nuclei' in data.keys():
-        if data['distance between nuclei'] != 'none' and not math.isnan(data['distance between nuclei']):
+        if data['distance between nuclei'] != 'none':
             analysis.set_dist_between_nuclei_arg(data['distance between nuclei'])
     #----------------------------------------------------------
     
@@ -336,7 +336,7 @@ def run_analysis(json_name, position):
     #Set Cyto Channel Number
     #----------------------------------------------------
     if 'cyto channel number' in data.keys():
-        if data['cyto channel number'] != 'none'and not math.isnan(data['cyto channel number']):
+        if data['cyto channel number'] != 'none':
             analysis.set_cyto_channel_arg(data['cyto channel number'])
     #----------------------------------------------------------
 

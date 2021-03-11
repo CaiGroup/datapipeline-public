@@ -13,6 +13,8 @@ def reshape_michal_tiffs(tiff):
 def load(tiff_src, num_wav):    
     print(f'{tiff_src=}')
     
+    print(f'{num_wav=}')
+    
     #Read tiff file
     #---------------------------------------------------------------------
     tiff = tifffile.imread(tiff_src)
@@ -29,6 +31,9 @@ def load(tiff_src, num_wav):
         
         #Checks if channels is meant to be 4
         #assert tiff.shape[1]==4
+        print(f'{tiff.shape=}')
+        assert tiff.shape[1] == float(num_wav)
+        
         
         return tiff
     #---------------------------------------------------------------------
@@ -40,7 +45,7 @@ def load(tiff_src, num_wav):
         
         #Define the variables needed
         #---------------------------------------------------------------------
-        num_of_wavelengths = num_wav
+        num_of_wavelengths = int(num_wav)
 
         total_channels_times_z_stacks = tiff.shape[0]
 

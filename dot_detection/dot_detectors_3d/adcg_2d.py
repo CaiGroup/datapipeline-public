@@ -90,7 +90,8 @@ def get_adcg_dots(tiff_2d):
     
     
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool_normalization, \
-                      bool_background_subtraction, channels_to_detect_dots, bool_chromatic, num_wav, rand_dir):
+                      bool_background_subtraction, channels_to_detect_dots, bool_chromatic, num_wav, \
+                      z_slices, rand_dir):
     
     
     #Getting Background Src
@@ -128,21 +129,38 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
         tiff_3d = tiff[:, channel,:,:]
 
         dots_in_channel = None
+        
+        print(f'{tiff_3d.shape=}')
+        if z_slices == 'all':
+            pass
+        
+        else:
+            print(f'{z_slices=}')
+            print(f'{tiff_3d[z_slices,:,:].shape=}')
+            tiff_3d= np.array([tiff_3d[z_slices,:,:]])
+
+            #tiff_3d = tiff_3d[np.newaxis, ...]
 
         
         #Loops through Z-stacks for Dot Detection
         #---------------------------------------------------------------------
         df_points_3d = pd.DataFrame(columns = ['x', 'y', 'z', 'int'])
-        for z in range(tiff_shape[0]):
+        print(f'{tiff_3d.shape=}')
+        for z in range(tiff_3d.shape[0]):
             
             tiff_2d = tiff_3d[z, :, :]
             
             df_points_2d = get_adcg_dots(tiff_2d)
+            print(f'{df_points_2d=}')
             
-            del df_points_2d['int']
+            # del df_points_2d['int']
             
             df_points_2d = df_points_2d.rename(columns={'w': 'int'})
-            df['int'] = df['int']/1000
+            df_points_2d['int'] = df_points_2d['int']/1000
+            
+            z_array = np.full((df_points_2d.shape[0]), z)
+        
+            df_points_2d['z'] = z_array
             
             if bool_visualize_dots == True and z == tiff_shape[0]//2:
                 get_visuals(tiff_src, df_points_2d, tiff_2d, analysis_name)
@@ -153,9 +171,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
         channel_array = np.full((df_points_3d.shape[0]), channel + 1)
         hyb = int(tiff_src.split('HybCycle_')[1].split('/MMStack')[0])
         hyb_array = np.full((df_points_3d.shape[0]), hyb)
-        z_array = np.full((df_points_3d.shape[0]), 0)
         
-        df_points_3d['z'] = z_array
         df_points_3d['ch'] = channel_array
         df_points_3d['hyb'] = hyb_array
         
@@ -166,11 +182,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             print('Shitfing Locations')
             df_tiff['x'] = df_tiff['x'] + offset[1]
             df_tiff['y'] = df_tiff['y'] + offset[0]
-            
-            #Shift Locations
-            #---------------------------------------------------------------------
-            # dot_analysis[0] = shift_locations(dot_analysis[0], np.array(offset), tiff_src, bool_chromatic)
-            #---------------------------------------------------------------------
+
         
     csv_path = rand_dir +'/locs.csv'
     print(f'{csv_path=}')
@@ -197,6 +209,7 @@ if sys.argv[1] != 'debug_adcg':
     parser.add_argument("--channels", nargs = '+')
     parser.add_argument("--chromatic")
     parser.add_argument("--rand")
+    parser.add_argument("--z_slices")
     parser.add_argument("--num_wav")
     
     
@@ -215,9 +228,9 @@ if sys.argv[1] != 'debug_adcg':
         channels = [int(i.replace('[', '').replace(']','').replace(',','')) for i in args.channels]
     
     
-    
+    print(f'{args.z_slices=}')
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), args.norm, \
-                          args.back_subtract, channels, args.chromatic, args.num_wav, args.rand)
+                          args.back_subtract, channels, args.chromatic, args.num_wav, int(args.z_slices), args.rand)
                           
 else:                        
     print('Debugging')
@@ -227,7 +240,8 @@ else:
     analysis_name = 'linus_decoding'
     rand_dir = '/home/nrezaee/temp'
     visualize_dots = True
-    get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, False, False, channels, False, rand_dir)
+    z_slice = 0
+    get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, False, False, channels, False, 4, z_slice, rand_dir)
     
     
 

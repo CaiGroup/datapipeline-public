@@ -122,12 +122,13 @@ def run_alignment(exp_name, personal, position, align_function, num_wav):
             cmd = ' '.join(list_cmd)
     
             script_name = os.path.join(rand_dir, 'align.sh')
+            out_file_path = script_name = os.path.join(rand_dir, 'slurm_align.out')
             with open(script_name , 'w') as f:
                 f.write('#!/bin/bash \n')
                 f.write(cmd)
             
     
-            call_me = ['sbatch',  '--job-name', rand_list[sub_dirs.index(sub_dir)], "--time", "0:5:00","--mem-per-cpu", "9G", "--ntasks", '1', script_name ]
+            call_me = ['sbatch', '--output', out_file_path, '--job-name', rand_list[sub_dirs.index(sub_dir)], "--time", "0:5:00","--mem-per-cpu", "9G", "--ntasks", '1', script_name ]
             print(f'{" ".join(call_me)=}')
             subprocess.call(call_me)
 

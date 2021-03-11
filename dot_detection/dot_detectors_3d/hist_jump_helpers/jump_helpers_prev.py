@@ -44,24 +44,6 @@ def apply_thresh(dot_analysis, threshold):
         indexes.append(index)
         index+=1
     return dot_analysis
-    
-def remove_unneeded_intensities(intensities, per_remove):
-    num_bins = 100
-    plt.figure()
-    
-    print(f'{len(intensities)=}')
-    bins = np.arange(np.min(intensities), np.max(intensities), (np.max(intensities) - np.min(intensities))//num_bins)
-    y, x, ignore = plt.hist(intensities, bins=bins, cumulative=-1)
-    
-    bools = y < len(intensities)*per_remove
-    i = 0
-    while bools[i] == False:
-        i+=1
-    intensities = np.array(intensities)
-    
-    threshed = intensities[intensities < x[i]]
-    
-    return threshed
 
 def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name):
     res = blob_log(tiff_3d, min_sigma =1, max_sigma =2, num_sigma =2, threshold = 0.001)
@@ -81,23 +63,20 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name):
                         analysis_name, position, 'Dot_Locations')
                         
     if not os.path.exists(locs_dir):
-        try:
-            os.mkdir(locs_dir)
-        except:
-            pass
+        # try:
+        os.mkdir(locs_dir)
     
     hist_png_dir = os.path.join(locs_dir, 'Biggest_Jump_Histograms')
     
     if not os.path.exists(hist_png_dir):
-        try:
-            os.mkdir(hist_png_dir)
-        except:
-            pass
+        # try:
+        os.mkdir(hist_png_dir)
+        # except:
+        #     pass
     
     hist_png_path = os.path.join(hist_png_dir, hyb + '_' + 'Jump.png')
     
     dot_analysis = [points, intensities]
-    intensities = remove_unneeded_intensities(intensities, per_remove=.01)
     y, x = get_hist(intensities, hist_png_path)
     thresh = match_thresh_to_diff_stricter(y, x, strictness)
     points_threshed, intensities_threshed = apply_thresh(list(dot_analysis), thresh)
@@ -108,7 +87,7 @@ if sys.argv[1] == 'debug_jump_helper':
     print(f'{np.version.version=}')
     import tifffile as tf
     
-    tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_1/HybCycle_10/MMStack_Pos20.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_1/MMStack_Pos20.ome.tif'
     tiff_3d = tf.imread(tiff_src)[:,0]
     strictness= 5
     analysis_name = 'michal_decoding_top'

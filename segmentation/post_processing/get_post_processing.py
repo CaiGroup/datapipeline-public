@@ -95,12 +95,12 @@ def post_process(edge_delete_dist, dist_between_nuclei, label_img_src, labeled_c
     cwd = os.getcwd()
     post_process_dir = os.path.join(cwd, 'segmentation/post_processing')
     
-    if dist_between_nuclei==0:
+    if float(dist_between_nuclei)==0:
         pass
     else:
         label_img_src = make_distance_between_cells(label_img_src, dist_between_nuclei, post_process_dir)
         
-    if int(edge_delete_dist)  == 0:
+    if float(edge_delete_dist)  == 0:
         pass
     else:
         label_img_src = delete_edges(label_img_src, edge_delete_dist, post_process_dir)

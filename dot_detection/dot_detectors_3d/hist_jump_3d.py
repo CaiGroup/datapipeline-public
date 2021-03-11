@@ -121,7 +121,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         #strictness = 5
         print(f'{strictness=}')
         print(f'{tiff_3d.shape=}')
-        dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness=strictness))
+        dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name))
 
         assert len(dot_analysis[1]) >0
         #---------------------------------------------------------------------

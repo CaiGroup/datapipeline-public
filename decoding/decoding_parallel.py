@@ -55,6 +55,9 @@ def get_barcode_info(barcode_src):
 
 
 def run_matlab_decoding(rand, barcode_src, locations_cell_path, dest, num_of_rounds, allowed_diff, min_seeds, total_number_of_channels, channel_index, number_of_individual_channels_for_decoding):           
+    
+    print(f'{barcode_src=}')
+    print(f'{locations_cell_path=}')
     #Create Matlab Command
     #-------------------------------------------------------------------
     cmd = """  matlab -r "addpath('{0}');main_decoding('{1}', '{2}', '{3}', {4}, {5}, {6}, {7}, {8}, '{9}'); quit"; """ 
@@ -126,10 +129,16 @@ def save_points_int_to_csv(points, intensities, csv_dst):
     return None
     
 def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_seeds, channel_index = None, \
-        number_of_individual_channels_for_decoding=None, roi_path=None, bool_cellpose=False, decode_only_cells = False):
+        number_of_individual_channels_for_decoding=None, roi_path=None, decode_only_cells = False):
     
-    
+    print(f'{barcode_src=}')
+    print(f'{locations_src=}')
     print(f'{labeled_img.shape=}')
+    import tifffile as tf
+    tf.imwrite('parallel.tif', labeled_img)
+    print(f'{channel_index=}')
+    print(f'{number_of_individual_channels_for_decoding=}')
+    
     total_number_of_channels, num_of_rounds = get_barcode_info(barcode_src)
     
     
@@ -186,15 +195,16 @@ def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_se
 if sys.argv[1] == 'debug_parallel':
     import tifffile 
     
-    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_mat_dapi/MMStack_Pos0/Segmentation/Channel_1/labeled_img.tiff'
-    barcode_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_mat_dapi/BarcodeKey/channel_1.mat'
-    locations_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei-adcg-locs/jonathan_locs.csv'
+    labeled_img_src = 'parallel.tif'
+    barcode_src = '/groups/CaiLab/analyses/michalp/michal_1/michal_test/BarcodeKey/channel_1.mat'
+    locations_src = '/groups/CaiLab/analyses/michalp/michal_1/michal_test/MMStack_Pos15/Dot_Locations/locations.csv'
     
     dest = '/home/nrezaee/temp/'
     allowed_diff = 0
     min_seeds = 3
     
     labeled_img = tifffile.imread(labeled_img_src)
-    decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_seeds)
+    decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_seeds, channel_index=0, \
+        number_of_individual_channels_for_decoding=1)
 
 

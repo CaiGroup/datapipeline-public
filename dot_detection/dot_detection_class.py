@@ -103,7 +103,7 @@ class Dot_Detection:
             
             #Run Dot Detection
             #--------------------------------------------------------------------
-            df_locs = self.get_dot_locations()
+            df_locs = self.get_dot_locations(z_slice =z)
             #--------------------------------------------------------------------
             
             

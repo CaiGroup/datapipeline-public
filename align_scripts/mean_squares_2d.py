@@ -11,6 +11,8 @@ from load_tiff import tiffy
 from align_scripts.helpers.saving_offset import save_offset
 
 def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir, num_wav):
+    
+    print(f'{type(num_wav)=}')
     fixed_np = tiffy.load(fixed_image_src, num_wav)
     moving_np = tiffy.load(moving_image_src, num_wav)
     
