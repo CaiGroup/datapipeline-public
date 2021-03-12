@@ -45,7 +45,7 @@ def load(tiff_src, num_wav):
         
         #Define the variables needed
         #---------------------------------------------------------------------
-        num_of_wavelengths = int(num_wav)
+        num_of_wavelengths = int(float(num_wav))
 
         total_channels_times_z_stacks = tiff.shape[0]
 

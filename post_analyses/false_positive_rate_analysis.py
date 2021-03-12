@@ -53,7 +53,7 @@ def save_to_file(num_reals, num_fakes, ratio, num_reals_seg, num_fakes_seg, rati
          state_ratio, '\n\n', \
          state_reals_cells + '\n', \
          state_offs_cells + '\n', \
-         state_ratio_cells]  
+         state_ratio_cells+ '\n\n']  
 
     file1.writelines(L) 
     file1.close() 
@@ -120,6 +120,31 @@ def get_false_pos_intensities_hist(genes_csv_src, dest):
              rwidth=0.8, color = ['b', 'orange'])
     plt.savefig(dest)
     
+def save_to_file_z(num_reals, num_fakes, ratio, z, dst):
+    state_z = 'Z Slice ' + str(z) + ':'
+    state_reals = 'Number of On Barcodes: ' + str(num_reals)
+    state_offs =  'Number of Off Barcodes: ' + str(num_fakes)
+    state_ratio = 'False Positive Rate: ' + str(ratio)
+
+    file1 = open(dst,"a") 
+    L = [state_z + '\n', \
+         state_reals + '\n', \
+         state_offs+ '\n', \
+         state_ratio, '\n\n']  
+
+    file1.writelines(L) 
+    file1.close() 
+    
+    print("Saving False Barcodes to", dst)
+
+def false_pos_rate_across_z(df, dst):
+    z_s = range(round(min(df.z)), round(max(df.z))+1)
+    for z in z_s:
+        print(z)
+        df_z = df[(df.z > (z-.5)) & (df.z <= (z +.5))]
+        num_fakes_z, num_reals_z, ratio_z = get_false_positive_rate_info(df_z)
+        save_to_file_z(num_reals_z, num_fakes_z, ratio_z, z, dst)
+        
 def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto = None):
     print("Getting False Barcodes")
     
@@ -151,10 +176,21 @@ def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto =
     
     fig_dest = os.path.join(os.path.dirname(dst), 'On-Off-Barcode-Intensity-Analysis.png')
     get_false_pos_intensities_hist(gene_locations_assigned_to_cell_src, fig_dest)
+    false_pos_rate_across_z(df_genes, dst)
     
     print("Saving False Barcodes to", dst)
 
     return num_reals, num_fakes, ratio
+    
+    
+import sys
+if sys.argv[1] == 'debug_false_pos':
+    results_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict4/MMStack_Pos0/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv'
+    dst = '/home/nrezaee/temp/false_pos.txt'
+    get_false_pos_rate_post_seg(results_src, dst)
+    
+    
+    
     
     
 def get_false_pos_rate_pre_seg(csv_src, barcode_src, dst):

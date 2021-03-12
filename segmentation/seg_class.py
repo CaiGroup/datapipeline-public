@@ -16,10 +16,11 @@ from segmentation.visualization.visual_seg import get_label_img_visuals
 #----------------------------
 
 
-if os.environ.get('DATA_PIPELINE_MAIN_DIR') is not None:
-    main_dir = os.environ['DATA_PIPELINE_MAIN_DIR']
-else:
-    raise Exception("The Main Directory env variable is not set. Set DATA_PIPELINE_MAIN_DIR!!!!!!!!")
+main_dir = '/groups/CaiLab'
+# if os.environ.get('DATA_PIPELINE_MAIN_DIR') is not None:
+#     main_dir = os.environ['DATA_PIPELINE_MAIN_DIR']
+# else:
+#     raise Exception("The Main Directory env variable is not set. Set DATA_PIPELINE_MAIN_DIR!!!!!!!!")
 
 
 #Analysis Class to set and run parameters for analyses

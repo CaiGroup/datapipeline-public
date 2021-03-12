@@ -22,11 +22,11 @@ import pandas as pd
 from helpers.excel2dict import get_dict_from_excel
 
 
-
-if os.environ.get('DATA_PIPELINE_MAIN_DIR') is not None:
-    main_dir = os.environ['DATA_PIPELINE_MAIN_DIR']
-else:
-    raise Exception("The Main Directory env variable is not set. Set DATA_PIPELINE_MAIN_DIR!!!!!!!!")
+main_dir = '/groups/CaiLab'
+# if os.environ.get('DATA_PIPELINE_MAIN_DIR') is not None:
+#     main_dir = os.environ['DATA_PIPELINE_MAIN_DIR']
+# else:
+#     raise Exception("The Main Directory env variable is not set. Set DATA_PIPELINE_MAIN_DIR!!!!!!!!")
 
 def Diff(li1, li2):
     return (list(list(set(li1)-set(li2)) + list(set(li2)-set(li1))))

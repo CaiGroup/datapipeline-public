@@ -31,6 +31,9 @@ if file_extension == '.json':
 elif file_extension == '.xlsx':
     analysis_dict = get_dict_from_excel(json_path)
     
+else:
+    raise Exception("You have to put in a .json stupid!!!!!!!!!")
+    
 #----------------------------------------------------------
 
 print(f'{analysis_dict=}')

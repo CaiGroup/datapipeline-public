@@ -28,7 +28,7 @@ def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, d
     #Getting Tiff
     #----------------------------------------------
     print('Reading TIff')
-    tiff = tiffy.load(tiff_path)
+    tiff = tiffy.load(tiff_path,num_wav)
     file_name = os.path.basename(tiff_path)
     dir_name = os.path.dirname(tiff_path)
     #----------------------------------------------

@@ -14,7 +14,8 @@ from align_scripts.helpers.combine_offs import combine_offsets
 #-------------------------------------------------
 
 
-main_dir = os.environ['DATA_PIPELINE_MAIN_DIR']
+
+main_dir = '/groups/CaiLab'
 
 
 def get_and_sort_hybs(path_to_experiment_dir):
@@ -128,7 +129,7 @@ def run_alignment(exp_name, personal, position, align_function, num_wav):
                 f.write(cmd)
             
     
-            call_me = ['sbatch', '--output', out_file_path, '--job-name', rand_list[sub_dirs.index(sub_dir)], "--time", "0:5:00","--mem-per-cpu", "9G", "--ntasks", '1', script_name ]
+            call_me = ['sbatch', '--output', out_file_path, '--job-name', rand_list[sub_dirs.index(sub_dir)], "--time", "0:10:00","--mem-per-cpu", "9G", "--ntasks", '1', script_name ]
             print(f'{" ".join(call_me)=}')
             subprocess.call(call_me)
 

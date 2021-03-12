@@ -9,7 +9,8 @@ from align_scripts.mean_squares_blur import preprocess_align
 
 
 
-main_dir = os.environ['DATA_PIPELINE_MAIN_DIR']
+
+main_dir = '/groups/CaiLab'
 
 def get_and_sort_hybs(path_to_experiment_dir):
     

@@ -97,13 +97,15 @@ def save_plotted_cell(labeled_img, seg_dict_channel, fig_dest):
     plt.ylim([0,labeled_img.shape[2]])
     
     for i in range(len(seg_dict_channel)):#len(seg_dict_channel)):
-        
-        points = seg_dict_channel[i][0]
-        print(f'{points.shape=}')
-        print(f'{points[:2]=}')
-        
-        plt.scatter(points[:,1][:100], points[:,0][:100], s=10)
-        print(f'{fig_dest=}')
+        print(f'{seg_dict_channel.keys()=}')
+            
+        if i in list(seg_dict_channel.keys()):
+            points = seg_dict_channel[i][0]
+            print(f'{points.shape=}')
+            print(f'{points[:2]=}')
+            
+            plt.scatter(points[:,1][:100], points[:,0][:100], s=10)
+            print(f'{fig_dest=}')
         
     plt.savefig(fig_dest)
         

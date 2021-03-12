@@ -9,6 +9,7 @@ import time
 from datetime import datetime
 from load_tiff import tiffy
 from helpers.send_email_notif import send_finished_notif
+from helpers.sync_specific_analysis import send_analysis_to_onedrive
 
 #Alignment Scripts
 #----------------------------
@@ -311,7 +312,7 @@ class Analysis:
         print("    Set Threshold to", str(self.threshold))
         
     def set_cyto_channel_arg(self, cyto_arg):
-        self.cyto_channel_num = int(cyto_arg)
+        self.cyto_channel_num = int(float(cyto_arg))
         
         print("    Set Cytoplasm Channel Number to", str(self.cyto_channel_num))
         
@@ -651,6 +652,8 @@ class Analysis:
         print(f'{self.email=}')
         if self.email != 'none':
             send_finished_notif(self.analysis_dir, self.email)
+        
+        send_analysis_to_onedrive(self.analysis_dir)
 
     #--------------------------------------------------------------------------------
     #End of running the parameters

@@ -197,7 +197,7 @@ if sys.argv[1] == 'debug_parallel':
     
     labeled_img_src = 'parallel.tif'
     barcode_src = '/groups/CaiLab/analyses/michalp/michal_1/michal_test/BarcodeKey/channel_1.mat'
-    locations_src = '/groups/CaiLab/analyses/michalp/michal_1/michal_test/MMStack_Pos15/Dot_Locations/locations.csv'
+    locations_src = '/groups/CaiLab/analyses/michalp/michal_1/michal_full_form/MMStack_Pos3/Dot_Locations/locations.csv'
     
     dest = '/home/nrezaee/temp/'
     allowed_diff = 0
