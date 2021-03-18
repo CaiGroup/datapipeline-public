@@ -127,6 +127,8 @@ class Dot_Detection:
             df_locs.to_csv(locations_path, index = False)
             self.save_locations_shape(locations_path)
             #--------------------------------------------------------------------
+            
+        return locations_path
 
     def run_dot_detection(self):
         
@@ -163,6 +165,8 @@ class Dot_Detection:
         self.save_locations_shape(locations_path)
         #self.save_locs_shape(locations_path)
         #--------------------------------------------------------------------
+        
+        return locations_path
         
     def get_dot_locations(self, z_slice= 'all'):
 
@@ -233,7 +237,9 @@ class Dot_Detection:
                 temp_dir = os.path.join(main_dir, 'personal', 'nrezaee', 'temp_dots')
                 rand = rand_list[sub_dirs.index(sub_dir)]
                 rand_dir = os.path.join(temp_dir, rand)
-                os.mkdir(rand_dir)
+                if not os.path.exists(rand_dir):
+                    os.mkdir(rand_dir)
+
                 #------------------------------------------------
              
                 print('Offset in DOt Detection Class', str(offset))

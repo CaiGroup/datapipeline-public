@@ -56,8 +56,8 @@ def get_visuals(tiff_src, df_locs_2d, tiff_2d, analysis_name):
 def plot_and_save_locations_3d(img_array, locations_2d, dest):
     
     plt.figure(figsize=(40,40))
-    plt.imshow(img_array*30, cmap='gray')
-    plt.scatter(np.array(locations_2d[:,0] - .5), np.array(locations_2d[:,1]) -.5 , s= 2, c='r')
+    plt.imshow(np.log(img_array), cmap='gray')
+    plt.scatter(np.array(locations_2d[:,0] - .5), np.array(locations_2d[:,1]) -.5 , s= 3, c='r')
     print(f'{dest=}')
     plt.savefig(dest)
     return None
@@ -65,8 +65,8 @@ def plot_and_save_locations_3d(img_array, locations_2d, dest):
 def plot_and_save_locations_3d_michal(img_array, locations_2d, dest):
     
     plt.figure(figsize=(40,40))
-    plt.imshow(img_array*20, cmap='gray')
-    plt.scatter(np.array(locations_2d[:,0] - .5), np.array(locations_2d[:,1]) -.5 , s= 2, c='r')
+    plt.imshow(np.log(img_array), cmap='gray')
+    plt.scatter(np.array(locations_2d[:,0] - .5), np.array(locations_2d[:,1]) -.5 , s= 3, c='r')
     print(f'{dest=}')
     plt.savefig(dest)
     return None

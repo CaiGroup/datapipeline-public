@@ -8,6 +8,7 @@ import pickle
 sys.path.append(os.getcwd())
 
 from load_tiff import tiffy
+from align_scripts.align_errors import get_align_errors
 from align_scripts.helpers.saving_offset import save_offset
 
 def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir, num_wav):
@@ -63,6 +64,14 @@ def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir, num_wav):
     #offset_neg = np.insert(offset_neg, 0, 0, axis=0)
     
     save_offset(moving_image_src, offset_neg, rand_dir)
+    
+    improve_percent = get_align_errors(fixed_np, moving_np, offset_neg)
+    
+    file1 = open("myfile.txt","w") 
+    file1.write(str(improv_percent)) 
+    file1.close() 
+        
+        
 
 import argparse
 

@@ -38,15 +38,12 @@ def get_specific_positions(spec_positions, positions):
     spec_positions = [str(int(float(spec_position))) for spec_position in spec_positions]
 
     new_positions = []
-    print(3)
-    print(f'{spec_positions=}')
-    print(f'{positions=}')
-
+    
     for spec_position in spec_positions:
         new_positions.append([position for position in positions \
                      if spec_position in position][0])
         
-    print(4)
+    
     return new_positions
     
 
@@ -137,21 +134,10 @@ def read_xlsx(json_name, source_of_jsons):
         json.dump(data, fp)
     
     return data, json_file_path
-    
-def check_if_all_hybs_exist(data):
-
-    data_dir = os.path.join('/groups/CaiLab/personal/', data['personal'], 'raw', data['experiment_name'])
-    glob_me = os.path.join(data_dir, '*')
-    bool_present, diff_hybs = check_if_all_hybs_are_present(glob_me)
-    
-    if bool_present == False:
-    
-        str_hybs = ','.join(str(e) for e in diff_hybs)
-        warning_message = "Warning the following Hybs seem to be missing from the dataset: " + str_hybs 
-        print(warning_message)
         
 def make_analysis_dirs(data):
     
+    print(11)
     personal_dir = os.path.join(main_dir, 'analyses', data['personal'])
     if not os.path.isdir(personal_dir):
         os.mkdir(personal_dir)
@@ -162,6 +148,7 @@ def make_analysis_dirs(data):
         
     analyses_in_exp = os.listdir(exp_analyses_dir)
     analysis_name = json_name.split('.json')[0]
+    print(19)
     
     
     
@@ -314,6 +301,18 @@ def get_slurm_params(json_name, data, position):
     output_file_path = os.path.join(output_dir, 'slurm_output.out')
     #--------------------------------------------------------------
     return batch_name, nodes, ntasks, mem_per_cpu, time, output_file_path, running_in_slurm 
+    
+def check_if_all_hybs_exist(data):
+
+    data_dir = os.path.join('/groups/CaiLab/personal/', data['personal'], 'raw', data['experiment_name'])
+    glob_me = os.path.join(data_dir, '*')
+    bool_present, diff_hybs = check_if_all_hybs_are_present(glob_me)
+    
+    if bool_present == False:
+    
+        str_hybs = ','.join(str(e) for e in diff_hybs)
+        warning_message = "Warning the following Hybs seem to be missing from the dataset: " + str_hybs 
+        print(warning_message)
 
 
 #Set Arguments
@@ -349,6 +348,7 @@ else:
         #============================================================================================================================
         try:
             
+            print(.9)
             filename, file_extension = os.path.splitext(json_name)
             if file_extension == '.json':
                 
@@ -357,7 +357,7 @@ else:
             elif file_extension == '.xlsx':
                 data, json_file_path = read_xlsx(json_name, args.source_of_jsons)
 
-                
+            print(.905)
             #Check if all Hybs are present
             #--------------------------------------------------------------------------
             if 'decoding with previous locations variable' in data.keys():
@@ -365,11 +365,13 @@ else:
                     pass
         
             else:
-                check_if_all_hybs_exist(data)
+                pass
+                #check_if_all_hybs_exist(data)
                 
-                
+            print(.906)
             analyses_in_exp, analysis_name , exp_analyses_dir = make_analysis_dirs(data)
             
+            print(.91)
             #Try Statement to see if the same analysis name has been used
             #====================================================================
             try:
@@ -394,7 +396,7 @@ else:
                 #----------------------------------------------------------
                 for position in positions:
                     
-                    
+                    print(1)
                     #Make Position Directory
                     #----------------------------------------------------------
                     position_dir = os.path.join(exp_analyses_dir, analysis_name, position.split('.ome')[0])
@@ -408,7 +410,7 @@ else:
                         email = 'none'
         
                     print("Running", json_name, "for", position, flush=True)
-                    
+                    print(2)
                     #Checking for SLURM commands
                     #---------------------------------------------------------------------------------
                     if "clusters" in data.keys():

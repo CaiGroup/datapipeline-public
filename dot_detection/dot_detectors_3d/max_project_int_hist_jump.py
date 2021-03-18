@@ -108,16 +108,6 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
         #Check if 2d Dot Detection
         #---------------------------------------------------------------------
-        if z_slices == 'all':
-            pass
-        
-        else:
-            tiff_3d= np.array([tiff_3d[z_slices,:,:]])
-        #---------------------------------------------------------------------
-        
-        
-        #Check if 2d Dot Detection
-        #---------------------------------------------------------------------
         tiff_3d = np.max(tiff_3d, axis=0)
         tiff_3d = tiff_3d[np.newaxis, ...]
         print(f'{tiff_3d.shape=}')
@@ -156,6 +146,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         #Visualize Dots
         #---------------------------------------------------------------------
         median_z = 0
+        print(f'{median_z=}')
         print(f'{bool_visualize_dots=}')
         if bool_visualize_dots == True:# and channel == 1 and z == median_z:
             get_visuals_3d(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name)
@@ -177,7 +168,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
     df_tiff.to_csv(csv_path, index=False)
 
 
-if sys.argv[1] != 'debug_hist_3d':    
+if sys.argv[1] != 'debug_max_project':    
     def str2bool(v):
       return v.lower() == "true"
     

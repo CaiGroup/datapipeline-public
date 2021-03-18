@@ -53,6 +53,18 @@ def decoding(barcode_src ,locations_src, dest, allowed_diff, min_seeds, channel_
     os.system(cmd)
 
     return None
+    
+import sys
+if sys.argv[1] == 'debug_no_parallel':
+    barcode_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei-ch1-prev-top30/takei_prev_top30/BarcodeKey/barcode.mat'
+    locations_src = '/groups/CaiLab/personal/nrezaee/raw/fake_dots-seq_decoding/locations/fake_dots.csv'
+    allowed_diff =1
+    min_seeds = 3
+    channel_index =0
+    number_of_individual_channels_for_decoding = 1
+    dest = 'foo_top_30'
+    decoding(barcode_src, locations_src, dest, allowed_diff, min_seeds, channel_index, number_of_individual_channels_for_decoding)
+    
 
 
 

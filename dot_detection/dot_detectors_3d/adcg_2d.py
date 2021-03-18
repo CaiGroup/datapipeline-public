@@ -213,6 +213,7 @@ if sys.argv[1] != 'debug_adcg':
     parser.add_argument("--num_wav")
     
     
+    
     args, unknown = parser.parse_known_args()
     
     
@@ -230,7 +231,7 @@ if sys.argv[1] != 'debug_adcg':
     
     print(f'{args.z_slices=}')
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), args.norm, \
-                          args.back_subtract, channels, args.chromatic, args.num_wav, int(args.z_slices), args.rand)
+                          args.back_subtract, channels, args.chromatic, args.num_wav, args.z_slices, args.rand)
                           
 else:                        
     print('Debugging')

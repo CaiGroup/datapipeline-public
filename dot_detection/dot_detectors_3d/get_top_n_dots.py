@@ -117,7 +117,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
 
             #Normalize tiff 2d
             #---------------------------------------------------------------------
-            tiff_2d = cv2.normalize(tiff_2d,  None, 0, 1000, cv2.NORM_MINMAX)
+            #tiff_2d = cv2.normalize(tiff_2d,  None, 0, 1000, cv2.NORM_MINMAX)
             #---------------------------------------------------------------------
             
             #Get dots from 2d image
@@ -168,7 +168,8 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             #---------------------------------------------------------------------
             dot_analysis[0] = shift_locations(dot_analysis[0], np.array(offset), tiff_src, bool_chromatic)
             #---------------------------------------------------------------------
-
+            
+            
             #Add to dots in one z slace to dots in channel
             #---------------------------------------------------------------------
             dots_in_channel = add_to_dots_in_channel(dots_in_channel, dot_analysis)
@@ -189,7 +190,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
 
   
 print(f'{sys.argv[1]=}')
-if sys.argv[1] != 'debug':
+if sys.argv[1] != 'debug_top_dots':
     print('Running')
     def str2bool(v):
       return v.lower() == "true"
@@ -233,13 +234,13 @@ if sys.argv[1] != 'debug':
                           
 else:                        
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_2/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_fiducials/HybCycle_0/MMStack_Pos0.ome.tif'
     offset = [0,0,0]
     channels = 'all' #[1]
-    analysis_name = None
+    analysis_name = 'linus_fid_dots'
     n_dots = 10
     rand_dir = '/home/nrezaee/temp'
-    get_dots_for_tiff(tiff_src, offset, analysis_name, False, False, False, channels, False, 10, rand_dir)
+    get_dots_for_tiff(tiff_src, offset, analysis_name, True, False, False, channels, False, 10, 4, rand_dir)
     
     
 

@@ -14,6 +14,7 @@ from helpers.sync_specific_analysis import send_analysis_to_onedrive
 #Alignment Scripts
 #----------------------------
 from align_scripts import run_alignment
+from align_scripts import fiducial_alignment
 #----------------------------
 
 #Align Error Script
@@ -131,6 +132,7 @@ class Analysis:
         self.get_cyto_seg = False
         self.area_tol = 0
         self.num_wav = 4
+        self.locs_src = None
         #--------------------------------------------------------------
         
         
@@ -359,13 +361,15 @@ class Analysis:
         
         if self.dimensions == 2:
             
-            dot_detector.run_dot_detection_2d()
+            locs_src = dot_detector.run_dot_detection_2d()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
-            return None
+            return locs_src
         
         
-        dot_detector.run_dot_detection()
+        locs_src = dot_detector.run_dot_detection()
         timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
+        
+        return locs_src
     def run_alignment_errors(self):
 
         #Get alignment errors
@@ -469,6 +473,7 @@ class Analysis:
         #--------------------------------------------------------------------------------
         
         
+        print(f'{self.align=}')
         #Alignment
         #--------------------------------------------------------------------------------
         if self.align !=None or self.dot_detection != False or self.decoding_across == True or \
@@ -476,27 +481,32 @@ class Analysis:
                 
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Alignment')
             if not self.decoding_with_previous_dots and not self.decoding_with_previous_locations:
-                if self.align == None:
                     
-                    offset = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, 'no_align', self.num_wav)
-                    offsets_path = os.path.join(path, 'offsets.json')
-                
-                else:
-                    
-                    offset = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, self.align, self.num_wav)
-                    offsets_path = os.path.join(path, 'offsets.json')
-                    print("        Saving to", offsets_path, flush=True)
-                
-                #Write Results to Path
-                #-----------------------------------------------------
-                with open(offsets_path, 'w') as jsonfile:
-                    json.dump(offset, jsonfile)
+              
+                    timer_tools.logg_elapsed_time(self.start_time, 'Starting Alignment')    
+                    if self.align == None or self.align == 'fiducial_markers':
                         
-                #-----------------------------------------------------
-            timer_tools.logg_elapsed_time(self.start_time, 'Ending Alignment')
-        #--------------------------------------------------------------------------------
-        #End of Alignement
-            
+     
+                                           
+                        offset = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, 'no_align', self.num_wav)
+                        offsets_path = os.path.join(path, 'offsets.json')
+                    
+                    else:
+                        
+                        offset = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, self.align, self.num_wav)
+                        offsets_path = os.path.join(path, 'offsets.json')
+                        print("        Saving to", offsets_path, flush=True)
+                    
+                    #Write Results to Path
+                    #-----------------------------------------------------
+                    with open(offsets_path, 'w') as jsonfile:
+                        json.dump(offset, jsonfile)
+                            
+                    #-----------------------------------------------------
+                    timer_tools.logg_elapsed_time(self.start_time, 'Ending Alignment')
+            #--------------------------------------------------------------------------------
+            #End of Alignement
+                
 
         #Get Errors for Alignment
         #--------------------------------------------------------------------------------
@@ -518,8 +528,17 @@ class Analysis:
         #Run Dot Detection
         #--------------------------------------------------------------------------------
         if self.dot_detection != False:
-            self.run_dot_detection()
+            self.locs_src = self.run_dot_detection()
         #--------------------------------------------------------------------------------
+        
+        if self.align == 'fiducial_markers':
+            dst_fiducials_dir = os.path.join(self.position_dir, 'Alignment')
+            try:
+                os.mkdir(dst_fiducials_dir)
+            except:
+                pass
+            
+            fiducial_alignment.get_fiducial_offset(self.data_dir, self.position, dst_fiducials_dir, self.locs_src, self.num_wav)
         
             
         #Declare Decoding Class if needed

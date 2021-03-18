@@ -107,13 +107,21 @@ def run_alignment(exp_name, personal, position, align_function, num_wav):
         #Declare Random Dir
         #-----------------------------------------------------------------
         rand = rand_list[sub_dirs.index(sub_dir)]
+        temp_dir = os.path.join(main_dir, 'personal', 'nrezaee', 'temp_align')
         rand_dir = os.path.join(temp_dir, rand)
-        os.mkdir(rand_dir)
+        try:
+            os.mkdir(rand_dir)
+        except FileExistsError:
+            pass
         #-----------------------------------------------------------------
         
         if align_function == 'no_align':
             key = os.path.join(hyb, position)
             offsets[key] = [0,0,0]
+            
+        elif align_function == 'fiducial_markers':
+            pass 
+        
             
         else:
             print(f'{tiff_file_path=}')
@@ -129,7 +137,7 @@ def run_alignment(exp_name, personal, position, align_function, num_wav):
                 f.write(cmd)
             
     
-            call_me = ['sbatch', '--output', out_file_path, '--job-name', rand_list[sub_dirs.index(sub_dir)], "--time", "0:10:00","--mem-per-cpu", "9G", "--ntasks", '1', script_name ]
+            call_me = ['sbatch', '--output', out_file_path, '--job-name', rand_list[sub_dirs.index(sub_dir)], "--time", "0:20:00","--mem-per-cpu", "9G", "--ntasks", '1', script_name ]
             print(f'{" ".join(call_me)=}')
             subprocess.call(call_me)
 
