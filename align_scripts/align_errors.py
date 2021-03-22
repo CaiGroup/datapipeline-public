@@ -208,7 +208,8 @@ def get_align_errors(fixed_tiff, moving_tiff, offset):
             error = "Worsened by "+"{:.2%}".format(improv_percent)
             #error = "Worsened by " + str(improv_percent)
     
-    return improv_percent
+    print("Align Error:", str(error))
+    return error
 
 import sys
 if sys.argv[1] == 'debug_align_errors':

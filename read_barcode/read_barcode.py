@@ -36,7 +36,14 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
         #------------------------------------------------------------------
         barcode_key_dir = os.path.dirname(barcode_src)
         
-        fake_barcodes_path = os.path.join(barcode_key_dir, 'fake_barcode.csv')
+        print(f'{barcode_key_dir=}')
+        if os.path.basename(barcode_src) == 'barcode.csv':
+            fake_barcodes_path = os.path.join(barcode_key_dir, 'fake_barcode.csv')
+        elif 'channel' in os.path.basename(barcode_src):
+            fake_barcode_file =  os.path.basename(barcode_src).split('.')[0] + '_fake.csv'
+            fake_barcodes_path = os.path.join(barcode_key_dir, fake_barcode_file)
+        else:
+            raise Exception("The barcode source is wrong.")
         #------------------------------------------------------------------
         
         
@@ -87,7 +94,7 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
 
 if sys.argv[1] == 'debug_add_fakes':
     
-    barcode_src = '/groups/CaiLab/personal/michalp/raw/michal_1/barcode_key/channel_1.csv'
+    barcode_src = '/groups/CaiLab/personal/michalp/raw/michal_2/barcode_key/channel_1.csv'
     barcode_dst = 'foo.mat'
     bool_fake_barcodes = True
     

@@ -9,6 +9,7 @@ sys.path.append(os.getcwd())
 
 from load_tiff import tiffy
 from align_scripts.helpers.saving_offset import save_offset
+from align_scripts.align_errors import get_align_errors
 
 def matlab_dapi(fixed_image_src, moving_image_src, rand_dir):
 

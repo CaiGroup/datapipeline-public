@@ -122,7 +122,7 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name):
     intensities, reverse_threshold = remove_unneeded_intensities(intensities, per_remove=.01)
     y, x, thresh = get_hist(intensities, strictness, hist_png_path)
     points_threshed, intensities_threshed = apply_thresh(list(dot_analysis), thresh)
-    points_threshed, intensities_threshed = apply_reverse_thresh([points_threshed, intensities_threshed], reverse_threshold)
+    #points_threshed, intensities_threshed = apply_reverse_thresh([points_threshed, intensities_threshed], reverse_threshold)
     return points_threshed, intensities_threshed
     
 import sys
