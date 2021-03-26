@@ -44,6 +44,7 @@ def get_fiducial_visual_debug(fid_tiff, fid_locs, dst):
             plt.scatter(locs_z.x, locs_z.y)
             png_dst = os.path.join(dst, 'channel_' +str(channel) + '_z_' + str(i) + '.png')
             plt.imshow(np.log(fid_tiff[i, channel]), cmap='gray')
+            print(f'{png_dst=}')
             plt.savefig(png_dst)
         
 
@@ -143,10 +144,11 @@ def get_dots_for_tiff(tiff_src, num_wav, dst, channels_to_detect_dots = 'all'):
     
 import sys
 if sys.argv[1] == 'debug_fid_dot_detect':
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_1/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-10-19-takei/final_fiducials/MMStack_Pos0.ome.tif'
     
+    dst = 'foo'
     num_wav = 4
-    df_tiff = get_dots_for_tiff(tiff_src, 4)
+    df_tiff = get_dots_for_tiff(tiff_src, 4, dst)
     print(f'{type(df_tiff)=}')
     print(f'{df_tiff=}')
 

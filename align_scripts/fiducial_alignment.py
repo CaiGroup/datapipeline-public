@@ -117,7 +117,7 @@ import sys
 
 if sys.argv[1] == 'debug_fiducials':
     sys.path.insert(0, os.getcwd())
-    data_dir = '/groups/CaiLab/personal/nrezaee/raw/test1/'
+    data_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-10-19-takei/'
     pos_dir = '/groups/CaiLab/'
     position = 'MMStack_Pos0.ome.tif'
     locs_src = '/groups/CaiLab/analyses/nrezaee/2020-11-24-takei-2ch-1200/top_takei_1200mrna/MMStack_Pos0/Dot_Locations/locations.csv'

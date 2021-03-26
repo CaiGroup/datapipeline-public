@@ -11,6 +11,7 @@ import shutil
 #-------------------------------------------------
 from align_scripts.helpers.rand_list import are_jobs_finished, get_random_list
 from align_scripts.helpers.combine_offs import combine_offsets
+from align_scripts.helpers.combine_offs import combine_align_errors
 #-------------------------------------------------
 
 
@@ -149,14 +150,19 @@ def run_alignment(exp_name, personal, position, align_function, num_wav):
             time.sleep(2)
         
         offsets = combine_offsets(rand_list)
+        
+        align_errors = combine_align_errors(rand_list)
+        
  
         #Delete Temp files
         for rand in rand_list:
             rand_dir = os.path.join(temp_dir, rand)
             shutil.rmtree(rand_dir)
+            
+        return offsets, align_errors
         
-    
-    return offsets
+    else:
+        return offsets
     
     
     

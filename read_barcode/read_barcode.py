@@ -94,9 +94,9 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
 
 if sys.argv[1] == 'debug_add_fakes':
     
-    barcode_src = '/groups/CaiLab/personal/michalp/raw/michal_2/barcode_key/channel_1.csv'
-    barcode_dst = 'foo.mat'
-    bool_fake_barcodes = True
+    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/sim_dots/barcode_key/channel_1_top_10.csv'
+    barcode_dst = 'foo/sim_barcode_top_10.mat'
+    bool_fake_barcodes = False
     
     read_barcode(barcode_src, barcode_dst, bool_fake_barcodes)
     

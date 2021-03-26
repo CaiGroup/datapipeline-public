@@ -10,6 +10,7 @@ sys.path.append(os.getcwd())
 from load_tiff import tiffy
 from align_scripts.align_errors import get_align_errors
 from align_scripts.helpers.saving_offset import save_offset
+from align_scripts.helpers.saving_align_errors import save_align_errors
 
 def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir, num_wav):
     
@@ -65,12 +66,11 @@ def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir, num_wav):
     
     save_offset(moving_image_src, offset_neg, rand_dir)
     
-    improve_percent = get_align_errors(fixed_np, moving_np, offset_neg)
+    print(f'{offset_neg=}')
+    align_error = get_align_errors(fixed_np, moving_np, offset_neg)
     
-    file1 = open("myfile.txt","w") 
-    file1.write(str(improv_percent)) 
-    file1.close() 
-        
+    save_align_errors(moving_image_src, align_error, rand_dir)
+    
         
 
 import argparse

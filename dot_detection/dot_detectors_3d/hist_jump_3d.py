@@ -99,7 +99,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             # tiff_3d = run_back_sub(background, tiff_3d, channel, offset)
             print(f'{background.shape=}')
             print(f'{channel=}')
-            tiff_3d = tiff_3d - background[:, channel]*1.3
+            tiff_3d = tiff_3d - background[:, channel]*1
             tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
             tf.imwrite('foo.tif', tiff_3d)
         #---------------------------------------------------------------------
@@ -118,9 +118,9 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
         #Check if 2d Dot Detection
         #---------------------------------------------------------------------
-        tiff_3d = np.max(tiff_3d, axis=0)
-        tiff_3d = tiff_3d[np.newaxis, ...]
-        print(f'{tiff_3d.shape=}')
+        # tiff_3d = np.max(tiff_3d, axis=0)
+        # tiff_3d = tiff_3d[np.newaxis, ...]
+        # print(f'{tiff_3d.shape=}')
         #---------------------------------------------------------------------
         
         
@@ -154,8 +154,8 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         print(f'{dot_analysis[0]=}')
         
         #Visualize Dots
-        #---------------------------------------------------------------------
-        median_z = 0
+        #--------------------------------------------------------------------
+        median_z = 2
         print(f'{bool_visualize_dots=}')
         if bool_visualize_dots == True:# and channel == 1 and z == median_z:
             get_visuals_3d(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name)

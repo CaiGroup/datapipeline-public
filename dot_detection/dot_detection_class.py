@@ -96,6 +96,21 @@ class Dot_Detection:
                 i+=1
         
         f.close()
+        
+    def get_ave_over_hyb_ch_z(self, src, dst):
+        
+        df = pd.read_csv(src)
+        df_aves = pd.DataFrame(columns = ['hyb', 'ch', 'z', 'ave_int', 'n_dots'])
+    
+        for hyb in df.hyb.unique():
+            for ch in df.ch.unique():
+                for z in df.z.unique():
+                    df_hyb_ch_z = df[(df.hyb == hyb) & (df.z == z) & (df.ch == ch)]
+                    dict_ave_row = {'hyb':hyb,'ch':ch,'z':z, 'ave_int':df_hyb_ch_z.int.mean(), \
+                                    'n_dots':df_hyb_ch_z.shape[0]}
+                    df_aves = df_aves.append(dict_ave_row, ignore_index = True)
+                    
+        df_aves.to_csv(dst, index=False)
     
  
     def run_dot_detection_2d(self):
@@ -163,6 +178,9 @@ class Dot_Detection:
 
         df_locs.to_csv(locations_path, index = False)
         self.save_locations_shape(locations_path)
+        
+        bright_analysis_dst = os.path.join(self.locations_dir, 'Average_Brightness_Analysis.csv')
+        self.get_ave_over_hyb_ch_z(locations_path, bright_analysis_dst)
         #self.save_locs_shape(locations_path)
         #--------------------------------------------------------------------
         

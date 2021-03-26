@@ -489,18 +489,23 @@ class Analysis:
      
                                            
                         offset = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, 'no_align', self.num_wav)
-                        offsets_path = os.path.join(path, 'offsets.json')
                     
                     else:
                         
-                        offset = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, self.align, self.num_wav)
+                        offset, align_errors = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, self.align, self.num_wav)
                         offsets_path = os.path.join(path, 'offsets.json')
                         print("        Saving to", offsets_path, flush=True)
-                    
+                        
+                        align_errors_path = os.path.join(path, 'align_errors.json')
+                        with open(align_errors_path, 'w') as jsonfile:
+                            json.dump(align_errors, jsonfile)
+                        
                     #Write Results to Path
                     #-----------------------------------------------------
+                    offsets_path = os.path.join(path, 'offsets.json')
                     with open(offsets_path, 'w') as jsonfile:
                         json.dump(offset, jsonfile)
+                    
                             
                     #-----------------------------------------------------
                     timer_tools.logg_elapsed_time(self.start_time, 'Ending Alignment')

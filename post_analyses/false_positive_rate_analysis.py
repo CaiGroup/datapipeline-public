@@ -145,6 +145,19 @@ def false_pos_rate_across_z(df, dst):
         num_fakes_z, num_reals_z, ratio_z = get_false_positive_rate_info(df_z)
         save_to_file_z(num_reals_z, num_fakes_z, ratio_z, z, dst)
         
+def get_off_on_visuals(decoded_genes_src, dst):
+    df = pd.read_csv(decoded_genes_src)
+    fake_ids = [ gene for gene in df.gene if 'fake' in gene]
+    real_ids = [ gene for gene in df.gene if 'fake' not in gene]
+
+    df_fake = df[df.gene.isin(fake_ids)]
+    df_real = df[df.gene.isin(real_ids)]
+    
+    plt.figure(figsize=(30,30))
+    plt.scatter(df_fake.x, df_fake.y, s=1, color='red')
+    plt.scatter(df_real.x, df_real.y, s=.3, color='blue')
+    plt.savefig(dst)
+        
 def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto = None):
     print("Getting False Barcodes")
     
@@ -178,6 +191,9 @@ def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto =
     get_false_pos_intensities_hist(gene_locations_assigned_to_cell_src, fig_dest)
     false_pos_rate_across_z(df_genes, dst)
     
+    fig_dest = os.path.join(os.path.dirname(dst), 'Visualize_On_Off_Genes.png')
+    get_off_on_visuals(gene_locations_assigned_to_cell_src, fig_dest)
+    
     print("Saving False Barcodes to", dst)
 
     return num_reals, num_fakes, ratio
@@ -185,7 +201,7 @@ def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto =
     
 import sys
 if sys.argv[1] == 'debug_false_pos':
-    results_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict4/MMStack_Pos0/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv'
+    results_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_all_pos/MMStack_Pos3/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv'
     dst = '/home/nrezaee/temp/false_pos.txt'
     get_false_pos_rate_post_seg(results_src, dst)
     
