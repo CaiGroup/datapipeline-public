@@ -187,6 +187,7 @@ def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_se
         
     dest_unfilt = os.path.join(dest, 'pre_seg_diff_' + str(allowed_diff) + '_minseeds_'+ str(min_seeds)+ '_unfiltered.csv')
     dest_filt = os.path.join(dest, 'pre_seg_diff_' + str(allowed_diff) + '_minseeds_'+ str(min_seeds)+ '_filtered.csv')
+    print(f'{dest_filt=}')
     get_combined_csv(dest, cell_dirs, dest_unfilt, dest_filt)
     
     return rand_list
@@ -195,12 +196,14 @@ def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_se
 if sys.argv[1] == 'debug_parallel':
     import tifffile 
     
-    labeled_img_src = 'parallel.tif'
-    barcode_src = '/groups/CaiLab/analyses/michalp/michal_1/michal_test/BarcodeKey/channel_1.mat'
-    locations_src = '/groups/CaiLab/analyses/michalp/michal_1/michal_full_form/MMStack_Pos3/Dot_Locations/locations.csv'
+    labeled_img_src = '/groups/CaiLab/personal/michalp/raw/michal_2/segmentation/MMStack_Pos1_z3_3d.tif'
+    barcode_src = '/groups/CaiLab/analyses/michalp/michal_2/michal_2_decoding_strict_10_ch3/BarcodeKey/channel_3.mat'
+    locations_src = '/groups/CaiLab/analyses/michalp/michal_2/michal_2_decoding_strict_10_ch3/MMStack_Pos1/Dot_Locations/locations.csv'
     
-    dest = '/home/nrezaee/temp/'
-    allowed_diff = 0
+    dest = '/home/nrezaee/test_cronjob_multi_dot/foo/michal_hand_seg_ch3_pos1'
+    if not os.path.exists(dest):
+        os.makedirs(dest)
+    allowed_diff = 1
     min_seeds = 3
     
     labeled_img = tifffile.imread(labeled_img_src)

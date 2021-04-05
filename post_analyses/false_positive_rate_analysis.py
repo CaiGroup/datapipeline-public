@@ -160,11 +160,15 @@ def get_off_on_visuals(decoded_genes_src, dst):
         
 def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto = None):
     print("Getting False Barcodes")
-    
+
     #Get Dataframe
     #=====================================================
     df_genes = pd.read_csv(gene_locations_assigned_to_cell_src)[:upto]
     #=====================================================
+    print(f'{df_genes=}')
+    
+    if 'geneID' in df_genes.columns:
+        df_genes = df_genes.rename(index={'geneID': "gene"})
 
     #Get False Positives
     #------------------------------------------------------
@@ -174,12 +178,12 @@ def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto =
     #Remove the Genes outside the cells
     #------------------------------------------------------
     print(f'{df_genes.shape=}')
-    df_genes_only_cells = df_genes[df_genes['cellID'] != 0]
+    # df_genes = df_genes[df_genes['cellID'] != 0]
     #--------------------------00------------------------------ 
     
     #Get False Positives
     #------------------------------------------------------
-    num_fakes_seg, num_reals_seg, ratio_seg = get_false_positive_rate_info(df_genes_only_cells)
+    num_fakes_seg, num_reals_seg, ratio_seg = get_false_positive_rate_info(df_genes)
     #------------------------------------------------------  
     
     #Write to text file
@@ -201,7 +205,7 @@ def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto =
     
 import sys
 if sys.argv[1] == 'debug_false_pos':
-    results_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_all_pos/MMStack_Pos3/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv'
+    results_src = '/home/nrezaee/test_cronjob_multi_dot/foo/michal_hand_seg_ch2_pos1/pre_seg_diff_0_minseeds_3_filtered.csv'
     dst = '/home/nrezaee/temp/false_pos.txt'
     get_false_pos_rate_post_seg(results_src, dst)
     

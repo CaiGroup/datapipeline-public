@@ -155,9 +155,9 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
         #Visualize Dots
         #--------------------------------------------------------------------
-        median_z = 2
+        median_z = tiff_3d.shape[0]//2
         print(f'{bool_visualize_dots=}')
-        if bool_visualize_dots == True:# and channel == 1 and z == median_z:
+        if bool_visualize_dots == True and channel == 1:# and z == median_z:
             get_visuals_3d(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name)
         #---------------------------------------------------------------------
         
@@ -229,19 +229,19 @@ if sys.argv[1] != 'debug_hist_3d':
 else:
     
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_1/HybCycle_30/MMStack_Pos11.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/Arun/raw/03292021_Automation_Triton_Signaling/HybCycle_1/MMStack_Pos0.ome.tif'
     offset = [0,0,0]
     channels = [1]
-    analysis_name = 'michal_align'
+    analysis_name = 'arun_dot_2_strict_10'
     rand_dir = '/home/nrezaee/temp'
     vis_dots = True
-    back_sub = True
+    back_sub = False
     chromatic = False
     gauss = False
     rad = False
-    strictness = 4
+    strictness = 10
     z_slices = 'all'
-    num_wav = 3
+    num_wav = 4
     get_dots_for_tiff(tiff_src, offset, analysis_name, vis_dots, back_sub, channels, chromatic, gauss, \
         strictness, rad, z_slices, num_wav, rand_dir)
     

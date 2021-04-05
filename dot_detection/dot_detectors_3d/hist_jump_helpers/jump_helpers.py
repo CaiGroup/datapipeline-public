@@ -6,12 +6,51 @@ import os
 import sys
 sys.path.append(os.getcwd())
 from load_tiff import tiffy
+import numpy as np
+import cv2
+
+def blur_back_subtract(tiff_2d, num_tiles):
+    blur_kernel  = tuple(np.array(tiff_2d.shape)//num_tiles)
+    blurry_img = cv2.blur(tiff_2d,blur_kernel)
+    tiff_2d = cv2.subtract(tiff_2d, blurry_img)
+    
+    return tiff_2d
+
+def blur_back_subtract_3d(img_3d, num_tiles=100):
+    
+    for i in range(img_3d.shape[0]):
+        img_3d[i,:,:] = blur_back_subtract(img_3d[i,:,:], num_tiles)
+    return img_3d
+
+def normalize(img, max_norm=1000):
+    norm_image = cv2.normalize(img, None, alpha=0, beta=max_norm, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+    return norm_image
+
+def tophat_2d(img_2d):
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(2,2))*4
+    tophat_img = cv2.morphologyEx(img_2d, cv2.MORPH_TOPHAT, kernel)
+    return tophat_img
+
+def tophat_3d(img_3d):
+    print(f'{img_3d.shape=}')
+    for i in range(len(img_3d)):
+        print(f'{i=}')
+        img_3d[i] = tophat_2d(img_3d[i])
+    return img_3d
+
+def preprocess_img(img_3d):
+    norm_img_3d = normalize(img_3d)
+    blur_img_3d = blur_back_subtract_3d(norm_img_3d)
+    print(f'{blur_img_3d.shape=}')
+    #tophat_img_3d = tophat_3d(blur_img_3d)
+    nonzero_img_3d = np.where(blur_img_3d < 0, 0, blur_img_3d)
+    return nonzero_img_3d
 
 def get_hist(intense, strictness, hist_png_path):
     num_bins = 100
     plt.figure()
     print(f'{len(intense)=}')
-    bins = np.arange(np.min(intense), np.max(intense), (np.max(intense) - np.min(intense))//num_bins)
+    bins = np.arange(np.min(intense), np.max(intense), (np.max(intense) - np.min(intense))/num_bins)
     y, x, ignore = plt.hist(intense, bins=bins, cumulative=-1)
     thresh = match_thresh_to_diff_stricter(y, x, strictness)
     plt.axvline(x=thresh, color='r')
@@ -41,30 +80,25 @@ def apply_thresh(dot_analysis, threshold):
     index = 0
     indexes = []
     len_of_dot_analysis = len(dot_analysis[1])
-    while (index < len_of_dot_analysis):
-        if dot_analysis[1][index] <= threshold:
-            dot_analysis[0] = np.delete(dot_analysis[0], index, axis =0)
-            dot_analysis[1] = np.delete(dot_analysis[1], index)
-            len_of_dot_analysis-=1
-            assert len_of_dot_analysis == len(dot_analysis[1])
-            index-=1
-        indexes.append(index)
-        index+=1
+    for i in range(len(dot_analysis[1])):
+        if dot_analysis[1][i] <= threshold:
+            indexes.append(i)
+    dot_analysis[0] = np.delete(dot_analysis[0], indexes, axis =0)
+    dot_analysis[1] = np.delete(dot_analysis[1], indexes)
+    print(f'{len(indexes)=}')
     return dot_analysis
+
     
 def apply_reverse_thresh(dot_analysis, threshold):
     index = 0
     indexes = []
     len_of_dot_analysis = len(dot_analysis[1])
-    while (index < len_of_dot_analysis):
-        if dot_analysis[1][index] >= threshold:
-            dot_analysis[0] = np.delete(dot_analysis[0], index, axis =0)
-            dot_analysis[1] = np.delete(dot_analysis[1], index)
-            len_of_dot_analysis-=1
-            assert len_of_dot_analysis == len(dot_analysis[1])
-            index-=1
-        indexes.append(index)
-        index+=1
+    for i in range(len(dot_analysis[1])):
+        if dot_analysis[1][i] >= threshold:
+            indexes.append(i)
+    dot_analysis[0] = np.delete(dot_analysis[0], indexes, axis =0)
+    dot_analysis[1] = np.delete(dot_analysis[1], indexes)
+    print(f'{len(indexes)=}')
     return dot_analysis
     
 def remove_unneeded_intensities(intensities, per_remove):
@@ -72,7 +106,7 @@ def remove_unneeded_intensities(intensities, per_remove):
     plt.figure()
     
     print(f'{len(intensities)=}')
-    bins = np.arange(np.min(intensities), np.max(intensities), (np.max(intensities) - np.min(intensities))//num_bins)
+    bins = np.arange(np.min(intensities), np.max(intensities), (np.max(intensities) - np.min(intensities))/num_bins)
     y, x, ignore = plt.hist(intensities, bins=bins, cumulative=-1)
     
     bools = y < len(intensities)*per_remove
@@ -86,6 +120,7 @@ def remove_unneeded_intensities(intensities, per_remove):
     return threshed, x[i]
 
 def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name):
+    #tiff_3d = preprocess_img(tiff_3d)
     res = blob_log(tiff_3d, min_sigma =1, max_sigma =2, num_sigma =2, threshold = 0.001)
     points = res[:,:3]
 
@@ -106,7 +141,7 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name):
         try:
             os.mkdir(locs_dir)
         except:
-            passprint
+            pass 
     
     hist_png_dir = os.path.join(locs_dir, 'Biggest_Jump_Histograms')
     
@@ -122,7 +157,7 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name):
     intensities, reverse_threshold = remove_unneeded_intensities(intensities, per_remove=.01)
     y, x, thresh = get_hist(intensities, strictness, hist_png_path)
     points_threshed, intensities_threshed = apply_thresh(list(dot_analysis), thresh)
-    #points_threshed, intensities_threshed = apply_reverse_thresh([points_threshed, intensities_threshed], reverse_threshold)
+    points_threshed, intensities_threshed = apply_reverse_thresh([points_threshed, intensities_threshed], reverse_threshold)
     return points_threshed, intensities_threshed
     
 import sys
