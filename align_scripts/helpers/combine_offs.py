@@ -4,7 +4,7 @@ import pickle
 
 def combine_offsets(rand_list):
     
-    temp_dir = '/groups/CaiLab/personal/nrezaee/temp_align'
+    temp_dir = '/groups/CaiLab/personal/temp/temp_align'
     offsets = {}
     
     for rand in rand_list:
@@ -34,7 +34,7 @@ def combine_offsets(rand_list):
 
 def combine_align_errors(rand_list):
     
-    temp_dir = '/groups/CaiLab/personal/nrezaee/temp_align'
+    temp_dir = '/groups/CaiLab/personal/temp/temp_align'
     offsets = {}
     
     for rand in rand_list:

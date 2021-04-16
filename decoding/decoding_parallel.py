@@ -196,11 +196,11 @@ def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_se
 if sys.argv[1] == 'debug_parallel':
     import tifffile 
     
-    labeled_img_src = '/groups/CaiLab/personal/michalp/raw/michal_2/segmentation/MMStack_Pos1_z3_3d.tif'
-    barcode_src = '/groups/CaiLab/analyses/michalp/michal_2/michal_2_decoding_strict_10_ch3/BarcodeKey/channel_3.mat'
-    locations_src = '/groups/CaiLab/analyses/michalp/michal_2/michal_2_decoding_strict_10_ch3/MMStack_Pos1/Dot_Locations/locations.csv'
+    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_pos0/MMStack_Pos0/Segmentation/labeled_img.tif'
+    barcode_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_pos0/BarcodeKey/channel_1.mat'
+    locations_src = '/groups/CaiLab/personal/nrezaee/raw/jonathan_linus_analysis/jonathan_dots.csv'
     
-    dest = '/home/nrezaee/test_cronjob_multi_dot/foo/michal_hand_seg_ch3_pos1'
+    dest = '/home/nrezaee/test_cronjob_multi_dot/foo/jonathan_linus_results'
     if not os.path.exists(dest):
         os.makedirs(dest)
     allowed_diff = 1

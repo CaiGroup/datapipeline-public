@@ -1,0 +1,2 @@
+#!/bin/bash 
+  matlab -r "addpath('/home/nrezaee/test_cronjob_multi_dot/decoding/helpers');main_decoding('/groups/CaiLab/analyses/nrezaee/arun_1/arun_1_decoding_strict_5_ch1/BarcodeKey/channel_1.mat', '/home/nrezaee/test_cronjob_multi_dot/foo/arun_1_ch_1_/cell_104/locations_for_cell.csv', '/home/nrezaee/test_cronjob_multi_dot/foo/arun_1_ch_1_/cell_104', 4, 32, 1, 1, 1, '3'); quit"; 

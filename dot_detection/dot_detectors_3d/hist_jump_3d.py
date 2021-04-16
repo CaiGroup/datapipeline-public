@@ -157,7 +157,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         #--------------------------------------------------------------------
         median_z = tiff_3d.shape[0]//2
         print(f'{bool_visualize_dots=}')
-        if bool_visualize_dots == True and channel == 1:# and z == median_z:
+        if bool_visualize_dots == True:# and z == median_z:
             get_visuals_3d(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name)
         #---------------------------------------------------------------------
         

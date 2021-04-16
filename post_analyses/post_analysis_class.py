@@ -105,6 +105,10 @@ class Post_Analyses:
         if self.segmentation != False:
             for channel in self.channels:
                 
+                on_barcode_path = os.path.join(self.barcode_key_src, 'channel_' +str(channel)+'.csv')
+                
+                off_barcode_path = os.path.join(self.barcode_key_src, 'channel_' +str(channel)+'_fake.csv')
+                
                 genes_assigned_to_cell_src = os.path.join(self.position_dir, 'Segmentation', 'Channel_' + str(channel), 'gene_locations_assigned_to_cell.csv')
 
                 if not os.path.exists(self.false_pos_dir):
@@ -117,7 +121,7 @@ class Post_Analyses:
 
                 dst_file_path = os.path.join(dst_dir,'false_positives_after_segmentation.txt')
                 
-            get_false_pos_rate_post_seg(genes_assigned_to_cell_src, dst_file_path)
+            get_false_pos_rate_post_seg(genes_assigned_to_cell_src, on_barcode_path, off_barcode_path, dst_file_path)
         #----------------------------------------------------------------------------------
     #--------------------------------------------------------------------------------
         

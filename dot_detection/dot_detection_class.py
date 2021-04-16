@@ -252,7 +252,7 @@ class Dot_Detection:
                 
                 #Set results dir
                 #------------------------------------------------
-                temp_dir = os.path.join(main_dir, 'personal', 'nrezaee', 'temp_dots')
+                temp_dir = os.path.join(main_dir, 'personal', 'temp', 'temp_dots')
                 rand = rand_list[sub_dirs.index(sub_dir)]
                 rand_dir = os.path.join(temp_dir, rand)
                 if not os.path.exists(rand_dir):
@@ -264,6 +264,7 @@ class Dot_Detection:
                 
                 print('========================================================================')
                 
+                print(f'{self.dot_detection=}')
                 if 'top' in self.dot_detection:
                     
                     n_dots = int(self.dot_detection.split('top')[1].split('dots')[0])
@@ -369,6 +370,38 @@ class Dot_Detection:
         
         return df_locs
         
+if sys.argv[1] == 'debug_dot_class':
+                       
+    experiment_name = 'arun_1'
+    personal='nrezaee'
+    position = 'MMStack_Pos0.ome.tif'
+    locations_dir=None
+    analysis_name = 'test_form2_______strict_6.json'
+    visualize_dots = True
+    normalization = False
+    background_subtraction = False
+    decoding_individual = True
+    chrom = False
+    dot_detection = 'biggest jump 3d'
+    gauss = False
+    strict = 10
+    dim = 3
+    rad = False
+    num_z = 7
+    nbins = 100
+    threshold = 300
+    num_wav = 4
+    
+    dot_detection = Dot_Detection = (experiment_name, personal, position, locations_dir, \
+                   analysis_name, visualize_dots, normalization, \
+                   background_subtraction, decoding_individual, chrom, \
+                   dot_detection, gauss, strict, dim, \
+                   rad, num_z, nbins, threshold, num_wav)
+                   
+    
+                   
+    
+    
         
             
             

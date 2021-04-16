@@ -7,6 +7,7 @@ import numpy as np
 import sys
 import random 
 import string
+import glob
 
 print(1)
 sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
@@ -81,11 +82,21 @@ def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cy
 def get_tiff_for_segment(tiff_dir, position):
     
     glob_me = os.path.join(tiff_dir, '*')
-    sorted_hybs = get_and_sort_hybs(glob_me)
-    assert len(sorted_hybs) >=1, "There were no Directories found in the hyb dir"
-      
-    tiff_for_segment = os.path.join(sorted_hybs[0], position)
-    
+    all_dirs = glob.glob(glob_me)
+    print(f'{all_dirs=}')
+    bool_seg_dir = [('segmentation' == a_dir.rsplit('/', 1)[-1]) for a_dir in all_dirs]
+    print(f'{bool_seg_dir=}')
+    if any(bool_seg_dir):
+        tiff_for_segment = glob.glob(os.path.join(tiff_dir, 'segmentation', position))[0]
+        
+    else:
+        sorted_hybs = get_and_sort_hybs(glob_me)
+        assert len(sorted_hybs) >=1, "There were no Directories found in the hyb dir"
+          
+        tiff_for_segment = os.path.join(sorted_hybs[0], position)
+        
+    print(f'{tiff_for_segment=}')
+       
     return tiff_for_segment
         
 def post_process(edge_delete_dist, dist_between_nuclei, label_img_src, labeled_cyto_path, label_img_dst):
@@ -105,10 +116,6 @@ def post_process(edge_delete_dist, dist_between_nuclei, label_img_src, labeled_c
     else:
         label_img_src = delete_edges(label_img_src, int(float(edge_delete_dist)), post_process_dir)
         
-        # if labeled_cyto_path != None:
-        #     print(2)
-        #     labeled_cyto_src = delete_edges(labeled_cyto_path, edge_delete_dist, post_process_dir)
-        #     copyfile(labeled_cyto_src, labeled_cyto_path)
         
     print(f'{label_img_dst=}')
     copyfile(label_img_src, label_img_dst)
@@ -155,7 +162,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     
 if sys.argv[1] == 'debug_post':
     print('=---------------------------------------')
-    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei'
+    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/arun_1'
     segment_results_path = '/home/nrezaee/temp2'
     position  = 'MMStack_Pos0.ome.tif'
     edge = 0

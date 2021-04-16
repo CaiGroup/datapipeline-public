@@ -61,9 +61,9 @@ def submit_seg_job(rand_dir, rand_list, num_z):
     print("Running Segmentation with SLURM GPU's")
     
     if num_z >= 4:
-        command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /home/nrezaee/sandbox/cellpose/gpu/tensorflow-20.02-tf1-py3.sif python -m cellpose  --do_3D --img_filter dapi_channel --pretrained_model cyto --diameter 0 --use_gpu --no_npy --save_tif --dir '
+        command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /groups/CaiLab/personal/nrezaee/tensorflow-20.02-tf1-py3.sif python -m cellpose  --do_3D --img_filter dapi_channel --pretrained_model cyto --diameter 0 --use_gpu --no_npy --save_tif --dir '
     if num_z < 4:
-        command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /home/nrezaee/sandbox/cellpose/gpu/tensorflow-20.02-tf1-py3.sif python -m cellpose   --img_filter dapi_channel --pretrained_model cyto --diameter 0 --use_gpu --no_npy --save_tif --dir '
+        command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /groups/CaiLab/personal/nrezaee/tensorflow-20.02-tf1-py3.sif python -m cellpose   --img_filter dapi_channel --pretrained_model cyto --diameter 0 --use_gpu --no_npy --save_tif --dir '
     
     command_for_cellpose_with_dir = command_for_cellpose + rand_dir
     print(f'{command_for_cellpose_with_dir=}')

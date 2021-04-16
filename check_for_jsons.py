@@ -314,15 +314,41 @@ def check_if_all_hybs_exist(data):
         warning_message = "Warning the following Hybs seem to be missing from the dataset: " + str_hybs 
         print(warning_message)
 
+def create_multiple_jsons_for_thresholds(json_src):
+    with open(json_src) as json_file:
+        data = json.load(json_file)
+        
+    if 'strictness' in data.keys():
+        if data['strictness'] == 'multiple':
+            for i in range(0,10,2):
+                print(i)
+                
+                new_json_src = json_src.split('.json')[0] + '_______strict_'+str(i)+'.json'
+                data['strictness'] = i
+                print(f'{new_json_src=}')
+                with open(new_json_src, 'w') as outfile:
+                    json.dump(data, outfile)
+                
+    
+            os.remove(json_src)
+    
+def check_for_multiple_thresholds_dir(json_srcs, main_dir):
+
+    for json_src in json_srcs:
+        json_full_src = os.path.join(main_dir, json_src)
+        create_multiple_jsons_for_thresholds(json_full_src)
 
 #Set Arguments
 #----------------------------------------------------------
+main_dir = '/groups/CaiLab'
 parser = argparse.ArgumentParser()
 parser.add_argument("--source_of_jsons", help="Directory for source of jsons", nargs='?')
 args = parser.parse_args()
 
 if args.source_of_jsons == None:
     args.source_of_jsons = os.path.join(main_dir, 'json_analyses')
+    
+check_for_multiple_thresholds_dir(os.listdir(args.source_of_jsons) , args.source_of_jsons)
 #----------------------------------------------------------
 
 
@@ -330,9 +356,8 @@ if args.source_of_jsons == None:
 #--------------------------------------------------------------
 dir = os.listdir(args.source_of_jsons) 
 #--------------------------------------------------------------
-  
-  
-  
+print(f'{dir=}')
+
 
 # Checking if the list is empty or not 
 #--------------------------------------------------------------
@@ -341,7 +366,7 @@ if len(dir) == 0:
     pass
     
 else: 
-    
+
     for json_name in dir:
   
         #Try statement in case of error in opening json or making directories

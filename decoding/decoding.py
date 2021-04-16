@@ -56,13 +56,13 @@ def decoding(barcode_src ,locations_src, dest, allowed_diff, min_seeds, channel_
     
 import sys
 if sys.argv[1] == 'debug_no_parallel':
-    barcode_src = 'foo/sim_barcode_new_top10.mat'
-    locations_src = '/groups/CaiLab/personal/nrezaee/raw/sim_dots_non_uni/locations/sim_locs_non_uni.csv'
+    barcode_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_pos0/BarcodeKey/channel_1.mat'
+    locations_src = '/groups/CaiLab/personal/nrezaee/raw/jonathan_linus_analysis/jonathan_dots.csv'
     allowed_diff =1
     min_seeds = 3
     channel_index = None
     number_of_individual_channels_for_decoding = None
-    dest = 'foo/sim_results_non_uni_plus_220_new_top_10'
+    dest = 'foo/jonathan_linus_results'
     if not os.path.exists(dest):
         os.makedirs(dest)
     decoding(barcode_src, locations_src, dest, allowed_diff, min_seeds, channel_index, number_of_individual_channels_for_decoding)

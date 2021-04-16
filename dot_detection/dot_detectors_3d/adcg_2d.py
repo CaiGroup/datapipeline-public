@@ -235,7 +235,7 @@ if sys.argv[1] != 'debug_adcg':
                           
 else:                        
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_5/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_1/MMStack_Pos0.ome.tif'
     offset = [1,1]
     channels = [1]
     analysis_name = 'linus_decoding'

@@ -38,7 +38,8 @@ def get_mapped_genes(df_genes_only_cells):
     return mapped_genes
 #------------------------------------------------------
 
-def save_to_file(num_reals, num_fakes, ratio, num_reals_seg, num_fakes_seg, ratio_seg, dst):
+def save_to_file(num_reals, num_fakes, ratio, num_reals_seg, num_fakes_seg, \
+                 ratio_seg, norm_ratio, dst):
     state_reals = 'Number of On Barcodes: ' + str(num_reals)
     state_offs =  'Number of Off Barcodes: ' + str(num_fakes)
     state_ratio = 'False Positive Rate: ' + str(ratio)
@@ -47,13 +48,18 @@ def save_to_file(num_reals, num_fakes, ratio, num_reals_seg, num_fakes_seg, rati
     state_offs_cells =  'Number of Off Barcodes in Cells: ' + str(num_fakes_seg)
     state_ratio_cells = 'False Positive Rate  in Cells: ' + str(ratio_seg)
     
+    norm_false_pos = ratio_seg*norm_ratio
+    
+    state_normalized = 'Normalized False Positive Rate in Cells: ' + str(norm_false_pos)
+    
     file1 = open(dst,"w") 
-    L = [state_reals + '\n', \
-         state_offs+ '\n', \
-         state_ratio, '\n\n', \
-         state_reals_cells + '\n', \
+    # L = [state_reals + '\n', \
+    #      state_offs+ '\n', \
+    #      state_ratio, '\n\n', \
+    L =  [      state_reals_cells + '\n', \
          state_offs_cells + '\n', \
-         state_ratio_cells+ '\n\n']  
+         state_ratio_cells+ '\n\n',
+         state_normalized + '\n\n']  
 
     file1.writelines(L) 
     file1.close() 
@@ -158,7 +164,13 @@ def get_off_on_visuals(decoded_genes_src, dst):
     plt.scatter(df_real.x, df_real.y, s=.3, color='blue')
     plt.savefig(dst)
         
-def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto = None):
+def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, on_barcode_src, off_barcode_src, dst, upto = None):
+    
+    on_barcode_shape = pd.read_csv(on_barcode_src).shape[0] - 1
+    off_barcode_shape = pd.read_csv(off_barcode_src).shape[0] - 1
+    
+    norm_ratio = on_barcode_shape/off_barcode_shape
+    
     print("Getting False Barcodes")
 
     #Get Dataframe
@@ -188,7 +200,8 @@ def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto =
     
     #Write to text file
     #------------------------------------------------------
-    save_to_file(num_reals, num_fakes, ratio, num_reals_seg, num_fakes_seg, ratio_seg, dst)
+    save_to_file(num_reals, num_fakes, ratio, num_reals_seg, num_fakes_seg, \
+                 ratio_seg, norm_ratio, dst)
     #------------------------------------------------------
     
     fig_dest = os.path.join(os.path.dirname(dst), 'On-Off-Barcode-Intensity-Analysis.png')
@@ -205,9 +218,11 @@ def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, dst, upto =
     
 import sys
 if sys.argv[1] == 'debug_false_pos':
-    results_src = '/home/nrezaee/test_cronjob_multi_dot/foo/michal_hand_seg_ch2_pos1/pre_seg_diff_0_minseeds_3_filtered.csv'
+    results_src = '/home/nrezaee/test_cronjob_multi_dot/foo/jonathan_linus_results/pre_seg_diff_1_minseeds_3_filtered.csv'
     dst = '/home/nrezaee/temp/false_pos.txt'
-    get_false_pos_rate_post_seg(results_src, dst)
+    on_barcode_src = '/groups/CaiLab/personal/nrezaee/raw/arun_1/barcode_key/channel_1.csv'
+    off_barcode_src = '/groups/CaiLab/personal/nrezaee/raw/arun_1/barcode_key/channel_1_fake.csv'
+    get_false_pos_rate_post_seg(results_src, on_barcode_src, off_barcode_src, dst)
     
     
     

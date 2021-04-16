@@ -370,6 +370,7 @@ class Analysis:
         timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
         
         return locs_src
+        
     def run_alignment_errors(self):
 
         #Get alignment errors

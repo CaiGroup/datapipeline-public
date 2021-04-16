@@ -86,7 +86,7 @@ def run_alignment(exp_name, personal, position, align_function, num_wav):
     cwd = os.getcwd()
     align_dir = os.path.join(cwd, 'align_scripts',)
     
-    temp_dir = os.path.join(main_dir, 'personal', 'nrezaee', 'temp_align')
+    temp_dir = os.path.join(main_dir, 'personal', 'temp', 'temp_align')
     
     if align_function == 'no_align':
         offsets = {}
@@ -108,7 +108,7 @@ def run_alignment(exp_name, personal, position, align_function, num_wav):
         #Declare Random Dir
         #-----------------------------------------------------------------
         rand = rand_list[sub_dirs.index(sub_dir)]
-        temp_dir = os.path.join(main_dir, 'personal', 'nrezaee', 'temp_align')
+        temp_dir = os.path.join(main_dir, 'personal', 'temp', 'temp_align')
         rand_dir = os.path.join(temp_dir, rand)
         try:
             os.mkdir(rand_dir)
