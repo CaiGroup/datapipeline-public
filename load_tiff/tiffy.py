@@ -10,7 +10,7 @@ def reshape_michal_tiffs(tiff):
     new_tiff = np.swapaxes(new_tiff, 0, 1)
     return new_tiff
 
-def load(tiff_src, num_wav):    
+def load(tiff_src, num_wav, num_z):    
     print(f'{tiff_src=}')
     
     print(f'{num_wav=}')
@@ -18,6 +18,9 @@ def load(tiff_src, num_wav):
     #Read tiff file
     #---------------------------------------------------------------------
     tiff = tifffile.imread(tiff_src)
+    print(f'{tiff.shape=}')
+    print(f'{num_z=}')
+    print(f'{type(num_z)=}')
     #---------------------------------------------------------------------
     
     #Raise assertion to check that x and y are equal length 
@@ -25,6 +28,8 @@ def load(tiff_src, num_wav):
     assert tiff.shape[-1] == tiff.shape[-2]
     #---------------------------------------------------------------------
     
+    #print(f'{str(num_z)=}')
+    #print(f'{str(1.0)=}')
     #Checks if tiff is read normally
     #---------------------------------------------------------------------
     if len(tiff.shape)==4:
@@ -37,6 +42,10 @@ def load(tiff_src, num_wav):
         
         return tiff
     #---------------------------------------------------------------------
+    
+    elif num_z != None and len(tiff.shape)==3:
+        tiff_new_dim = tiff[np.newaxis, ...]
+        return tiff_new_dim
     
     #Checks if tiff is (channels*z stacks, 2048, 2048)
     #---------------------------------------------------------------------

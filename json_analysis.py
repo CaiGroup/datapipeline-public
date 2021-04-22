@@ -374,7 +374,15 @@ def run_analysis(json_name, position):
         if not data['dimensions'] == 'none':
             analysis.set_dimensions_arg(data['dimensions'])
     #----------------------------------------------------------
+
+    #Set Number Of Z
+    #----------------------------------------------------
+    if 'z slices' in data.keys():
+        if not data['z slices'] == 'none':
+            analysis.set_z_slices_arg(data['z slices'])
+    #----------------------------------------------------------
     
+
     #Writ
     #----------------------------------------------------------
     analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)

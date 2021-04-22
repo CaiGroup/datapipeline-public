@@ -8,6 +8,7 @@ import sys
 import random 
 import string
 import glob
+import tifffile as tf
 
 print(1)
 sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
@@ -61,23 +62,34 @@ def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cy
         labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, dst = labeled_cyto_path, cyto_channel = cyto_channel_num, num_wav = num_wav)
         
     else:
-        
-        if get_nuclei_img == True:
-            labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
-            label_img = get_labeled_img_cellpose(tiff_for_segment, dst = labeled_img_path, num_wav = num_wav)
-        else:
-            labeled_img_path = None
             
-        if get_cyto_img == True:
-            labeled_cyto_path = os.path.join(segment_results_path, 'labeled_cyto_img.tif')
-            labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, dst = labeled_cyto_path, cyto_channel = cyto_channel_num, num_wav = num_wav)
-        else:
+        if 'Labeled_Images' in tiff_for_segment:
+            labeled_img_path = tiff_for_segment
             labeled_cyto_path = None
+        else:
+            if get_nuclei_img == True:
+                labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
+                label_img = get_labeled_img_cellpose(tiff_for_segment, dst = labeled_img_path, num_wav = num_wav)
+            else:
+                labeled_img_path = None
+                
+            if get_cyto_img == True:
+                labeled_cyto_path = os.path.join(segment_results_path, 'labeled_cyto_img.tif')
+                labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, dst = labeled_cyto_path, cyto_channel = cyto_channel_num, num_wav = num_wav)
+            else:
+                labeled_cyto_path = None
         
     
         
         
     return labeled_img_path, labeled_cyto_path
+    
+def make_2d_into_3d(tiff_2d, num_z=20):
+    tiff_3d = []
+    for i in range(num_z):
+        tiff_3d.append(tiff_2d)
+    tiff_3d = np.array(tiff_3d)
+    return tiff_3d
     
 def get_tiff_for_segment(tiff_dir, position):
     
@@ -86,13 +98,26 @@ def get_tiff_for_segment(tiff_dir, position):
     print(f'{all_dirs=}')
     bool_seg_dir = [('segmentation' == a_dir.rsplit('/', 1)[-1]) for a_dir in all_dirs]
     print(f'{bool_seg_dir=}')
-    if any(bool_seg_dir):
+    bool_labeled_img_dir = [('Labeled_Images' == a_dir.rsplit('/', 1)[-1]) for a_dir in all_dirs]
+    
+
+    if any(bool_labeled_img_dir):
+        tiff_for_segment = os.path.join(tiff_dir, 'Labeled_Images', position)
+        tiff = tf.imread(tiff_for_segment)
+        if len(tiff.shape) == 3:
+            pass
+        elif len(tiff.shape) ==2:
+            tiff_3d = make_2d_into_3d(tiff)
+            tiff_for_segment = tiff_for_segment.replace('.ome.', '2d_stacked.ome.')
+            tf.imwrite(tiff_for_segment, tiff_3d)
+        else:
+            raise Exception("The Labeled Image has to be 2d or 3d.")
+    elif any(bool_seg_dir):
         tiff_for_segment = glob.glob(os.path.join(tiff_dir, 'segmentation', position))[0]
-        
     else:
         sorted_hybs = get_and_sort_hybs(glob_me)
         assert len(sorted_hybs) >=1, "There were no Directories found in the hyb dir"
-          
+        
         tiff_for_segment = os.path.join(sorted_hybs[0], position)
         
     print(f'{tiff_for_segment=}')

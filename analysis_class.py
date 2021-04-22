@@ -133,6 +133,7 @@ class Analysis:
         self.area_tol = 0
         self.num_wav = 4
         self.locs_src = None
+        self.num_z = None
         #--------------------------------------------------------------
         
         
@@ -169,6 +170,8 @@ class Analysis:
         
     def set_background_subtraction_true(self):
         self.background_subtraction = True
+        background_file = os.path.join(self.data_dir, 'background',self.position)
+        assert os.path.isfile(background_file), "The background file for subtraction is missing at " + str(background_file) 
         print("    Set Background Subtraction", flush=True)
         
     def set_chromatic_abberration_true(self):
@@ -342,6 +345,11 @@ class Analysis:
         self.dimensions = int(dims)
         
         print("    Set Dimensions to", str(self.dimensions))
+        
+    def set_z_slices_arg(self, z_slices):
+        self.num_z = float(z_slices)
+        
+        print("    Set Z Slices to", str(self.num_z))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -354,7 +362,7 @@ class Analysis:
                                                self.analysis_name, self.visualize_dots, self.normalization, \
                                                self.background_subtraction, self.decoding_individual, self.chromatic_abberration, \
                                                self.dot_detection, self.gaussian_fitting, self.strictness_dot_detection, self.dimensions, \
-                                               self.radial_center, self.num_zslices, self.nbins, self.threshold, self.num_wav)
+                                               self.radial_center, self.num_zslices, self.nbins, self.threshold, self.num_wav, self.num_z)
                    
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 
@@ -468,7 +476,7 @@ class Analysis:
             
             sample_tiff_src = os.path.join(exp_dir, hyb_dir, self.position)
             
-            sample_tiff = tiffy.load(sample_tiff_src, self.num_wav)
+            sample_tiff = tiffy.load(sample_tiff_src, self.num_wav, self.num_z)
             
             self.num_zslices = sample_tiff.shape[0]
         #--------------------------------------------------------------------------------

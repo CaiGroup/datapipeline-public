@@ -46,8 +46,7 @@ def preprocess_img(img_3d):
     nonzero_img_3d = np.where(blur_img_3d < 0, 0, blur_img_3d)
     return nonzero_img_3d
 
-def get_hist(intense, strictness, hist_png_path):
-    num_bins = 100
+def get_hist(intense, strictness, hist_png_path, num_bins):
     plt.figure()
     print(f'{len(intense)=}')
     bins = np.arange(np.min(intense), np.max(intense), (np.max(intense) - np.min(intense))/num_bins)
@@ -55,7 +54,9 @@ def get_hist(intense, strictness, hist_png_path):
     thresh = match_thresh_to_diff_stricter(y, x, strictness)
     plt.axvline(x=thresh, color='r')
     print(f'{hist_png_path=}')
-    plt.savefig(hist_png_path)
+    
+    if 'fid' not in hist_png_path:
+        plt.savefig(hist_png_path)
     return y,x, thresh
 
 def match_thresh_to_diff_stricter(y_hist, x_hist, strictness =1):
@@ -101,15 +102,14 @@ def apply_reverse_thresh(dot_analysis, threshold):
     print(f'{len(indexes)=}')
     return dot_analysis
     
-def remove_unneeded_intensities(intensities, per_remove):
-    num_bins = 100
-    plt.figure()
+def remove_unneeded_intensities(intensities, percent_remove, num_bins):
     
+    plt.figure()
     print(f'{len(intensities)=}')
     bins = np.arange(np.min(intensities), np.max(intensities), (np.max(intensities) - np.min(intensities))/num_bins)
     y, x, ignore = plt.hist(intensities, bins=bins, cumulative=-1)
     
-    bools = y < len(intensities)*per_remove
+    bools = y < len(intensities)*percent_remove
     i = 0
     while bools[i] == False:
         i+=1
@@ -119,7 +119,8 @@ def remove_unneeded_intensities(intensities, per_remove):
     
     return threshed, x[i]
 
-def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name):
+def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins):
+    nbins = float(nbins)
     #tiff_3d = preprocess_img(tiff_3d)
     res = blob_log(tiff_3d, min_sigma =1, max_sigma =2, num_sigma =2, threshold = 0.001)
     points = res[:,:3]
@@ -154,11 +155,17 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name):
     hist_png_path = os.path.join(hist_png_dir, hyb + '_' + 'Jump.png')
     
     dot_analysis = [points, intensities]
-    intensities, reverse_threshold = remove_unneeded_intensities(intensities, per_remove=.01)
-    y, x, thresh = get_hist(intensities, strictness, hist_png_path)
-    points_threshed, intensities_threshed = apply_thresh(list(dot_analysis), thresh)
-    points_threshed, intensities_threshed = apply_reverse_thresh([points_threshed, intensities_threshed], reverse_threshold)
-    return points_threshed, intensities_threshed
+    print(f'{intensities=}')
+    #print(f'{intensities.shape=}')
+    if len(intensities) > float(nbins):
+        intensities, reverse_threshold = remove_unneeded_intensities(intensities, percent_remove=.01, num_bins=nbins)
+        y, x, thresh = get_hist(intensities, strictness, hist_png_path, num_bins=nbins)
+        points_threshed, intensities_threshed = apply_thresh(list(dot_analysis), thresh)
+        points_threshed, intensities_threshed = apply_reverse_thresh([points_threshed, intensities_threshed], reverse_threshold)
+        return points_threshed, intensities_threshed
+    else:
+        return points, intensities
+    
     
 import sys
 if sys.argv[1] == 'debug_jump_helper':
@@ -166,11 +173,12 @@ if sys.argv[1] == 'debug_jump_helper':
     import tifffile as tf
     
     tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_1/HybCycle_10/MMStack_Pos20.ome.tif'
-    tiff_3d = tiffy.load(tiff_src, num_wav=3)[:,0]
+    tiff_3d = tiffy.load(tiff_src, num_wav=3,num_z=None)[:,0]
     strictness= 5
     analysis_name = 'michal_decoding_top'
     print(f'{tiff_3d.shape=}')
-    dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name))
+    num_bins=70
+    dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, num_bins))
     
     print(f'{dot_analysis[0].shape=}')
     
