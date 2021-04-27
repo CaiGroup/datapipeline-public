@@ -382,6 +382,12 @@ def run_analysis(json_name, position):
             analysis.set_z_slices_arg(data['z slices'])
     #----------------------------------------------------------
     
+    #Set Dot Radius
+    #----------------------------------------------------
+    if 'dot radius' in data.keys():
+        if not data['dot radius'] == 'none':
+            analysis.set_dot_radius_arg(data['dot radius'])
+    #----------------------------------------------------------
 
     #Writ
     #----------------------------------------------------------

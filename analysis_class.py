@@ -134,6 +134,7 @@ class Analysis:
         self.num_wav = 4
         self.locs_src = None
         self.num_z = None
+        self.dot_radius = 1
         #--------------------------------------------------------------
         
         
@@ -350,6 +351,11 @@ class Analysis:
         self.num_z = float(z_slices)
         
         print("    Set Z Slices to", str(self.num_z))
+        
+    def set_dot_radius_arg(self, dot_radius):
+        self.dot_radius = float(dot_radius)
+        
+        print("    Set Dot Radius to", str(self.dot_radius))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
