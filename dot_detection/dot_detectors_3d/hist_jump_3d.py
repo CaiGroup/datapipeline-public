@@ -51,7 +51,7 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
 
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
-                      strictness, bool_radial_center, z_slices, num_wav, rand_dir, num_z, nbins):
+                      strictness, bool_radial_center, z_slices, num_wav, rand_dir, num_z, nbins, dot_radius):
     
     #Getting Background Src
     #--------------------------------------------------------------------
@@ -99,7 +99,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             # tiff_3d = run_back_sub(background, tiff_3d, channel, offset)
             print(f'{background.shape=}')
             print(f'{channel=}')
-            tiff_3d = tiff_3d - background[:, channel]*1
+            tiff_3d = tiff_3d.astype(np.int32) - background[:, channel].astype(np.int32)*30
             tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
             tf.imwrite('foo.tif', tiff_3d)
         #---------------------------------------------------------------------
@@ -129,7 +129,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         #strictness = 5
         print(f'{strictness=}')
         print(f'{tiff_3d.shape=}')
-        dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins))
+        dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, dot_radius))
 
         assert len(dot_analysis[1]) >0
         #---------------------------------------------------------------------
@@ -201,6 +201,7 @@ if sys.argv[1] != 'debug_hist_3d':
     parser.add_argument("--num_wav")
     parser.add_argument("--num_z")
     parser.add_argument("--nbins")
+    parser.add_argument("--dot_radius")
     
     
     
@@ -226,29 +227,30 @@ if sys.argv[1] != 'debug_hist_3d':
 
     
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
-                          args.back_subtract, channels, args.chromatic, str2bool(args.gaussian), int(args.strictness), \
-                          str2bool(args.radial_center), args.z_slices, args.num_wav, args.rand, args.num_z, args.nbins)
+                          str2bool(args.back_subtract), channels, args.chromatic, str2bool(args.gaussian), int(args.strictness), \
+                          str2bool(args.radial_center), args.z_slices, args.num_wav, args.rand, args.num_z, args.nbins, float(args.dot_radius))
 
 else:
     
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/simone_2/HybCycle_20/MMStack_Pos2.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_20/MMStack_Pos2.ome.tif'
     offset = [0,0,0]
-    channels = 'all'
-    analysis_name = 'temp'
+    channels = [1]
+    analysis_name = 'linus_decoding'
     rand_dir = '/home/nrezaee/temp'
-    vis_dots = False
+    vis_dots = True
     back_sub = False
     chromatic = False
     gauss = False
     rad = False
-    strictness = 2
+    strictness = 10
     z_slices = 'all'
     num_wav = 4
-    num_z = 1
-    nbins = 50
+    num_z = None
+    nbins = 100
+    dot_radius = 1
     get_dots_for_tiff(tiff_src, offset, analysis_name, vis_dots, back_sub, channels, chromatic, gauss, \
-        strictness, rad, z_slices, num_wav, rand_dir, num_z, nbins)
+        strictness, rad, z_slices, num_wav, rand_dir, num_z, nbins, dot_radius)
     
     
     

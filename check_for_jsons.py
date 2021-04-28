@@ -328,6 +328,15 @@ def create_multiple_jsons_for_thresholds(json_src):
                 print(f'{new_json_src=}')
                 with open(new_json_src, 'w') as outfile:
                     json.dump(data, outfile)
+                    
+        elif data['strictness'] == 'multiple low':
+            for i in range(-5,5,2):
+                print(i)
+                new_json_src = json_src.split('.json')[0] + '_______strict_'+str(i)+'.json'
+                data['strictness'] = i
+                print(f'{new_json_src=}')
+                with open(new_json_src, 'w') as outfile:
+                    json.dump(data, outfile)
                 
     
             os.remove(json_src)

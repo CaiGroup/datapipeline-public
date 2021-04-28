@@ -4,6 +4,7 @@ import sys
 sys.path.insert(0, os.getcwd())
 from align_scripts.fiducial_marker_helpers.get_fiducial_dots_in_tiff import get_dots_for_tiff
 from align_scripts.fiducial_marker_helpers.FMAligner import FMAligner
+from align_scripts.fiducial_marker_helpers.colocalize_dots import get_colocs
 import pandas as pd
 
 from scipy.io import loadmat
@@ -89,9 +90,11 @@ def get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav):
     fid_init_path = os.path.join(data_dir, 'initial_fiducials', position)
     fid_final_path = os.path.join(data_dir, 'final_fiducials', position)
     
-    df_fid_final = get_dots_for_tiff(fid_final_path, num_wav, dst_dir)
-    df_fid_init = get_dots_for_tiff(fid_init_path, num_wav, dst_dir)
+    df_fid_final = get_dots_for_tiff(fid_final_path, num_wav, os.path.join(dst_dir, 'final_fids'),dot_radius=2)
+    df_fid_init = get_dots_for_tiff(fid_init_path, num_wav, os.path.join(dst_dir, 'initial_fids'), dot_radius=2)
     
+    df_fid_final, df_fid_init = get_colocs(df_fid_final, df_fid_init)
+
     print(f'{df_fid_final}')
     print(f'{df_fid_init=}')
     
@@ -117,11 +120,13 @@ import sys
 
 if sys.argv[1] == 'debug_fiducials':
     sys.path.insert(0, os.getcwd())
-    data_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-10-19-takei/'
+    data_dir = '/groups/CaiLab/personal/nrezaee/raw/linus_data/'
     pos_dir = '/groups/CaiLab/'
     position = 'MMStack_Pos0.ome.tif'
     locs_src = '/groups/CaiLab/analyses/nrezaee/2020-11-24-takei-2ch-1200/top_takei_1200mrna/MMStack_Pos0/Dot_Locations/locations.csv'
-    dst_dir = 'foo'
+    dst_dir = 'foo/test_fid_alignment'
+    if not os.path.exists(dst_dir):
+        os.mkdir(dst_dir)
     num_wav = 4
     get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav)
 

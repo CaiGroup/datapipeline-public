@@ -48,7 +48,7 @@ class Dot_Detection:
                    analysis_name, visualize_dots, normalization, \
                    background_subtraction, decoding_individual, chromatic_abberration, \
                    dot_detection, gaussian_fitting, strictness_dot_detection, dimensions, \
-                   radial_center, num_zslices, nbins, threshold, num_wav, z_slices):
+                   radial_center, num_zslices, nbins, threshold, num_wav, z_slices, dot_radius):
 
         self.experiment_name = experiment_name
         self.personal = personal
@@ -71,7 +71,7 @@ class Dot_Detection:
         self.num_wav = num_wav
         self.num_z = z_slices
         self.nbins = float(nbins)
-        
+        self.dot_radius = dot_radius
         
         #Set Directories
         #--------------------------------------------------------------
@@ -329,7 +329,7 @@ class Dot_Detection:
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
                             '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
                             '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav',  \
-                            self.num_wav, '--z_slices', z_slice, '--num_z', self.num_z, '--nbins', self.nbins]
+                            self.num_wav, '--z_slices', z_slice, '--num_z', self.num_z, '--nbins', self.nbins, '--dot_radius', self.dot_radius]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
@@ -352,7 +352,7 @@ class Dot_Detection:
                 
                 #os.system(cmd)
                 out_path = os.path.join(rand_dir, 'slurm.out')
-                call_me = ['sbatch', '--job-name', rand_list[sub_dirs.index(sub_dir)], '--output', out_path, "--time", time_for_slurm, "--mem-per-cpu", "5G", '--ntasks', '1', script_name]
+                call_me = ['sbatch', '--job-name', rand_list[sub_dirs.index(sub_dir)], '--output', out_path, "--time", time_for_slurm, "--mem-per-cpu", "10G", '--ntasks', '2', script_name]
                 print(" ".join(call_me))
                 subprocess.call(call_me)
                 #------------------------------------------------

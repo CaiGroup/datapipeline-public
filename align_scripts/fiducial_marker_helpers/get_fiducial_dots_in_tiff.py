@@ -95,17 +95,15 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
 
     return df
 
-def get_dots_for_tiff(tiff_src, analysis_name, \
-                      bool_background_subtraction, channels_to_detect_dots, bool_gaussian_fitting, \
-                      strictness, bool_radial_center,num_wav, dst):
+def get_dots_for_tiff(tiff_src,num_wav, dst, dot_radius, strictness=15):
     
-    #Getting Background Src
-    #--------------------------------------------------------------------
-    if bool_background_subtraction == True:
-            background_src = get_background(tiff_src)
-            print(f'{background_src=}')
-            background = tiffy.load(background_src, num_wav)
-    #--------------------------------------------------------------------
+    # #Getting Background Src
+    # #--------------------------------------------------------------------
+    # if bool_background_subtraction == True:
+    #         background_src = get_background(tiff_src)
+    #         print(f'{background_src=}')
+    #         background = tiffy.load(background_src, num_wav)
+    # #--------------------------------------------------------------------
     
     #Reading Tiff File
     #--------------------------------------------------------------------
@@ -126,11 +124,11 @@ def get_dots_for_tiff(tiff_src, analysis_name, \
         
     #Loops through channels for Dot Detection
     #---------------------------------------------------------------------
-    if channels_to_detect_dots=='all':
+    # if channels_to_detect_dots=='all':
         
-        channels = range(tiff.shape[1]-1)
-    else:
-        channels = [int(channel)-1 for channel in channels_to_detect_dots]
+    channels = range(tiff.shape[1]-1)
+    # else:
+    #     channels = [int(channel)-1 for channel in channels_to_detect_dots]
     
     
     for channel in channels:
@@ -143,13 +141,14 @@ def get_dots_for_tiff(tiff_src, analysis_name, \
 
         #Background Subtraction
         #---------------------------------------------------------------------
-        if bool_background_subtraction == True:
-            # tiff_3d = run_back_sub(background, tiff_3d, channel, offset)
-            print(f'{background.shape=}')
-            print(f'{channel=}')
-            tiff_3d = tiff_3d - background[:, channel]*1
-            tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
-            tf.imwrite('foo.tif', tiff_3d)
+        # if bool_background_subtraction == True:
+        #     # tiff_3d = run_back_sub(background, tiff_3d, channel, offset)
+        #     assert background.shape == tiff.shape, "The background shape does not equal the tiff shape."
+        #     print(f'{background.shape=}')
+        #     print(f'{channel=}')
+        #     tiff_3d = tiff_3d - background[:, channel]*1
+        #     tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
+        #     tf.imwrite('foo.tif', tiff_3d)
         #---------------------------------------------------------------------
 
         print((channel+1), end = " ", flush =True)
@@ -159,7 +158,7 @@ def get_dots_for_tiff(tiff_src, analysis_name, \
         #strictness = 5
         print(f'{strictness=}')
         print(f'{tiff_3d.shape=}')
-        dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name))
+        dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, dot_radius))
 
         assert len(dot_analysis[1]) >0
         #---------------------------------------------------------------------
@@ -167,21 +166,18 @@ def get_dots_for_tiff(tiff_src, analysis_name, \
         
         #Gaussian Fit the dots
         #---------------------------------------------------------------------
-        print(f'{bool_gaussian_fitting=}')
-        if bool_gaussian_fitting == True:
-            dot_analysis = get_gaussian_fitted_dots(tiff_src, channel, dot_analysis[0])
-        #---------------------------------------------------------------------
+        # if bool_gaussian_fitting == True:
+        #     dot_analysis = get_gaussian_fitted_dots(tiff_src, channel, dot_analysis[0])
+        # #---------------------------------------------------------------------
         
-        #Center the dots
-        #---------------------------------------------------------------------
-        print(f'{bool_radial_center=}')
-        if bool_radial_center == True:
-            dot_analysis = get_radial_centered_dots(tiff_src, channel, dot_analysis[0])
+        # #Center the dots
+        # #---------------------------------------------------------------------
+        # if bool_radial_center == True:
+        #     dot_analysis = get_radial_centered_dots(tiff_src, channel, dot_analysis[0])
         #---------------------------------------------------------------------
         
         dot_analysis[0][:, [0,2]] = dot_analysis[0][:, [2,0]]
-        
-        print(f'{dot_analysis[0]=}')
+    
         
         #Add dots to main dots in tiff
         #---------------------------------------------------------------------
@@ -191,6 +187,8 @@ def get_dots_for_tiff(tiff_src, analysis_name, \
         
         
     def get_fiducial_visual_debug(fid_tiff, fid_locs, dst):
+        if not os.path.exists(dst):
+            os.makedirs(dst)
         for channel in fid_locs.ch.unique():
             for i in range(fid_tiff[:, channel-1].shape[0]):
                 locs_z = fid_locs[(fid_locs.z == i) & (fid_locs.ch == channel)]
@@ -203,21 +201,27 @@ def get_dots_for_tiff(tiff_src, analysis_name, \
                 
     get_fiducial_visual_debug(tiff, df_tiff, dst)
     tf.imwrite('foo.tif', tiff)
+    
+    if not os.path.exists(dst):
+        os.mkdir(dst)
     csv_path = os.path.join(dst,'locs.csv')
     print(f'{csv_path=}')
     df_tiff.to_csv(csv_path, index=False)
+    
+    return df_tiff
     
 import sys
 if sys.argv[1] == 'debug_fid_dot_detect':
     df_tiff = get_dots_for_tiff(tiff_src='/groups/CaiLab/personal/nrezaee/raw/2020-10-19-takei/initial_fiducials/MMStack_Pos0.ome.tif',
                                 analysis_name='foo', \
                                 bool_background_subtraction=False, 
-                                channels_to_detect_dots='all', 
+                                channels_to_detect_dots=[1], 
                                 bool_gaussian_fitting='False', \
-                                strictness=20, 
+                                strictness=15, 
                                 bool_radial_center=False,
                                 num_wav=4,
-                                dst='foo')
+                                dot_radius=2,
+                                dst='foo/final')
                                 
     print(f'{type(df_tiff)=}')
     print(f'{df_tiff=}')

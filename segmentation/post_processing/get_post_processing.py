@@ -88,7 +88,7 @@ def make_2d_into_3d(tiff_2d, num_z=20):
     tiff_3d = []
     for i in range(num_z):
         tiff_3d.append(tiff_2d)
-    tiff_3d = np.array(tiff_3d)
+    tiff_3d = np.array(tiff_3d).astype(np.int16)
     return tiff_3d
     
 def get_tiff_for_segment(tiff_dir, position):

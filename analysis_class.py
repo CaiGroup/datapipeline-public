@@ -368,7 +368,8 @@ class Analysis:
                                                self.analysis_name, self.visualize_dots, self.normalization, \
                                                self.background_subtraction, self.decoding_individual, self.chromatic_abberration, \
                                                self.dot_detection, self.gaussian_fitting, self.strictness_dot_detection, self.dimensions, \
-                                               self.radial_center, self.num_zslices, self.nbins, self.threshold, self.num_wav, self.num_z)
+                                               self.radial_center, self.num_zslices, self.nbins, self.threshold, self.num_wav, self.num_z, \
+                                               self.dot_radius)
                    
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 

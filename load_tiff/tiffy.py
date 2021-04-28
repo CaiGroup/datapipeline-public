@@ -10,7 +10,7 @@ def reshape_michal_tiffs(tiff):
     new_tiff = np.swapaxes(new_tiff, 0, 1)
     return new_tiff
 
-def load(tiff_src, num_wav, num_z):    
+def load(tiff_src, num_wav, num_z=None):    
     print(f'{tiff_src=}')
     
     print(f'{num_wav=}')

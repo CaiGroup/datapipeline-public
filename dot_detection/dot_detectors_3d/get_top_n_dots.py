@@ -68,7 +68,9 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
     #Getting Background Src
     #--------------------------------------------------------------------
     if bool_background_subtraction == True:
-            background = get_background(tiff_src)
+        background_src = get_background(tiff_src)
+        print(f'{background_src=}')
+        background = tiffy.load(background_src, num_wav)
     #--------------------------------------------------------------------
     
     #Reading Tiff File
@@ -111,7 +113,10 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             #Background Subtraction
             #---------------------------------------------------------------------
             if bool_background_subtraction == True:
-                tiff_2d = apply_background_subtraction(background, tiff_2d, z, channel)
+                print(f'{background.shape=}')
+                print(f'{channel=}')
+                tiff_3d = tiff_3d- background[:, channel]*1.4
+                tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
             #---------------------------------------------------------------------
             
 
@@ -231,18 +236,19 @@ if sys.argv[1] != 'debug_top_dots':
     
     
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), args.norm, \
-                          args.back_subtract, channels, args.chromatic, int(args.n_dots), args.num_wav, \
+                          str2bool(args.back_subtract), channels, args.chromatic, int(args.n_dots), args.num_wav, \
                           args.rand, args.num_z)
                           
 else:                        
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_fiducials/HybCycle_0/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/simone_all/HybCycle_10/MMStack_Pos0.ome.tif'
     offset = [0,0,0]
     channels = 'all' #[1]
-    analysis_name = 'linus_fid_dots'
+    analysis_name = 'linus_decoding'
     n_dots = 10
     rand_dir = '/home/nrezaee/temp'
-    get_dots_for_tiff(tiff_src, offset, analysis_name, True, False, False, channels, False, 10, 4, rand_dir)
+    num_z = None
+    get_dots_for_tiff(tiff_src, offset, analysis_name, False, False, True, channels, False, 10, 4, rand_dir, num_z)
     
     
 

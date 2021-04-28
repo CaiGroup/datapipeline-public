@@ -46,7 +46,7 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, position, label_im
     
     #Get Gene Matrix
     #-------------------------------------------
-    df_gene_cell_matrix = cellpose_segment_funcs.get_gene_cell_matrix(df_gene_list_assigned_cell)
+    df_gene_cell_matrix = cellpose_segment_funcs.get_gene_cell_matrix(df_gene_list_assigned_cell, label_img)
     df_gene_cell_matrix_path = os.path.join(segment_results_path, 'count_matrix.csv')
     print(f'{df_gene_cell_matrix_path=}')
     df_gene_cell_matrix.to_csv(df_gene_cell_matrix_path)
@@ -63,10 +63,10 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, position, label_im
 if sys.argv[1] == 'debug_run_cellpose':
     tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei'
     segmented_dst_dir = '/home/nrezaee/temp'
-    decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_pos1/MMStack_Pos1/Decoded/Channel_1/pre_seg_diff_1_minseeds_3_filtered.csv'
+    decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/arun_1/arun_1_decoding_low_mult_______strict_-4/MMStack_Pos0/Decoded/Channel_1/pre_seg_diff_1_minseeds_3_filtered.csv'
     position = 'MMStack_Pos0.ome.tif'
     
-    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_pos1/MMStack_Pos1/Segmentation/labeled_img_post.tif'
+    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/arun_1/arun_1_decoding_low_mult_______strict_-4/MMStack_Pos0/Segmentation/labeled_img_post.tif'
     labeled_img = tifffile.imread(labeled_img_src)
     
     run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, position, labeled_img)

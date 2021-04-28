@@ -126,25 +126,36 @@ def get_cell_info(label_img):
     return df_cell_info
 
 
-def get_gene_cell_matrix(df_gene_list):
-    """
-    Generate cell by gene matrices from the local df gene_list
+def add_empty_cells(df_gene_cell, labels):
+    df_gene_cell_all = df_gene_cell
 
-    Parameters
-    ----------
-    df_gene_list : pandas data frame
-        Columns: gene, x, y, z, intensity (optional), cellID
+    for i in labels:
+        gene_column = 'cell_'+str(i) + '.0'
 
-    Returns
-    -------
-    df_gene_cell : pandas data frame
+        if gene_column not in df_gene_cell.columns:
+            df_gene_cell_all[gene_column] = 0
+    
+    bool_cols = []
+    for col in df_gene_cell.columns:
+        bool_cols.append(df_gene_cell[col] == df_gene_cell_all[col])
+    
+    cell_cols = list(df_gene_cell_all.columns)[1:]
+    cell_indices = []
+    for i in range(len(cell_cols)):
+        index = float(cell_cols[i].split('cell_')[1])
+        cell_indices.append(index)
+        
+    sorted_indices = sorted(cell_indices)
+    sorted_cols = []
+    for index in sorted_indices:
+        sorted_cols.append('cell_'+str(index))
+        
+    sorted_cols.insert(0, 'gene')
+    df_gene_cell_all_sorted = df_gene_cell_all[sorted_cols]
+    
+    return df_gene_cell_all_sorted
 
-    See also
-    --------
-
-    Notes
-    -----
-    """
+def get_gene_cell_matrix(df_gene_list, labeled_img):
 
     # Organize code by gene and count unique cellIDs
     # ---------------------------------------------------------------------
@@ -191,5 +202,8 @@ def get_gene_cell_matrix(df_gene_list):
         for cell_id, group in df_cell:
             df_gene_cell.iloc[i, cell_index[cell_id]] += group.shape[0]
     # ---------------------------------------------------------------------
+    labels = np.unique(labeled_img)
+    df_gene_cell_all = add_empty_cells(df_gene_cell, labels)
+    
+    return df_gene_cell_all
 
-    return df_gene_cell

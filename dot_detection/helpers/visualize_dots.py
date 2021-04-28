@@ -57,7 +57,7 @@ def plot_and_save_locations_3d(img_array, locations_2d, dest):
     
     plt.figure(figsize=(40,40))
     plt.imshow(np.log(img_array), cmap='gray')
-    plt.scatter(np.array(locations_2d[:,0] - .5), np.array(locations_2d[:,1]) -.5 , s= 1, c='r')
+    plt.scatter(np.array(locations_2d[:,0] - .5), np.array(locations_2d[:,1]) -.5 , facecolors='none', edgecolors='y', s=20, alpha=.35)
     print(f'{dest=}')
     plt.savefig(dest)
     return None
@@ -66,7 +66,7 @@ def plot_and_save_locations_3d_michal(img_array, locations_2d, dest):
     
     plt.figure(figsize=(40,40))
     plt.imshow(np.log(img_array), cmap='gray')
-    plt.scatter(np.array(locations_2d[:,0] - .5), np.array(locations_2d[:,1]) -.5 , s= 1, c='r')
+    plt.scatter(np.array(locations_2d[:,0] - .5), np.array(locations_2d[:,1]) -.5 , facecolors='none', edgecolors='y', s=20, alpha=.35)
     print(f'{dest=}')
     plt.savefig(dest)
     return None
