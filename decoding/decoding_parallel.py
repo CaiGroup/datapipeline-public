@@ -200,7 +200,7 @@ if sys.argv[1] == 'debug_parallel':
     barcode_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_pos0/BarcodeKey/channel_1.mat'
     locations_src = '/groups/CaiLab/personal/nrezaee/raw/jonathan_linus_analysis/jonathan_dots.csv'
     
-    dest = '/home/nrezaee/test_cronjob_multi_dot/foo/jonathan_linus_results'
+    dest = '/home/nrezaee/test_cronjob_multi_dot/foo/test'
     if not os.path.exists(dest):
         os.makedirs(dest)
     allowed_diff = 1

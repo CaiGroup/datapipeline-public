@@ -14,7 +14,7 @@ import sys
 import math
 
 
-main_dir = os.environ['DATA_PIPELINE_MAIN_DIR']
+main_dir = '/groups/CaiLab'
 
 #Import Analysis Class
 #----------------------------------------------------------
@@ -176,6 +176,8 @@ def run_analysis(json_name, position):
             analysis.set_decoding_across_true()   
         elif 'none' in data['decoding']:
             pass
+        elif 'non barcoded'== data['decoding']:
+            analysis.set_non_barcoded_decoding_true()
         elif 'individual' in data['decoding'].keys(): 
             analysis.set_decoding_individual(data['decoding']['individual'])
     #----------------------------------------------------------  
@@ -330,7 +332,7 @@ def run_analysis(json_name, position):
     #----------------------------------------------------
     if 'threshold' in data.keys():
         if data['threshold'] != 'none':
-            analysis.set_threshold_arg(data['nbins'])
+            analysis.set_threshold_arg(data['threshold'])
     #----------------------------------------------------------
     
     #Set Cyto Channel Number
@@ -388,7 +390,36 @@ def run_analysis(json_name, position):
         if not data['dot radius'] == 'none':
             analysis.set_dot_radius_arg(data['dot radius'])
     #----------------------------------------------------------
+    
+    #Set Overlap
+    #----------------------------------------------------
+    if 'overlap' in data.keys():
+        if not data['overlap'] == 'none':
+            analysis.set_dot_overlap_arg(data['overlap'])
+    #----------------------------------------------------------
+    
+    #Num of Radii
+    #----------------------------------------------------
+    if 'num of radii' in data.keys():
+        if not data['num of radii'] == 'none':
+            analysis.set_num_radii_arg(data['num of radii'])
+    #----------------------------------------------------------
 
+    #Radius Step
+    #----------------------------------------------------
+    if 'radius step' in data.keys():
+        if not data['radius step'] == 'none':
+            analysis.set_radius_step_arg(data['radius step'])
+    #----------------------------------------------------------
+    
+    
+    #Debug Dot Detection
+    #----------------------------------------------------
+    if 'debug dot detection' in data.keys():
+        if data['debug dot detection'] == 'true':
+            analysis.set_debug_dot_detection_true()
+    #----------------------------------------------------------
+    
     #Writ
     #----------------------------------------------------------
     analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)

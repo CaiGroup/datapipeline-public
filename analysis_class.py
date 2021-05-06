@@ -72,10 +72,8 @@ import timer
 
 
 
-if os.environ.get('DATA_PIPELINE_MAIN_DIR') is not None:
-    main_dir = os.environ['DATA_PIPELINE_MAIN_DIR']
-else:
-    raise Exception("The Main Directory env variable is not set. Set DATA_PIPELINE_MAIN_DIR!!!!!!!!")
+main_dir = '/groups/CaiLab'
+
 
 
 #Analysis Class to set and run parameters for analyses
@@ -126,7 +124,7 @@ class Analysis:
         self.cyto_erode = 0
         self.decode_only_cells = False
         self.nbins = 100
-        self.threshold = 300
+        self.threshold = .001
         self.cyto_channel_num = -2
         self.get_nuclei_seg = False
         self.get_cyto_seg = False
@@ -135,6 +133,11 @@ class Analysis:
         self.locs_src = None
         self.num_z = None
         self.dot_radius = 1
+        self.decoding_non_barcoded = False
+        self.overlap=1
+        self.num_radii = 2
+        self.radius_step = 1
+        self.debug_dot_detection = False
         #--------------------------------------------------------------
         
         
@@ -194,6 +197,10 @@ class Analysis:
     def set_decoding_across_true(self):
         self.decoding_across = True
         print("    Set Decoding Across Channels", flush=True)
+
+    def set_non_barcoded_decoding_true(self):
+        self.decoding_non_barcoded = True
+        print("    Set Decoding Non Barcoded", flush=True)
         
     def set_decoding_with_previous_dots_true(self):
         self.decoding_with_previous_dots  = True
@@ -313,7 +320,7 @@ class Analysis:
         print("    Set Number of Bins to", str(self.nbins))
     
     def set_threshold_arg(self, threshold_arg):
-        self.threshold = int(threshold_arg)
+        self.threshold = float(threshold_arg)
         
         print("    Set Threshold to", str(self.threshold))
         
@@ -356,6 +363,26 @@ class Analysis:
         self.dot_radius = float(dot_radius)
         
         print("    Set Dot Radius to", str(self.dot_radius))
+        
+    def set_dot_overlap_arg(self, overlap):
+        self.overlap = float(overlap)
+        
+        print("    Set Overlap to", str(self.overlap))
+        
+    def set_num_radii_arg(self, num_radii):
+        self.num_radii = float(num_radii)
+        
+        print("    Set Number of Radii to", str(self.num_radii))
+        
+    def set_radius_step_arg(self, radius_step):
+        self.radius_step = float(radius_step)
+        
+        print("    Set Radius Step to", str(self.radius_step))
+    
+    def set_debug_dot_detection_true(self):
+        self.debug_dot_detection = True
+        print("    Set Debug Dot Dotection to True")
+        
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -369,7 +396,7 @@ class Analysis:
                                                self.background_subtraction, self.decoding_individual, self.chromatic_abberration, \
                                                self.dot_detection, self.gaussian_fitting, self.strictness_dot_detection, self.dimensions, \
                                                self.radial_center, self.num_zslices, self.nbins, self.threshold, self.num_wav, self.num_z, \
-                                               self.dot_radius)
+                                               self.dot_radius, self.radius_step, self.num_radii, self.debug_dot_detection)
                    
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 
@@ -565,7 +592,7 @@ class Analysis:
         #Declare Decoding Class if needed
         #--------------------------------------------------------------------------------
         if self.decoding_across == True or self.decoding_individual != 'all' \
-        or self.decoding_with_previous_dots == True or self.decoding_with_previous_locations == True:
+        or self.decoding_with_previous_dots == True or self.decoding_with_previous_locations == True or self.decoding_non_barcoded == True:
             decoder = Decoding(self.data_dir, self.position, self.decoded_dir, self.locations_dir, self.position_dir, self.barcode_dst, \
                 self.barcode_key_src, self.decoding_with_previous_dots, self.decoding_with_previous_locations, self.fake_barcodes, \
                 self.decoding_individual, self.min_seeds, self.allowed_diff, self.dimensions, self.num_zslices, self.segmentation, \
@@ -615,6 +642,17 @@ class Analysis:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Across')
             decoder.run_decoding_across()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Across')
+            
+        if self.decoding_non_barcoded== True:
+            if self.dot_detection == False:
+                timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
+                self.run_dot_detection()
+                timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
+            
+            timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Non-Barcoded')
+            decoder.run_non_barcoded_decoding()
+            timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Non-Barcoded')
+                
         #--------------------------------------------------------------------------------
         
         
@@ -639,7 +677,11 @@ class Analysis:
                 print(f'{self.labeled_img.shape=}')
                 print('Running Segmentation Individual')
                 segmenter.run_segmentation_individually()
-     
+            
+            elif self.decoding_non_barcoded == True:
+                
+                segmenter.run_segmentation_non_barcoded()
+            
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Segmentation')
         #--------------------------------------------------------------------------------
     
@@ -676,15 +718,16 @@ class Analysis:
         #--------------------------------------------------------------------------------
         
         
+        
         #Run Hamming Distance Analysis  
         #--------------------------------------------------------------------------------
-        if self.segmentation != False and self.hamming_analysis == True:
-            timer_tools.logg_elapsed_time(self.start_time, 'Starting Hamming Analysis')
-            if self.decoding_across == True:
-                post_analysis.run_hamming_analysis_across()
-            elif self.decoding_individual !='all':
-                post_analysis.run_hamming_analysis_indiv()
-            timer_tools.logg_elapsed_time(self.start_time, 'Ending Hamming Analysis')
+        # if self.segmentation != False and self.hamming_analysis == True:
+        #     timer_tools.logg_elapsed_time(self.start_time, 'Starting Hamming Analysis')
+        #     if self.decoding_across == True:
+        #         post_analysis.run_hamming_analysis_across()
+        #     elif self.decoding_individual !='all':
+        #         post_analysis.run_hamming_analysis_indiv()
+        #     timer_tools.logg_elapsed_time(self.start_time, 'Ending Hamming Analysis')
         #--------------------------------------------------------------------------------
         
         timer_tools.logg_elapsed_time(self.start_time, 'Finished with Analysis of Position')

@@ -39,7 +39,7 @@ function [T, T_unfiltered] = dotlocations2table(dotlocations, barcodekeyNames, m
     z = [];
     seeds = [];
     intensity = [];
-    geneID = {};
+    gene = {};
  
     % loop through each row/points and generate variables
     numRows = size(dotlocations,1);
@@ -50,7 +50,7 @@ function [T, T_unfiltered] = dotlocations2table(dotlocations, barcodekeyNames, m
                 numPointsPerRow = size(dotlocations{r,4},1);
                 geneRep = cell(numPointsPerRow,1);
                 geneRep(:) = {barcodekeyNames{r}};
-                geneID = cat(1, geneID, geneRep);
+                gene = cat(1, gene, geneRep);
                 x = cat(1, x, dotlocations{r,4}(:,1));
                 y = cat(1, y, dotlocations{r,4}(:,2));
                 z = cat(1, z, dotlocations{r,4}(:,3));
@@ -61,7 +61,7 @@ function [T, T_unfiltered] = dotlocations2table(dotlocations, barcodekeyNames, m
     end
     
     % unfiltered
-    T_unfiltered = table(geneID, x, y, z, intensity, seeds);
+    T_unfiltered = table(gene, x, y, z, intensity, seeds);
          
     % filter the table with minimum number of seedes
     T = T_unfiltered(T_unfiltered.seeds >= minNumSeeds,:);

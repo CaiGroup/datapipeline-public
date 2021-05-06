@@ -61,12 +61,12 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, position, label_im
 
 
 if sys.argv[1] == 'debug_run_cellpose':
-    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei'
+    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/test1-big'
     segmented_dst_dir = '/home/nrezaee/temp'
-    decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/arun_1/arun_1_decoding_low_mult_______strict_-4/MMStack_Pos0/Decoded/Channel_1/pre_seg_diff_1_minseeds_3_filtered.csv'
+    decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/test1-big/non_barcoded/MMStack_Pos0/Decoded/sequential_decoding_results.csv'
     position = 'MMStack_Pos0.ome.tif'
     
-    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/arun_1/arun_1_decoding_low_mult_______strict_-4/MMStack_Pos0/Segmentation/labeled_img_post.tif'
+    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/test1-big/non_barcoded/MMStack_Pos0/Segmentation/labeled_img_post.tif'
     labeled_img = tifffile.imread(labeled_img_src)
     
     run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, position, labeled_img)

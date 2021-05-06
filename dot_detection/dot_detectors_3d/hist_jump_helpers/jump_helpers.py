@@ -16,7 +16,7 @@ def blur_back_subtract(tiff_2d, num_tiles):
     
     return tiff_2d
 
-def blur_back_subtract_3d(img_3d, num_tiles=100):
+def blur_back_subtract_3d(img_3d, num_tiles=10):
     
     for i in range(img_3d.shape[0]):
         img_3d[i,:,:] = blur_back_subtract(img_3d[i,:,:], num_tiles)
@@ -39,8 +39,8 @@ def tophat_3d(img_3d):
     return img_3d
 
 def preprocess_img(img_3d):
-    norm_img_3d = normalize(img_3d)
-    blur_img_3d = blur_back_subtract_3d(norm_img_3d)
+    #norm_img_3d = normalize(img_3d)
+    blur_img_3d = blur_back_subtract_3d(img_3d)
     print(f'{blur_img_3d.shape=}')
     #tophat_img_3d = tophat_3d(blur_img_3d)
     nonzero_img_3d = np.where(blur_img_3d < 0, 0, blur_img_3d)
@@ -91,16 +91,19 @@ def apply_thresh(dot_analysis, threshold):
 
     
 def apply_reverse_thresh(dot_analysis, threshold):
-    index = 0
-    indexes = []
-    len_of_dot_analysis = len(dot_analysis[1])
-    for i in range(len(dot_analysis[1])):
-        if dot_analysis[1][i] >= threshold:
-            indexes.append(i)
-    dot_analysis[0] = np.delete(dot_analysis[0], indexes, axis =0)
-    dot_analysis[1] = np.delete(dot_analysis[1], indexes)
-    print(f'{len(indexes)=}')
-    return dot_analysis
+    if threshold == None:
+        return dot_analysis
+    else:
+        index = 0
+        indexes = []
+        len_of_dot_analysis = len(dot_analysis[1])
+        for i in range(len(dot_analysis[1])):
+            if dot_analysis[1][i] >= threshold:
+                indexes.append(i)
+        dot_analysis[0] = np.delete(dot_analysis[0], indexes, axis =0)
+        dot_analysis[1] = np.delete(dot_analysis[1], indexes)
+        print(f'{len(indexes)=}')
+        return dot_analysis
     
 def remove_unneeded_intensities(intensities, percent_remove, num_bins):
     
@@ -111,19 +114,37 @@ def remove_unneeded_intensities(intensities, percent_remove, num_bins):
     
     bools = y < len(intensities)*percent_remove
     i = 0
-    while bools[i] == False:
-        i+=1
-    intensities = np.array(intensities)
-    
-    threshed = intensities[intensities < x[i]]
-    
-    return threshed, x[i]
+    if any(bools):
+        while bools[i] == False:
+            i+=1
+        intensities = np.array(intensities)
+        
+        threshed = intensities[intensities < x[i]]
+        
+        
+        return threshed, x[i]
+    else:
+        return intensities, None
 
-def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, dot_radius):
+def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, dot_radius, threshold, radius_step, num_radii):
     nbins = float(nbins)
     #tiff_3d = preprocess_img(tiff_3d)
     print(f'{dot_radius=}')
-    res = blob_log(tiff_3d, min_sigma =dot_radius, max_sigma =dot_radius+1, num_sigma =2, threshold = 0.001)
+    print(f'{radius_step=}')
+    print(f'{threshold=}')
+    print(f'{num_radii=}')
+    if num_radii == 2:
+        max_radius = dot_radius + radius_step
+        min_radius = dot_radius
+    elif num_radii == 1:
+        min_radius = dot_radius
+        max_radius = dot_radius
+    elif num_radii > 2:
+        max_radius = dot_radius + (radius_step)* num_radii
+        min_radius = dot_radius
+        
+    res = blob_log(tiff_3d, min_sigma =min_radius, max_sigma =max_radius, num_sigma =num_radii, threshold = threshold)
+    #elsy's data dot_radius of .5, threshold of .001
     points = res[:,:3]
 
     intensities = []
@@ -156,7 +177,7 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, d
     hist_png_path = os.path.join(hist_png_dir, hyb + '_' + 'Jump.png')
     
     dot_analysis = [points, intensities]
-    print(f'{intensities=}')
+    #print(f'{intensities=}')
     #print(f'{intensities.shape=}')
     if len(intensities) > float(nbins):
         intensities, reverse_threshold = remove_unneeded_intensities(intensities, percent_remove=.01, num_bins=nbins)
@@ -170,17 +191,19 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, d
     
 import sys
 if sys.argv[1] == 'debug_jump_helper':
-    print(f'{np.version.version=}')
     import tifffile as tf
     
-    tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_1/HybCycle_10/MMStack_Pos20.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_1/HybCycle_9/MMStack_Pos0.ome.tif'
     tiff_3d = tiffy.load(tiff_src, num_wav=3,num_z=None)[:,0]
     strictness= 5
     analysis_name = 'michal_decoding_top'
     print(f'{tiff_3d.shape=}')
-    num_bins=70
+    num_bins=100
     dot_radius=1
-    dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, num_bins, dot_radius))
+    radius_step=2
+    num_radii= 2
+    threshold = .001
+    dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, num_bins, dot_radius, threshold, radius_step, num_radii))
     
     print(f'{dot_analysis[0].shape=}')
     

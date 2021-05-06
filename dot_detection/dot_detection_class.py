@@ -18,7 +18,8 @@ import subprocess
 import time
 import shutil
 import pandas as pd
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 #Import some helpers
@@ -35,11 +36,6 @@ from timer import timer_tools
 
 
 main_dir = '/groups/CaiLab'
-# if os.environ.get('DATA_PIPELINE_MAIN_DIR') is not None:
-#     main_dir = os.environ['DATA_PIPELINE_MAIN_DIR']
-# else:
-#     raise Exception("The Main Directory env variable is not set. Set DATA_PIPELINE_MAIN_DIR!!!!!!!!")
-
 
 #Dot Detection class for setting dot detection
 #=====================================================================================
@@ -48,7 +44,8 @@ class Dot_Detection:
                    analysis_name, visualize_dots, normalization, \
                    background_subtraction, decoding_individual, chromatic_abberration, \
                    dot_detection, gaussian_fitting, strictness_dot_detection, dimensions, \
-                   radial_center, num_zslices, nbins, threshold, num_wav, z_slices, dot_radius):
+                   radial_center, num_zslices, nbins, threshold, num_wav, z_slices, \
+                   dot_radius, radius_step, num_radii, debug_dot_detection):
 
         self.experiment_name = experiment_name
         self.personal = personal
@@ -72,6 +69,10 @@ class Dot_Detection:
         self.num_z = z_slices
         self.nbins = float(nbins)
         self.dot_radius = dot_radius
+        self.radius_step = radius_step
+        self.num_radii = num_radii
+        self.debug_dot_detection = debug_dot_detection
+        
         
         #Set Directories
         #--------------------------------------------------------------
@@ -81,6 +82,54 @@ class Dot_Detection:
         self.decoded_dir = os.path.join(self.position_dir, 'Decoded')
         self.locations_dir = os.path.join(self.position_dir, 'Dot_Locations')
         #--------------------------------------------------------------
+        
+    def get_z_slices_check_img(self, df,dst_dir):
+        z_s = np.array(np.round(df.z))+1
+        plt.figure()
+        plt.title("Number of Dots Across Z's", fontsize=20)
+        plt.xlabel("Z Slice")
+        plt.ylabel("Number of Dots")
+        plt.xticks(list(set(z_s)))
+        plt.hist(z_s)
+        plt.savefig(os.path.join(dst_dir, 'Dots_Across_Z_Slices.png'))
+        
+    def get_heatmap_of_xy(self, df, dst_dir):
+        size = int(np.round(df[['x','y']].values.max()))
+        tiles_across = 16
+        print(f'{size=}')
+        heatmap_sections = []
+        step_size = int(np.round(size/tiles_across))
+        for x in range(0,size,step_size):
+            heatmap_slide = []
+            for y in range(0,size,step_size):
+                df_square = df[(df.x >= x) & (df.x <=(x+512)) & \
+                               (df.y >=y) & (df.y <=(y+512))]
+    
+                heatmap_slide.append(df_square.shape[0])
+    
+            heatmap_sections.append(heatmap_slide)
+        heatmap_sections.reverse()
+    
+        heatmap_sections = np.array(heatmap_sections)
+        heatmap_sections = np.rot90(heatmap_sections,2).T
+    
+        colormap = sns.color_palette("Greens")
+        plt.figure()
+        plt.title('Map of Locations Across X and Y', fontsize=15)
+        map_xy = sns.heatmap(heatmap_sections, cmap=colormap)
+        map_xy.set_xticklabels(list(range(0,size,step_size)), fontsize = 5)
+        map_xy.set_yticklabels(list(range(0,size,step_size)), fontsize = 5)
+        
+        plt.savefig(os.path.join(dst_dir, 'Map_of_XY_Locations.png'))
+    
+    def get_location_checks(self, locations_csv_src):
+        dst_dir = os.path.join(os.path.dirname(locations_csv_src), 'Location_Checks')
+        if not os.path.exists(dst_dir):
+            os.mkdir(dst_dir)
+        df = pd.read_csv(locations_csv_src)
+        self.get_z_slices_check_img(df,dst_dir)
+        self.get_heatmap_of_xy(df, dst_dir)
+    
         
     def save_locations_shape(self, locs_csv_src):
         
@@ -183,6 +232,7 @@ class Dot_Detection:
         
         bright_analysis_dst = os.path.join(self.locations_dir, 'Average_Brightness_Analysis.csv')
         self.get_ave_over_hyb_ch_z(locations_path, bright_analysis_dst)
+        self.get_location_checks(locations_path)
         #self.save_locs_shape(locations_path)
         #--------------------------------------------------------------------
         
@@ -329,11 +379,12 @@ class Dot_Detection:
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
                             '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
                             '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav',  \
-                            self.num_wav, '--z_slices', z_slice, '--num_z', self.num_z, '--nbins', self.nbins, '--dot_radius', self.dot_radius]
+                            self.num_wav, '--z_slices', z_slice, '--num_z', self.num_z, '--nbins', self.nbins, '--dot_radius', self.dot_radius, \
+                            '--threshold', self.threshold, '--radius_step', self.radius_step, '--num_radii', self.num_radii]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
-                    time_for_slurm = "0:10:00"            
+                    time_for_slurm = "0:35:00"            
                 else:
 
                     
@@ -367,9 +418,14 @@ class Dot_Detection:
         
         #Delete the rand dirs
         #----------------------------------------------
-        for rand in rand_list:
-            rand_dir = os.path.join(temp_dir, rand)
-            shutil.rmtree(rand_dir)
+        if self.debug_dot_detection == True:
+            print('Did not delete dot detection directories')
+            pass
+        else:
+            print('Did delete dot detection directories')
+            for rand in rand_list:
+                rand_dir = os.path.join(temp_dir, rand)
+                shutil.rmtree(rand_dir)
         #----------------------------------------------
         
         return df_locs

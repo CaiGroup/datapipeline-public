@@ -6,6 +6,7 @@ import numpy as np
 import glob
 import pandas as pd
 import tifffile
+import shutil
 
 from helpers.reorder_hybs import get_and_sort_hybs
 from segmentation.cellpose_segment.helpers.get_cellpose_labeled_img import get_labeled_img_cellpose
@@ -22,6 +23,7 @@ from decoding import decoding
 from decoding import decoding_parallel
 from decoding import previous_points_decoding as previous_points_decoding
 from decoding import previous_locations_decoding as previous_locations_decoding
+from decoding import decoding_non_barcoded
 #----------------------------
 
 
@@ -171,7 +173,6 @@ class Decoding:
             
         else:
             
-
             print('Shape in Decoding Class: ' +  str(self.labeled_img.shape))
             decoding_parallel.decoding(barcode_file_path, locations_path, self.labeled_img, self.decoded_dir, self.allowed_diff, \
                     self.min_seeds, decode_only_cells = self.decode_only_cells)
@@ -179,6 +180,32 @@ class Decoding:
  
         print("Finished Decoding Across Channels")
         #--------------------------------------------------------------------
+        
+    def run_non_barcoded_decoding(self):
+        barcode_src = os.path.join(self.data_dir, 'non_barcoded_genes', 'sequential_key.csv')
+        
+        if not os.path.exists(self.barcode_dst):
+            os.makedirs(self.barcode_dst)
+            
+        barcode_file_path = os.path.join(self.barcode_dst, 'sequential_key.csv')
+        shutil.copyfile(barcode_src, barcode_file_path)
+        
+        #Set Directory for locations
+        #--------------------------------------------------------------------
+        locations_path = os.path.join(self.locations_dir, 'locations.csv')
+        #--------------------------------------------------------------------
+        
+        #Set Directory for Decoding
+        #--------------------------------------------------------------------
+        if not os.path.exists(self.decoded_dir):
+            os.makedirs(self.decoded_dir)
+        #--------------------------------------------------------------------
+        
+        print("Running Sequential Decoding (smFISH)")
+        
+        pos_num = int(self.position.split('.ome.tif')[0].split('Pos')[1])
+        decoding_non_barcoded.run_decoding_non_barcoded(barcode_src, locations_path, pos_num, self.decoded_dir)
+        
         
     def run_decoding_across_2d(self):
         
@@ -506,3 +533,44 @@ class Decoding:
         
         print("Finished Decoding Across Channels")
         #--------------------------------------------------------------------
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

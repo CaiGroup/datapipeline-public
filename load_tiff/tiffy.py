@@ -10,7 +10,7 @@ def reshape_michal_tiffs(tiff):
     new_tiff = np.swapaxes(new_tiff, 0, 1)
     return new_tiff
 
-def load(tiff_src, num_wav, num_z=None):    
+def load(tiff_src, num_wav=4, num_z=None):    
     print(f'{tiff_src=}')
     
     print(f'{num_wav=}')
@@ -28,8 +28,9 @@ def load(tiff_src, num_wav, num_z=None):
     assert tiff.shape[-1] == tiff.shape[-2]
     #---------------------------------------------------------------------
     
-    #print(f'{str(num_z)=}')
-    #print(f'{str(1.0)=}')
+    if num_z == 'None':
+        num_z=None
+    
     #Checks if tiff is read normally
     #---------------------------------------------------------------------
     if len(tiff.shape)==4:

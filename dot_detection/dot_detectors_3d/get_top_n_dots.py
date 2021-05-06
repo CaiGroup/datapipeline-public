@@ -103,6 +103,12 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
 
         dots_in_channel = None
 
+        if bool_background_subtraction == True:
+            print(f'{background.shape=}')
+            print(f'{channel=}')
+            tiff_3d = tiff_3d- background[:, channel]*.9
+            
+            tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
         
         #Loops through Z-stacks for Dot Detection
         #---------------------------------------------------------------------
@@ -112,11 +118,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             
             #Background Subtraction
             #---------------------------------------------------------------------
-            if bool_background_subtraction == True:
-                print(f'{background.shape=}')
-                print(f'{channel=}')
-                tiff_3d = tiff_3d- background[:, channel]*1.4
-                tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
+
             #---------------------------------------------------------------------
             
 
@@ -241,14 +243,18 @@ if sys.argv[1] != 'debug_top_dots':
                           
 else:                        
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/simone_all/HybCycle_10/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/simone_all/HybCycle_10/MMStack_Pos35.ome.tif'
     offset = [0,0,0]
     channels = 'all' #[1]
-    analysis_name = 'linus_decoding'
+    analysis_name = 'back_sub'
     n_dots = 10
     rand_dir = '/home/nrezaee/temp'
     num_z = None
-    get_dots_for_tiff(tiff_src, offset, analysis_name, False, False, True, channels, False, 10, 4, rand_dir, num_z)
+    back_sub = True
+    num_dots = 10
+    num_wav = 4
+    visualize_dots = True
+    get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, False, back_sub, channels, False, num_dots, num_wav, rand_dir, num_z)
     
     
 

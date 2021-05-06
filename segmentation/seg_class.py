@@ -131,6 +131,21 @@ class Segmentation:
                 
             run_cellpose.run_me(self.data_dir, self.seg_dir, decoded_genes_path, self.position, self.labeled_img)
             #----------------------------------------------
+
+    def run_segmentation_non_barcoded(self):
+        
+        # Get Segmentation DIrs
+        #----------------------------------------------
+        if not os.path.exists(self.seg_dir):
+            os.makedirs(self.seg_dir)
+        #----------------------------------------------
+        
+        #Get Decoded genes path
+        #----------------------------------------------
+        decoded_genes_path = os.path.join(self.decoded_dir, 'sequential_decoding_results.csv')
+        #----------------------------------------------
+            
+        run_cellpose.run_me(self.data_dir, self.seg_dir, decoded_genes_path, self.position, self.labeled_img)
     
     
 

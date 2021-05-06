@@ -63,6 +63,7 @@ def assign_to_cells(df_gene_list, label_img):
         
     x = df_gene_list['x'].astype(int) 
     y = df_gene_list['y'].astype(int) 
+    print(f'{label_img.shape=}')
 
     if 'z' in df_gene_list:
         
@@ -79,9 +80,9 @@ def assign_to_cells(df_gene_list, label_img):
 
 if sys.argv[1] == 'debug_assign_to_cells':
     import tifffile
-    decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/test1-big/debug_parallel/MMStack_Pos0/Decoded/Channel_1/pre_seg_diff_1_minseeds_2_filtered.csv'
+    decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/test1-big/non_barcoded/MMStack_Pos0/Decoded/sequential_decoding_results.csv'
     df_gene_list = pd.read_csv(decoded_genes_src)
-    label_img_src = '/groups/CaiLab/analyses/nrezaee/test1-big/cellpose/MMStack_Pos0/Segmentation/Channel_1/labeled_img.tiff'
+    label_img_src = '/groups/CaiLab/analyses/nrezaee/test1-big/non_barcoded/MMStack_Pos0/Segmentation/labeled_img.tif'
     label_img = tifffile.imread(label_img_src)
     print(f'{label_img.shape=}')
     df_gene_list = assign_to_cells(df_gene_list, label_img)

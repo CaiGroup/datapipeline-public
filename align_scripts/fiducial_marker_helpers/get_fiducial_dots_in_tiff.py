@@ -17,6 +17,18 @@ from align_scripts.fiducial_marker_helpers.fid_jump_helpers import hist_jump_thr
 from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
 from dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
 
+def get_fiducial_visual_debug(fid_tiff, fid_locs, dst):
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for channel in fid_locs.ch.unique():
+        for i in range(fid_tiff[:, channel-1].shape[0]):
+            locs_z = fid_locs[(fid_locs.z == i) & (fid_locs.ch == channel)]
+            plt.figure(figsize=(40,40))
+            plt.imshow(np.log(fid_tiff[i, channel]), cmap='gray')
+            plt.scatter(locs_z.x, locs_z.y, facecolors='none', edgecolors='y', s=2000)
+            png_dst = os.path.join(dst, 'channel_' +str(channel) + '_z_' + str(i) + '.png')
+            #print(f'{png_dst=}')
+            plt.savefig(png_dst)
 
 def add_ch_to_df(dots_in_channel, tiff_src, channel):
 
@@ -95,7 +107,7 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
 
     return df
 
-def get_dots_for_tiff(tiff_src,num_wav, dst, dot_radius, strictness=15):
+def get_dots_for_tiff(tiff_src,num_wav, dst, dot_radius, strictness=20):
     
     # #Getting Background Src
     # #--------------------------------------------------------------------
@@ -184,20 +196,6 @@ def get_dots_for_tiff(tiff_src,num_wav, dst, dot_radius, strictness=15):
         df_ch = add_hyb_and_ch_to_df(dot_analysis, tiff_src, channel)
         df_tiff = df_tiff.append(df_ch)
         print(f'{df_tiff.shape=}')
-        
-        
-    def get_fiducial_visual_debug(fid_tiff, fid_locs, dst):
-        if not os.path.exists(dst):
-            os.makedirs(dst)
-        for channel in fid_locs.ch.unique():
-            for i in range(fid_tiff[:, channel-1].shape[0]):
-                locs_z = fid_locs[(fid_locs.z == i) & (fid_locs.ch == channel)]
-                plt.figure(figsize=(40,40))
-                plt.imshow(np.log(fid_tiff[i, channel]), cmap='gray')
-                plt.scatter(locs_z.x, locs_z.y, facecolors='none', edgecolors='y', s=2000)
-                png_dst = os.path.join(dst, 'channel_' +str(channel) + '_z_' + str(i) + '.png')
-                #print(f'{png_dst=}')
-                plt.savefig(png_dst)
                 
     get_fiducial_visual_debug(tiff, df_tiff, dst)
     tf.imwrite('foo.tif', tiff)
