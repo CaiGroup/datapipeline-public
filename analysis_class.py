@@ -35,9 +35,6 @@ from read_barcode import read_barcode
 #Decoding Script
 #----------------------------
 from decoding.decoding_class import Decoding
-from decoding import decoding
-from decoding import previous_points_decoding as previous_points_decoding
-from decoding import previous_locations_decoding as previous_locations_decoding
 #----------------------------
 
 #Segmentation Script
@@ -138,6 +135,7 @@ class Analysis:
         self.num_radii = 2
         self.radius_step = 1
         self.debug_dot_detection = False
+        self.synd_decoding = False
         #--------------------------------------------------------------
         
         
@@ -383,6 +381,11 @@ class Analysis:
         self.debug_dot_detection = True
         print("    Set Debug Dot Dotection to True")
         
+    def set_syndrome_decoding_true(self):
+        self.synd_decoding= True
+        print("    Set Syndrome Decoding to True")
+        
+        
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -596,65 +599,79 @@ class Analysis:
             decoder = Decoding(self.data_dir, self.position, self.decoded_dir, self.locations_dir, self.position_dir, self.barcode_dst, \
                 self.barcode_key_src, self.decoding_with_previous_dots, self.decoding_with_previous_locations, self.fake_barcodes, \
                 self.decoding_individual, self.min_seeds, self.allowed_diff, self.dimensions, self.num_zslices, self.segmentation, \
-                self.decode_only_cells, self.labeled_img, self.num_wav)
+                self.decode_only_cells, self.labeled_img, self.num_wav, self.synd_decoding)
         #--------------------------------------------------------------------------------
         
-        #Run Decoding with previous dots
-        #--------------------------------------------------------------------------------
-        if self.decoding_with_previous_dots == True:
-            timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding With Previous Points')
-            decoder.run_decoding_with_previous_dots()        
-            timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding With Previous Points')
-        #--------------------------------------------------------------------------------
-        
-        #Run Decoding with previous locations
-        #--------------------------------------------------------------------------------
-        if self.decoding_with_previous_locations == True:
+        if self.synd_decoding == True:
+            #Run Decoding Individual
+            #--------------------------------------------------------------------------------
+            if not self.decoding_individual == 'all':
+                if self.dot_detection == False:
+                    timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
+                    self.run_dot_detection()
+                    timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
+                    
+                timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Individual')
+                decoder.run_synd_decoding_individual()
+                timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Individual')
+            #--------------------------------------------------------------------------------
+        else:
+            #Run Decoding with previous dots
+            #--------------------------------------------------------------------------------
+            if self.decoding_with_previous_dots == True:
+                timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding With Previous Points')
+                decoder.run_decoding_with_previous_dots()        
+                timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding With Previous Points')
+            #--------------------------------------------------------------------------------
             
-            timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding With Previous Locations')
-            decoder.run_decoding_with_previous_locations()     
-            timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding With Previous Locations')
-        #--------------------------------------------------------------------------------
-        
-        
-        #Run Decoding Individual
-        #--------------------------------------------------------------------------------
-        if not self.decoding_individual == 'all':
-            if self.dot_detection == False:
-                timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
-                self.run_dot_detection()
-                timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
+            #Run Decoding with previous locations
+            #--------------------------------------------------------------------------------
+            if self.decoding_with_previous_locations == True:
                 
-            timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Individual')
-            decoder.run_decoding_individual()
-            timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Individual')
-        #--------------------------------------------------------------------------------
-
-        #Run Decoding Across
-        #--------------------------------------------------------------------------------
-        if self.decoding_across == True:
-            if self.dot_detection == False:
-                timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
-                self.run_dot_detection()
-                timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
+                timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding With Previous Locations')
+                decoder.run_decoding_with_previous_locations()     
+                timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding With Previous Locations')
+            #--------------------------------------------------------------------------------
+            
+            
+            #Run Decoding Individual
+            #--------------------------------------------------------------------------------
+            if not self.decoding_individual == 'all':
+                if self.dot_detection == False:
+                    timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
+                    self.run_dot_detection()
+                    timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
+                    
+                timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Individual')
+                decoder.run_decoding_individual()
+                timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Individual')
+            #--------------------------------------------------------------------------------
+    
+            #Run Decoding Across
+            #--------------------------------------------------------------------------------
+            if self.decoding_across == True:
+                if self.dot_detection == False:
+                    timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
+                    self.run_dot_detection()
+                    timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
+                    
                 
-            
-            timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Across')
-            decoder.run_decoding_across()
-            timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Across')
-            
-        if self.decoding_non_barcoded== True:
-            if self.dot_detection == False:
-                timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
-                self.run_dot_detection()
-                timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
-            
-            timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Non-Barcoded')
-            decoder.run_non_barcoded_decoding()
-            timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Non-Barcoded')
+                timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Across')
+                decoder.run_decoding_across()
+                timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Across')
                 
-        #--------------------------------------------------------------------------------
-        
+            if self.decoding_non_barcoded== True:
+                if self.dot_detection == False:
+                    timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
+                    self.run_dot_detection()
+                    timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
+                
+                timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Non-Barcoded')
+                decoder.run_non_barcoded_decoding()
+                timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Non-Barcoded')
+                    
+            #--------------------------------------------------------------------------------
+            
         
         #Declare Segmentation
         #--------------------------------------------------------------------------------
@@ -717,18 +734,6 @@ class Analysis:
             timer_tools.logg_elapsed_time(self.start_time, 'Ending False Positive Rate')
         #--------------------------------------------------------------------------------
         
-        
-        
-        #Run Hamming Distance Analysis  
-        #--------------------------------------------------------------------------------
-        # if self.segmentation != False and self.hamming_analysis == True:
-        #     timer_tools.logg_elapsed_time(self.start_time, 'Starting Hamming Analysis')
-        #     if self.decoding_across == True:
-        #         post_analysis.run_hamming_analysis_across()
-        #     elif self.decoding_individual !='all':
-        #         post_analysis.run_hamming_analysis_indiv()
-        #     timer_tools.logg_elapsed_time(self.start_time, 'Ending Hamming Analysis')
-        #--------------------------------------------------------------------------------
         
         timer_tools.logg_elapsed_time(self.start_time, 'Finished with Analysis of Position')
         

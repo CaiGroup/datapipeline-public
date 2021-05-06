@@ -143,7 +143,11 @@ def post_process(edge_delete_dist, dist_between_nuclei, label_img_src, labeled_c
         
         
     print(f'{label_img_dst=}')
-    copyfile(label_img_src, label_img_dst)
+    try:
+        copyfile(label_img_src, label_img_dst)
+    except OSError:
+        print("The labeled image was already transfferred")
+        
     
         
     

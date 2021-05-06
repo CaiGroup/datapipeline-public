@@ -1,13 +1,13 @@
 import os
 import json
 import sys
-import scipy.io as sio
 import numpy as np
 import glob
 import pandas as pd
 import tifffile
 import shutil
 
+sys.path.insert(0, os.getcwd())
 from helpers.reorder_hybs import get_and_sort_hybs
 from segmentation.cellpose_segment.helpers.get_cellpose_labeled_img import get_labeled_img_cellpose
 
@@ -19,19 +19,23 @@ from read_barcode import read_barcode
 
 #Decoding Script
 #----------------------------
-from decoding import decoding
+
+from decoding import decoding_non_parallel
 from decoding import decoding_parallel
 from decoding import previous_points_decoding as previous_points_decoding
 from decoding import previous_locations_decoding as previous_locations_decoding
 from decoding import decoding_non_barcoded
+from decoding import syndrome_decoding
 #----------------------------
 
 
 #Analysis Class to set and run parameters for analyses
 #=====================================================================================
 class Decoding:
-    def __init__(self, data_dir, position, decoded_dir, locations_dir, position_dir, barcode_dst, barcode_src, bool_decoding_with_previous_dots, bool_decoding_with_previous_locations, \
-                    bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions, num_zslices, segmentation, decode_only_cells, labeled_img, num_wav):
+    def __init__(self, data_dir, position, decoded_dir, locations_dir, position_dir, barcode_dst, barcode_src, \
+                    bool_decoding_with_previous_dots, bool_decoding_with_previous_locations, \
+                    bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions, \
+                    num_zslices, segmentation, decode_only_cells, labeled_img, num_wav, synd_decoding):
         
         self.data_dir = data_dir
         self.position = position
@@ -52,6 +56,7 @@ class Decoding:
         self.decode_only_cells = decode_only_cells
         self.labeled_img = labeled_img
         self.num_wav = num_wav
+        self.synd_decoding = synd_decoding
          
     def labeled_img_from_tiff_dir(self):
         glob_me = os.path.join(self.data_dir, '*')
@@ -534,10 +539,66 @@ class Decoding:
         print("Finished Decoding Across Channels")
         #--------------------------------------------------------------------
         
+    def run_synd_decoding_individual(self):
+        
+        #Loop through each individual channel
+        #--------------------------------------------------------------------
+        for channel in self.decoding_individual:
+            
+            #Set Directories for reading barcode key
+            #--------------------------------------------------------------------
+            barcode_file_name = 'channel_' + str(channel) + '.csv'
+            barcode_src = os.path.join(self.barcode_src, barcode_file_name)
+            #--------------------------------------------------------------------
+        
+            #Set file path for locations
+            #--------------------------------------------------------------------
+            locations_path = os.path.join(self.locations_dir, 'locations.csv')
+            #--------------------------------------------------------------------
+        
+            
+            #Set directories for decoding
+            #--------------------------------------------------------------------
+            if not os.path.exists(self.decoded_dir):
+                os.makedirs(self.decoded_dir)
+                
+            decoding_dst_for_channel = os.path.join(self.decoded_dir, "Channel_"+str(channel))
+            if not os.path.exists(decoding_dst_for_channel):
+                os.makedirs(decoding_dst_for_channel)
+            #--------------------------------------------------------------------
+            
+            #Run Syndrome Decoding
+            #--------------------------------------------------------------------
+            syndrome_decoding.run_syndrome_decoding(locations_path, barcode_src, decoding_dst_for_channel)
+            #--------------------------------------------------------------------
 
 
 
 
+if sys.argv[1] == 'debug_decoding_class_synd':
+    decoder = Decoding(data_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei', 
+                        position = 'MMStack_Pos0.ome.tif', 
+                        decoded_dir = 'foo/test_decoding_class', 
+                        locations_dir = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Dot_Locations/', 
+                        position_dir = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/', 
+                        barcode_dst = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/BarcodeKey/', 
+                        barcode_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/barcode_key', 
+                        bool_decoding_with_previous_dots = False, 
+                        bool_decoding_with_previous_locations = False, 
+                        bool_fake_barcodes = True, 
+                        bool_decoding_individual = [1], 
+                        min_seeds = None, 
+                        allowed_diff = None, 
+                        dimensions = 3, 
+                        num_zslices = None, 
+                        segmentation = None, 
+                        decode_only_cells = True, 
+                        labeled_img = None, 
+                        num_wav = 4, 
+                        synd_decoding = True)
+    print('Made Decoding Class')
+    
+    decoder.run_synd_decoding_individual()
 
 
 

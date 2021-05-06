@@ -420,6 +420,13 @@ def run_analysis(json_name, position):
             analysis.set_debug_dot_detection_true()
     #----------------------------------------------------------
     
+    #Decoding Method
+    #----------------------------------------------------
+    if 'decoding method' in data.keys():
+        if data['decoding method'] == 'syndrome':
+            analysis.set_syndrome_decoding_true()
+    #----------------------------------------------------------
+    
     #Writ
     #----------------------------------------------------------
     analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)
