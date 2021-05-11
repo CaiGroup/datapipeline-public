@@ -1,5 +1,3 @@
-
-print(1)
 import numpy as np
 import os
 import glob
@@ -146,6 +144,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
     csv_path = rand_dir +'/locs.csv'
     print(f'{csv_path=}')
+    df_tiff.z = df_tiff.z = 1 
     df_tiff.to_csv(csv_path, index=False)
 
 
@@ -204,7 +203,7 @@ if sys.argv[1] != 'debug_matlab_3d':
     
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
                           args.back_subtract, channels, args.chromatic, str2bool(args.gaussian), \
-                          str2bool(args.radial_center),int(args.strictness), args.z_slices, int(args.nbins), \
+                          str2bool(args.radial_center),int(args.strictness), args.z_slices, int(float(args.nbins)), \
                           int(args.threshold), args.num_wav, args.rand)
         
 else:
@@ -216,4 +215,4 @@ else:
     rand_dir = '/home/nrezaee/temp'
     radial_center = False
     get_dots_for_tiff(tiff_src, offset, analysis_name, True, False, channels, False, False, radial_center, 0, None, 10, \
-                    300, 4, rand_dir)
+                    300, 2, rand_dir)

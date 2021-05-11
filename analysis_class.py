@@ -8,7 +8,9 @@ import logging
 import time
 from datetime import datetime
 from load_tiff import tiffy
-from helpers.send_email_notif import send_finished_notif
+from helpers.send_email_notif import send_finished_notif, are_logs_finished
+from helpers.combine_all_pos_locs import combine_locs_csv_s
+from helpers.combine_decoded_genes_all_pos import combine_pos_genes
 from helpers.sync_specific_analysis import send_analysis_to_onedrive
 
 #Alignment Scripts
@@ -136,6 +138,7 @@ class Analysis:
         self.radius_step = 1
         self.debug_dot_detection = False
         self.synd_decoding = False
+        self.lampfish_decoding = False
         #--------------------------------------------------------------
         
         
@@ -190,6 +193,8 @@ class Analysis:
         
     def set_dot_detection_arg(self, detection_arg):
         self.dot_detection = detection_arg
+        if self.dot_detection == 'matlab 3d':
+            self.threshold = 300
         print("    Set Dot Detection to", detection_arg, flush=True)
 
     def set_decoding_across_true(self):
@@ -385,7 +390,9 @@ class Analysis:
         self.synd_decoding= True
         print("    Set Syndrome Decoding to True")
         
-        
+    def set_lampfish_decoding_true(self):
+        self.lampfish_decoding = True
+        print("    Set Lampfish Decoding to True")
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -595,13 +602,25 @@ class Analysis:
         #Declare Decoding Class if needed
         #--------------------------------------------------------------------------------
         if self.decoding_across == True or self.decoding_individual != 'all' \
-        or self.decoding_with_previous_dots == True or self.decoding_with_previous_locations == True or self.decoding_non_barcoded == True:
+        or self.decoding_with_previous_dots == True or self.decoding_with_previous_locations == True or self.decoding_non_barcoded == True \
+        or self.lampfish_decoding:
             decoder = Decoding(self.data_dir, self.position, self.decoded_dir, self.locations_dir, self.position_dir, self.barcode_dst, \
                 self.barcode_key_src, self.decoding_with_previous_dots, self.decoding_with_previous_locations, self.fake_barcodes, \
                 self.decoding_individual, self.min_seeds, self.allowed_diff, self.dimensions, self.num_zslices, self.segmentation, \
                 self.decode_only_cells, self.labeled_img, self.num_wav, self.synd_decoding)
         #--------------------------------------------------------------------------------
         
+        
+        if self.lampfish_decoding == True:
+            if self.dot_detection == False:
+                timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
+                self.run_dot_detection()
+                timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
+            
+            timer_tools.logg_elapsed_time(self.start_time, 'Starting LampFISH Decoding')
+            decoder.run_lampfish_decoding()
+            timer_tools.logg_elapsed_time(self.start_time, 'Ending LampFISH Decoding')  
+            
         if self.synd_decoding == True:
             #Run Decoding Individual
             #--------------------------------------------------------------------------------
@@ -740,8 +759,18 @@ class Analysis:
         print(f'{self.email=}')
         if self.email != 'none':
             send_finished_notif(self.analysis_dir, self.email)
+            
+        if are_logs_finished(self.analysis_dir):
+            
+            if self.dot_detection != False:
+                combine_locs_csv_s(self.analysis_dir)
+            
+            if not self.decoding_individual == 'all':
+                for channel in self.decoding_individual:
+                    comb_pos_genes(self.analysis_dir, channel)
+            
         
-        send_analysis_to_onedrive(self.analysis_dir)
+            send_analysis_to_onedrive(self.analysis_dir)
 
     #--------------------------------------------------------------------------------
     #End of running the parameters

@@ -136,7 +136,7 @@ def get_shifted(fixed_tiff, moving_tiff, offset):
     
     shifted_dapi_img = scipy.ndimage.interpolation.shift(moving_dapi_img, offset)
 
-    assert np.sum(shifted_dapi_img) != 0
+    #assert np.sum(shifted_dapi_img) != 0
     
     shifted_dapi_img_center = []
     fixed_dapi_img_center = [] 

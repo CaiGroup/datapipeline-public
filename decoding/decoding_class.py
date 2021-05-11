@@ -19,7 +19,8 @@ from read_barcode import read_barcode
 
 #Decoding Script
 #----------------------------
-
+from decoding import lampfish, lampfish_ch2
+from decoding.lampfish_helpers import lampfish_analytics
 from decoding import decoding_non_parallel
 from decoding import decoding_parallel
 from decoding import previous_points_decoding as previous_points_decoding
@@ -569,11 +570,50 @@ class Decoding:
             
             #Run Syndrome Decoding
             #--------------------------------------------------------------------
-            syndrome_decoding.run_syndrome_decoding(locations_path, barcode_src, decoding_dst_for_channel)
+            syndrome_decoding.run_syndrome_decoding(locations_path, barcode_src, decoding_dst_for_channel, self.fake_barcodes)
             #--------------------------------------------------------------------
 
+    def run_lampfish_decoding(self):
+        
+        #Set file path for locations
+        #--------------------------------------------------------------------
+        locations_path = os.path.join(self.locations_dir, 'locations.csv')
+        #--------------------------------------------------------------------
+        
+        #Set file path for offsets
+        #--------------------------------------------------------------------
+        offsets_path = os.path.join(self.position_dir, 'offsets.json')
+        #--------------------------------------------------------------------
 
+        #Set position and dst
+        #--------------------------------------------------------------------
+        os.makedirs(self.decoded_dir, exist_ok=True)
+        pos = int(self.position.split('MMStack_Pos')[1].split('.ome.tif')[0])
+        ch1_locs_dst = os.path.join(self.decoded_dir, 'lampfish_ratio_results_just_ch1.csv')
+        #--------------------------------------------------------------------
 
+        #Get first channel
+        #--------------------------------------------------------------------
+        lampfish.get_ratio_first_channel(offsets_path, locations_path, self.data_dir, pos, ch1_locs_dst, self.num_wav)
+        #--------------------------------------------------------------------
+
+        #Get Channel Offsets
+        #--------------------------------------------------------------------
+        channel_offsets_dst = os.path.join(self.decoded_dir, 'channel_offsets.json')
+        lampfish.get_channel_offsets(self.data_dir, self.position, channel_offsets_dst, self.num_wav)
+        #--------------------------------------------------------------------
+        
+        #Get Second channel
+        #--------------------------------------------------------------------
+        ch2_locs_dst = os.path.join(self.decoded_dir, 'lampfish_ratio_result.csv')
+        lampfish_ch2.get_ratio_second_channel(offsets_path, channel_offsets_dst, ch1_locs_dst, self.data_dir, pos, ch2_locs_dst, self.num_wav)
+        #--------------------------------------------------------------------
+
+        #Get Analytics
+        #--------------------------------------------------------------------
+        ratio_visual_dst = os.path.join(self.decoded_dir, 'lampfish_ratio_visual.png')
+        lampfish_analytics.get_ratio_visualization(ch2_locs_dst, ratio_visual_dst)
+        #--------------------------------------------------------------------
 
 if sys.argv[1] == 'debug_decoding_class_synd':
     decoder = Decoding(data_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei', 
@@ -600,6 +640,57 @@ if sys.argv[1] == 'debug_decoding_class_synd':
     
     decoder.run_synd_decoding_individual()
 
+elif sys.argv[1] == 'debug_decoding_class_lampfish_linus':
+    decoder = Decoding(data_dir = '/groups/CaiLab/personal/Linus/raw/5ratiometric_test', 
+                        position = 'MMStack_Pos0.ome.tif', 
+                        decoded_dir = 'foo/test_decoding_class/lampfish', 
+                        locations_dir = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos/MMStack_Pos0/Dot_Locations/', 
+                        position_dir = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos/MMStack_Pos0/', 
+                        barcode_dst = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/BarcodeKey/', 
+                        barcode_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/barcode_key', 
+                        bool_decoding_with_previous_dots = False, 
+                        bool_decoding_with_previous_locations = False, 
+                        bool_fake_barcodes = False, 
+                        bool_decoding_individual = 'all', 
+                        min_seeds = None, 
+                        allowed_diff = None, 
+                        dimensions = 3, 
+                        num_zslices = None, 
+                        segmentation = None, 
+                        decode_only_cells = True, 
+                        labeled_img = None, 
+                        num_wav = 3, 
+                        synd_decoding = True)
+                        #lampfish_decoding = True)
+    print('Made Decoding Class')
+    
+    decoder.run_lampfish_decoding()
+    
+elif sys.argv[1] == 'debug_decoding_class_lampfish_test':
+    decoder = Decoding(data_dir = '/groups/CaiLab/personal/nrezaee/raw/test1', 
+                        position = 'MMStack_Pos0.ome.tif', 
+                        decoded_dir = 'foo/test_decoding_class/lampfish_test', 
+                        locations_dir = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/Dot_Locations/', 
+                        position_dir = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/', 
+                        barcode_dst = None, 
+                        barcode_src = None, 
+                        bool_decoding_with_previous_dots = False, 
+                        bool_decoding_with_previous_locations = False, 
+                        bool_fake_barcodes = False, 
+                        bool_decoding_individual = 'all', 
+                        min_seeds = None, 
+                        allowed_diff = None, 
+                        dimensions = 3, 
+                        num_zslices = None, 
+                        segmentation = None, 
+                        decode_only_cells = True, 
+                        labeled_img = None, 
+                        num_wav = 4, 
+                        synd_decoding = True)
+                        #lampfish_decoding = True)
+    print('Made Decoding Class')
+    
+    decoder.run_lampfish_decoding()
 
 
 

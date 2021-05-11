@@ -152,7 +152,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         median_z = tiff_3d.shape[0]//2
         print(f'{bool_visualize_dots=}')
         if bool_visualize_dots == True:# and z == median_z:
-            get_visuals_3d(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name)
+            get_visuals_3d(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name, median_z)
         #---------------------------------------------------------------------
         
         
@@ -232,10 +232,10 @@ if sys.argv[1] != 'debug_hist_3d':
 else:
     
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_2/HybCycle_10/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_1/MMStack_Pos0.ome.tif'
     offset = [0,0,0]
     channels = 'all'
-    analysis_name = 'michal_2_dot'
+    analysis_name = 'linus_decoding'
     rand_dir = '/home/nrezaee/temp'
     vis_dots = True
     back_sub = False

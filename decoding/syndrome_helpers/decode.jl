@@ -73,14 +73,14 @@ mpaths = decode_syndromes!(pnts, cb, H, params)
 #@profile mpaths = decode_syndromes!(pnts_cp, lat_thresh, z_thresh, code, ndrops, sa_params)
 xs = [pnts.x[dots] for dots in mpaths.cpath]
 ys = [pnts.y[dots] for dots in mpaths.cpath]
-
+zs = [pnts.z[dots] for dots in mpaths.cpath]
 
 println("decoded ", sum(pnts.decoded .!= 0), " dots of ", nrow(pnts))
 println("Done")
 
 mpaths[!,"xs"] = xs
 mpaths[!,"ys"] = ys
-
+mpaths[!,"zs"] = zs
 
 println("decoded ", sum(pnts.decoded .!= 0), " dots of ", nrow(pnts))
 

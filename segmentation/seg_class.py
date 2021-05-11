@@ -171,9 +171,9 @@ class Segmentation:
             #Get Decoded genes path
             #----------------------------------------------
             decoded_genes_glob = os.path.join(self.decoded_dir, 'Channel_'+str(channel_num),'*unfiltered.csv')
-            
+            print(f'{decoded_genes_glob=}')
             decoded_genes_paths = glob.glob(decoded_genes_glob)
-            
+            print(f'{decoded_genes_paths=}')
             assert len(decoded_genes_paths) == 1, "There should be exactly one file with *unfiltered.csv"
             
             decoded_genes_path = decoded_genes_paths[0]

@@ -1,15 +1,6 @@
 import numpy as np
 import tifffile
 
-def reshape_michal_tiffs(tiff):
-    new_tiff = []
-    new_tiff.append(tiff[:5])
-    new_tiff.append(tiff[5:10])
-    new_tiff.append(tiff[10:15])
-    new_tiff = np.array(new_tiff)
-    new_tiff = np.swapaxes(new_tiff, 0, 1)
-    return new_tiff
-
 def load(tiff_src, num_wav=4, num_z=None):    
     print(f'{tiff_src=}')
     
@@ -76,3 +67,46 @@ def load(tiff_src, num_wav=4, num_z=None):
     else:
         raise Exception("The tiff shape is weird!!!!!!!!")
 
+# from PIL import Image, ImageSequence
+# import numpy as np
+
+# def open_tiff_file(tiff_src, h=2048, w=2048):
+#     im_lb = Image.open(tiff_src)
+#     tiffarray = np.zeros((h,w,im_lb.n_frames))
+#     for i, page in enumerate(ImageSequence.Iterator(im_lb)):
+#         tiffarray[:,:,i] = np.asarray(page)   
+        
+#     tiff_swap1 = np.swapaxes(tiffarray, 0, 2)
+#     tiff_swap2 = np.swapaxes(tiff_swap1, 1, 2)
+#     return tiff_swap2
+
+# def reorganize_by_channel(tiff, num_channels):
+#     total_channels = 3
+#     tiff_reshaped = []
+#     for i in range(num_channels):
+#         z_s_per_channel = int(tiff.shape[0]/num_channels)
+#         print(f'{z_s_per_channel=}')
+#         tiff_reshaped.append(tiff[(i)*z_s_per_channel:(i+1)*z_s_per_channel])
+#     tiff_reshaped = np.array(tiff_reshaped)
+#     tiff_reshaped = np.swapaxes(tiff_reshaped, 0, 1)
+    
+#     return tiff_reshaped
+
+# def load(tiff_src, num_wav, num_z=None):
+    
+#     if type(num_wav) == float:
+#         num_wav = int(num_wav)
+#     elif type(num_wav) == str:
+#         num_wav = int(float(num_wav))
+#     elif type(num_wav) == int:
+#         pass
+#     else:
+#         raise Exception("The data type for num wav is set incorrectly.")
+        
+#     #Outputs tiff in (n, 2048, 2048)
+#     tiffarray = open_tiff_file(tiff_src)
+    
+#     #Outputs tiff in (z, ch, 2048, 2048)
+#     tiff_reshaped = reorganize_by_channel(tiffarray, num_wav)
+    
+#     return tiff_reshaped

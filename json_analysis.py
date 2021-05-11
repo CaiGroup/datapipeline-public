@@ -178,6 +178,8 @@ def run_analysis(json_name, position):
             pass
         elif 'non barcoded'== data['decoding']:
             analysis.set_non_barcoded_decoding_true()
+        elif 'lampfish' == data['decoding']:
+            analysis.set_lampfish_decoding_true()
         elif 'individual' in data['decoding'].keys(): 
             analysis.set_decoding_individual(data['decoding']['individual'])
     #----------------------------------------------------------  
