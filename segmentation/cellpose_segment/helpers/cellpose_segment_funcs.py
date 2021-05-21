@@ -9,22 +9,48 @@ from skimage.measure import regionprops_table
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import tifffile as tf
 import sys
 
 def get_plotted_assigned_genes(assigned_genes_csv_src, dst, label_img):
+    
+    #Plot labeled image
+    #-------------------------------------------------
     plt.figure(figsize=(20,20))
-    plt.imshow(label_img[:,:,label_img.shape[2]//2])
+    print(f'{label_img.shape=}')
+    label_img = np.swapaxes(label_img, 1, 2)
+    plt.imshow(label_img[label_img.shape[0]//2,:,:])
+    #-------------------------------------------------
+    
+    #Load Genes and get CellIDs
+    #-------------------------------------------------
     df_genes = pd.read_csv(assigned_genes_csv_src)
-    cellIDs = df_genes.cellID.unique()
+    cellIDs = list(df_genes.cellID.unique())
+    cellIDs.remove(0)
+    
+    #-------------------------------------------------
 
+    #Plot each cellID
+    #-------------------------------------------------
     for cell in cellIDs:
-        print(cell)
         df_genes_cell = df_genes[df_genes.cellID == cell]
         plt.xlim((0,2048))
         plt.ylim((0,2048))
         plt.scatter(list(df_genes_cell.x), list(df_genes_cell.y), s = 1)
+    #-------------------------------------------------
     
+    #Save figure
+    #-------------------------------------------------
+    print('File Path of Genes on Cells:', dst)
     plt.savefig(dst)
+    #-------------------------------------------------
+    
+if sys.argv[1] == 'debug_plotted_assigned_genes':
+    genes_csv = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv'
+    dst = 'foo/assigned.png'
+    labeled_img_src = '/home/nrezaee/temp/labeled_img_thresh_3.tif'
+    labeled_img = tf.imread(labeled_img_src)
+    get_plotted_assigned_genes(genes_csv, dst, labeled_img)
 
 def assign_to_cells(df_gene_list, label_img):
     """

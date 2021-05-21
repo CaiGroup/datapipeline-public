@@ -129,8 +129,8 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         #Visualize Dots
         #---------------------------------------------------------------------
         median_z = tiff.shape[0]//2
-        if bool_visualize_dots == True:# and channel == 1 and z == median_z:
-            get_visuals_3d(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name)
+        if bool_visualize_dots == True:# and z == median_z:
+            get_visuals_3d(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name, median_z)
         #---------------------------------------------------------------------
         
         #Shift Locations

@@ -20,7 +20,7 @@ H = [1 1 1 -1;]
 lat_thresh = 2
 
 #Set z thresh 2 for default
-z_thresh = 0.0
+z_thresh = 2
 cb_name = ARGS[2]
 cb = readdlm(cb_name, UInt8)
 
@@ -31,9 +31,9 @@ ndots = nrow(pnts)
 
 # Cost Parameters
 free_dot_cost = 5.0
-lat_var_factor = 112.0
-z_var_factor = 0.0
-lw_var_factor = 4.0
+lat_var_factor = parse(Float64, ARGS[4])
+z_var_factor = parse(Float64, ARGS[5])
+lw_var_factor = parse(Float64, ARGS[6])
 s_var_factor = 0.0
 erasure_penalty = 4.0
 
@@ -100,8 +100,7 @@ else
     ctrl = "w_neg_ctrl"
 end
 
-save_name = "decode_" * ctrl* "_lvf$lat_var_factor"*"_lwvf$lw_var_factor"*"dr$ndrops"*".csv"
-
+save_name = "decode_w_neg_ctrl_lvf112.0_lwvf4.0dr0.csv"
 dst_dir = ARGS[3]
 CSV.write(joinpath(dst_dir, save_name), save_df)
 

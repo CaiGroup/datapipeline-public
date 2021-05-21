@@ -11,29 +11,39 @@ import sys
 import json
 import sys
 from skimage.registration import phase_cross_correlation
-sys.path.insert(0,'/home/nrezaee/test_cronjob_multi_dot')
+sys.path.insert(0, os.getcwd())
+from decoding.lampfish_helpers.lampfish_funcs import get_hyb_dirs, get_loaded_tiff, get_3_by_3, get_pixels
 from load_tiff import tiffy
 
 def get_channel_offsets(tiff_dir, position, dst, num_wav):
-    glob_me = os.path.join(tiff_dir, '*', position)
-    tiff_dirs_dir = glob.glob(glob_me)
-    #print(f'{tiff_dirs_dir=}')
-    hyb_dirs = [hyb_dir for hyb_dir in tiff_dirs_dir if 'HybCycle_' in hyb_dir]
+    """
+    Get offset channel by channel 
+    """
+
+    #Get path for each hyb dir
+    #---------------------------------------------------------------
+    hyb_dirs = get_hyb_dirs(tiff_dir)
     print(f'{hyb_dirs=}')
+    #---------------------------------------------------------------
     
+    
+    #Get Offset for each hyb dir
+    #---------------------------------------------------------------
     offsets = {}
     for hyb_dir in hyb_dirs:
-        tiff_src = hyb_dir
-        tiff = tiffy.load(tiff_src, num_wav=num_wav)
-        shift, error, diffphase = phase_cross_correlation(tiff[0], tiff[1], upsample_factor = 100)
+        tiff_src = os.path.join(hyb_dir, position)
+        tiff = tiffy.load(tiff_src, num_wav=num_wav, num_z=1)
+        print(f'{tiff.shape=}')
+        shift, error, diffphase = phase_cross_correlation(tiff[:,0], tiff[:,1], upsample_factor = 100)
         print(f'{shift=}')
         offsets[tiff_src] = shift.tolist()
+    #---------------------------------------------------------------
         
-    
-    import json 
+    #Save Offsets
+    #---------------------------------------------------------------
     with open(dst, "w") as outfile: 
         json.dump(offsets, outfile)
-
+    #---------------------------------------------------------------
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -49,99 +59,81 @@ def plot_img(img, x_s,y_s,hyb):
         os.makedirs(temp_dir)
     plt.savefig(os.path.join(temp_dir, 'Hyb_' + str(hyb) +'.png'))
 
-def get_3_by_3(tiff_3d, df_locs, offset, hyb):
-    
-    #Add offset to points
-    intensity_3_by_3 = []
-    x_s = list(df_locs.x - offset[2])
-    y_s = list(df_locs.y - offset[1])
-    z_s = list(df_locs.z - offset[0]) 
-    ints = list(df_locs.int)
-    
-    #Get 3x3 of of points in ch1
-    for i in range(df_locs.shape[0]):
-        
-        if round(z_s[i])>=6:
-            square_3 = tiff_3d[5:7,round(y_s[i]-1):round(y_s[i]+2), round(x_s[i]-1):round(x_s[i]+2)]
-        elif round(z_s[i]) <= 1:
-            square_3 = tiff_3d[0:2,round(y_s[i]-1):round(y_s[i]+2), round(x_s[i]-1):round(x_s[i]+2)]
-        else:
-            square_3 = tiff_3d[round(z_s[i]-1):round(z_s[i]+2),round(y_s[i]-1):round(y_s[i]+2), round(x_s[i]-1):round(x_s[i]+2)]
-        
-        # print(f'{x_s[i]=}')
-        # print(f'{y_s[i]=}')
-        # print(f'{square_3.shape=}')
-        # print(f'{square_3=}')
-        # print(f'{ints[i]=}')
-        #(f'{i=}')
-        #assert  np.any(square_3 == ints[i]) or square_3.shape[0] ==0 or square_3.shape[1]==0
-        ave_square = np.sum(square_3)
-        #print(f'{ave_square=}')
-        intensity_3_by_3.append(ave_square)
-        
-    df_locs['sum_3x3_int_ch1'] = intensity_3_by_3
-    print(f'{hyb=}')
-    print('-------------------------------------------------')
-    df_locs['hyb'] = np.full((df_locs.shape[0]), hyb)
-    print(f'{df_locs.shape=}')
-    return df_locs
-    
-    
-def get_hyb_dirs(tiff_dir):
-    glob_me = os.path.join(tiff_dir, '*')
-    tiff_dirs_dir = glob.glob(glob_me)
-    print(f'{tiff_dirs_dir=}')
-    hyb_dirs = [hyb_dir for hyb_dir in tiff_dirs_dir if 'HybCycle_' in hyb_dir]
-    print(f'{hyb_dirs=}')
-    return hyb_dirs
-    
-def get_loaded_tiff(hyb_dirs, position, hyb, num_wav):
-    hyb_dir_list = [hyb_dir for hyb_dir in hyb_dirs if str(hyb) in hyb_dir.split(os.sep)[-1]]
-    assert len(hyb_dir_list) == 1
-    hyb_dir = hyb_dir_list[0]
-    tiff_src = os.path.join(hyb_dir, position)
-    tiff = tiffy.load(tiff_src, num_wav=num_wav)
-    return tiff, tiff_src
+
 #Set Position
-def get_ratio_first_channel(offsets_src, locations_src, tiff_dir, pos, dst, num_wav):
-    #Set Offset across Hybs
+def get_ratio_of_channels(offsets_src, channel_offset_src, locations_src, tiff_dir, pos, dst, num_wav, lampfish_pixel):
+    
+    #Get Offset across Hybs
+    #---------------------------------------------------------------
     with open(offsets_src) as json_file:
         offsets = json.load(json_file)
-       
-    #Set Locations csv
-    df_locs = pd.read_csv(locations_src)
-
-    #Get Hyb Dirs
-    hyb_dirs = get_hyb_dirs(tiff_dir)
+    #---------------------------------------------------------------
+    
+    #Get Offset across channels
+    #---------------------------------------------------------------
+    with open(channel_offset_src) as json_file:
+        offsets_ch = json.load(json_file)
+    #---------------------------------------------------------------
     
     #Get locations csv
+    #---------------------------------------------------------------
     df_locs = pd.read_csv(locations_src)
     print(f'{df_locs=}')
-    df_new_locs = pd.DataFrame(columns=['hyb', 'ch', 'x','y','z','int','sum_3x3_int_ch1'])
+    df_new_locs = pd.DataFrame(columns=['hyb', 'ch', 'x','y','z','int','sum_3x3_int_ch1', 'sum_3x3_int_ch2'])
+    #---------------------------------------------------------------
     
-    #Get Each Hyb
+    #Go through Each Hyb
+    #---------------------------------------------------------------
     position = 'MMStack_Pos' + str(pos) + '.ome.tif'
+    hyb_dirs = get_hyb_dirs(tiff_dir)
     for hyb in df_locs.hyb.unique():
         
-        #Get the Tiff src
-        # hyb_dir_list = [hyb_dir for hyb_dir in hyb_dirs if str(hyb) in hyb_dir.split(os.sep)[-1]]
-        # assert len(hyb_dir_list) == 1
-        # hyb_dir = hyb_dir_list[0]
-        # tiff_src = os.path.join(hyb_dir, position)
-        # tiff = tiffy.load(tiff_src, num_wav=3)    
+        #Load the tiff 
+        #---------------------------------------------------------------
         tiff, tiff_src = get_loaded_tiff(hyb_dirs, position, hyb, num_wav=num_wav)
+        tiff_ch1 = tiff[:,0,:,:]
+        tiff_ch2 = tiff[:,1,:,:]
+        #---------------------------------------------------------------
         
-        #Load tiff and get right dots and offset
-        tiff_ch = tiff[:,0,:,:]
+        #Get right locations and offset
+        #---------------------------------------------------------------
         df_hyb_ch = df_locs[(df_locs.hyb == df_locs.hyb.min()) & (df_locs.ch == 1)]
-        offset = offsets[(os.sep).join(tiff_src.split(os.sep)[-2:])]
+        offset_key = (os.sep).join(tiff_src.split(os.sep)[-2:])
+        offset = np.insert(np.array(offsets[offset_key]), 0, 0)
+        offset_ch = offset + np.array(offsets_ch[tiff_src])
+        print(f'{df_hyb_ch.shape=}')
+        #---------------------------------------------------------------
         
-        #Get the 3x3 of image
-        df_new_locs = df_new_locs.append(get_3_by_3(tiff_ch, df_hyb_ch, offset, hyb))
-        # print(f'{df_new_locs.columns=}')
+        #Remove Locations Outside tiff
+        #---------------------------------------------------------------
+        # df_hyb_ch = df_hyb_ch[(df_hyb_ch.z < tiff_ch1.shape[0]) & (df_hyb_ch.z > 0) & \
+        #                         (df_hyb_ch.x < tiff_ch1.shape[1]) & (df_hyb_ch.x > 0) & \
+        #                         (df_hyb_ch.y < tiff_ch1.shape[2]) & (df_hyb_ch.y > 0)]
+        print(f'{df_hyb_ch.shape=}')
+        #---------------------------------------------------------------
+        
+        
+        #Get the 3x3 column 
+        #---------------------------------------------------------------
+        if lampfish_pixel == True:
+            df_ch1 = get_pixels(tiff_ch1, df_hyb_ch, offset, hyb, new_col_name='sum_3x3_int_ch1' )
+            df_ch1_ch2 = get_pixels(tiff_ch2, df_ch1, offset_ch, hyb, new_col_name='sum_3x3_int_ch2' )
+        
+        else:
+            df_ch1 = get_3_by_3(tiff_ch1, df_hyb_ch, offset, hyb, new_col_name='sum_3x3_int_ch1' )
+            df_ch1_ch2 = get_3_by_3(tiff_ch2, df_ch1, offset_ch, hyb, new_col_name='sum_3x3_int_ch2' )
+ 
+        df_new_locs = df_new_locs.append(df_ch1_ch2)
         print(f'{df_new_locs.shape=}')
+        #---------------------------------------------------------------
         
+    #Save dataframe to csv
+    #---------------------------------------------------------------
     df_new_locs.to_csv(dst, index=False)
+    df_new_locs = pd.read_csv(dst)
+    df_new_locs['ratio'] = df_new_locs['sum_3x3_int_ch1'].astype(np.float64)/(df_new_locs['sum_3x3_int_ch2'] + df_new_locs['sum_3x3_int_ch1'])
+    df_new_locs.to_csv(dst, index=False)
+    #---------------------------------------------------------------
     
 if sys.argv[1] == 'debug_lampfish_ch1':
     pos = 0
@@ -153,10 +145,35 @@ if sys.argv[1] == 'debug_lampfish_ch1':
 elif sys.argv[1] == 'debug_lampfish_ch1_test1':
     pos = 0
     offsets_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/offsets.json'
+    channel_offset_src = '/home/nrezaee/test_cronjob_multi_dot/foo/test_decoding_class/lampfish_test/channel_offsets.json'
     locations_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/Dot_Locations/locations.csv'
     tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/test1'
-    get_ratio_first_channel(offsets_src, locations_src, tiff_dir, pos, dst='foo/lampfish_decoding__test_ch1.csv', num_wav=4)   
+    lampfish_pixel = True
+    get_ratio_of_channels(offsets_src, channel_offset_src, locations_src, tiff_dir, \
+                            pos, 'foo/lampfish_decoding.csv', 4, \
+                            lampfish_pixel)   
     
+elif sys.argv[1] == 'debug_lampfish_align':
+    get_channel_offsets(tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/5ratiometric_test_max_int', 
+                        position = 'MMStack_Pos0.ome.tif', 
+                        dst = 'foo/channel_offsets_test.csv', 
+                        num_wav = 3)
+    
+elif sys.argv[1] == 'debug_lampfish_max_int':
+    pos = 0
+    offsets_src = '/groups/CaiLab/analyses/nrezaee/5ratiometric_test_max_int/5ratio_all_pos_max_int_pos0/MMStack_Pos0/offsets.json'
+    channel_offset_src = '/groups/CaiLab/analyses/nrezaee/5ratiometric_test_max_int/5ratio_all_pos_max_int_pos0/MMStack_Pos0/Decoded/channel_offsets.json'
+    locations_src = '/groups/CaiLab/analyses/nrezaee/5ratiometric_test_max_int/5ratio_all_pos_max_int_pos0/MMStack_Pos0/Dot_Locations/locations.csv'
+    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/5ratiometric_test_max_int/'
+    lampfish_pixel = True
+    get_ratio_of_channels(offsets_src, 
+                        channel_offset_src, 
+                        locations_src, 
+                        tiff_dir, 
+                        pos, 
+                        'foo/lampfish_decoding.csv', 
+                        3, \
+                        lampfish_pixel)   
 
 
         

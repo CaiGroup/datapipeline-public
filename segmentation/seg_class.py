@@ -29,7 +29,7 @@ class Segmentation:
     def __init__(self, data_dir, position, seg_dir, decoded_dir, locations_dir, barcode_dst, barcode_src, \
                     bool_fake_barcodes, bool_decoding_individual, num_z_slices, seg_type, seg_data_dir, dimensions, num_zslices, \
                     labeled_img, edge_dist, dist_between_nuclei, bool_cyto_match, area_tol, cyto_channel_num, \
-                    get_nuclei_img, get_cyto_img, num_wav):
+                    get_nuclei_img, get_cyto_img, num_wav, nuclei_radius):
 
         self.data_dir = data_dir
         self.position = position
@@ -56,6 +56,7 @@ class Segmentation:
         self.get_cyto_img = get_cyto_img
         self.labeled_img = labeled_img
         self.num_wav = num_wav
+        self.nuclei_radius = nuclei_radius
         
     def combine_seg_z_s(seg_channel_dir):
     
@@ -212,10 +213,11 @@ class Segmentation:
         #----------------------------------------------
         
         label_img_path = save_labeled_img(self.data_dir, self.seg_dir, self.position, self.edge_dist, self.dist_between_nuclei,  \
-            self.bool_cyto_match, self.area_tol, self.cyto_channel_num, self.get_nuclei_img, self.get_cyto_img, self.num_wav)
+            self.bool_cyto_match, self.area_tol, self.cyto_channel_num, self.get_nuclei_img, self.get_cyto_img, self.num_wav, \
+            self.nuclei_radius, self.num_zslices)
         
         print(f'{label_img_path=}')
-        # get_label_img_visuals(label_img_path, self.data_dir, self.position)
+        get_label_img_visuals(label_img_path, self.data_dir, self.position, self.num_wav)
         
         labeled_img = tf.imread(label_img_path)
         

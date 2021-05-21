@@ -57,11 +57,7 @@ def plot_and_save_locations_3d(img_array, locations, dest,z):
     
     plt.figure(figsize=(40,40))
     plt.imshow(np.log(img_array), cmap='gray')
-    print(f'{locations=}')
     locations_2d = locations[((locations[:,2] - 1) < z) & ((locations[:,2] + 1) > z)]
-    np.save('foo/locations.npy', locations)
-    print(f'{z=}')
-    print(f'{locations_2d=}')
     plt.scatter(np.array(locations_2d[:,0] - .5), np.array(locations_2d[:,1]) -.5 , facecolors='none', edgecolors='y', s=20, alpha=.35)
     print(f'{dest=}')
     plt.savefig(dest)

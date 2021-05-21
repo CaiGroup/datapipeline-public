@@ -2,6 +2,7 @@ import numpy as np
 from skimage.feature import blob_log
 import matplotlib.pyplot as plt
 import os
+import pandas as pd
 
 import sys
 sys.path.append(os.getcwd())
@@ -9,6 +10,20 @@ from load_tiff import tiffy
 import numpy as np
 import cv2
 
+def save_strictnesses(threshs, cumul_of_dots, thresh, df_dst):
+    df = pd.DataFrame(list(zip(cumul_of_dots, threshs)),
+               columns =['cumulative number of dots', 'threshold'])
+    
+    print(f'{df=}')
+    index_of_thresh = df[df.threshold == thresh].index[0]
+    strictnesses = list(range(index_of_thresh - df.shape[0], index_of_thresh))
+    strictnesses.reverse()
+    df['strictness'] = np.array(strictnesses) +1
+    
+    df.to_csv(df_dst, index=False)
+    
+    return df
+    
 def blur_back_subtract(tiff_2d, num_tiles):
     blur_kernel  = tuple(np.array(tiff_2d.shape)//num_tiles)
     blurry_img = cv2.blur(tiff_2d,blur_kernel)
@@ -51,7 +66,12 @@ def get_hist(intense, strictness, hist_png_path, num_bins):
     print(f'{len(intense)=}')
     bins = np.arange(np.min(intense), np.max(intense), (np.max(intense) - np.min(intense))/num_bins)
     y, x, ignore = plt.hist(intense, bins=bins, cumulative=-1)
+    
     thresh = match_thresh_to_diff_stricter(y, x, strictness)
+    
+    strict_dst =  os.path.join(os.path.dirname(hist_png_path), 'strictnesses.csv')
+    save_strictnesses(x, y, thresh, strict_dst) 
+    print(f'{thresh=}')
     plt.axvline(x=thresh, color='r')
     print(f'{hist_png_path=}')
     
@@ -125,14 +145,13 @@ def remove_unneeded_intensities(intensities, percent_remove, num_bins):
         return threshed, x[i]
     else:
         return intensities, None
-
-def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, dot_radius, threshold, radius_step, num_radii):
-    nbins = float(nbins)
-    #tiff_3d = preprocess_img(tiff_3d)
-    print(f'{dot_radius=}')
-    print(f'{radius_step=}')
-    print(f'{threshold=}')
-    print(f'{num_radii=}')
+        
+def get_laplacian_params(num_radii, dot_radius, radius_step):
+    
+    # print(f'{dot_radius=}')
+    # print(f'{radius_step=}')
+    # print(f'{threshold=}')
+    # print(f'{num_radii=}')
     if num_radii == 2:
         max_radius = dot_radius + radius_step
         min_radius = dot_radius
@@ -143,14 +162,16 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, d
         max_radius = dot_radius + (radius_step)* num_radii
         min_radius = dot_radius
         
-    res = blob_log(tiff_3d, min_sigma =min_radius, max_sigma =max_radius, num_sigma =num_radii, threshold = threshold)
-    #elsy's data dot_radius of .5, threshold of .001
-    points = res[:,:3]
-
+    return num_radii, min_radius, max_radius
+    
+def get_intensities(points, tiff_3d):
     intensities = []
     for i in range(len(points)):
         intensities.append(tiff_3d[int(points[i,0]), int(points[i,1]), int(points[i,2])])
-        
+    
+    return intensities
+    
+def get_hist_png_path(tiff_src, analysis_name):
     tiff_split = tiff_src.split(os.sep)
     personal = tiff_split[4]
     exp_name = tiff_split[6]
@@ -176,9 +197,24 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, d
     
     hist_png_path = os.path.join(hist_png_dir, hyb + '_' + 'Jump.png')
     
+    return hist_png_path
+    
+
+def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, dot_radius, threshold, radius_step, num_radii):
+    nbins = float(nbins)
+    #tiff_3d = preprocess_img(tiff_3d)
+    
+    num_radii, min_radius, max_radius = get_laplacian_params(num_radii, dot_radius, radius_step)
+        
+    res = blob_log(tiff_3d, min_sigma =min_radius, max_sigma =max_radius, num_sigma =num_radii, threshold = threshold, overlap=0)
+    #elsy's data dot_radius of .5, threshold of .001
+    points = res[:,:3]
+    intensities = get_intensities(points, tiff_3d)
+        
+    hist_png_path = get_hist_png_path(tiff_src, analysis_name)
+    
     dot_analysis = [points, intensities]
-    #print(f'{intensities=}')
-    #print(f'{intensities.shape=}')
+
     if len(intensities) > float(nbins):
         intensities, reverse_threshold = remove_unneeded_intensities(intensities, percent_remove=.01, num_bins=nbins)
         y, x, thresh = get_hist(intensities, strictness, hist_png_path, num_bins=nbins)
@@ -193,10 +229,10 @@ import sys
 if sys.argv[1] == 'debug_jump_helper':
     import tifffile as tf
     
-    tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_1/HybCycle_9/MMStack_Pos0.ome.tif'
-    tiff_3d = tiffy.load(tiff_src, num_wav=3,num_z=None)[:,0]
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_9/MMStack_Pos0.ome.tif'
+    tiff_3d = tiffy.load(tiff_src, num_wav=4,num_z=None)[:,0]
     strictness= 5
-    analysis_name = 'michal_decoding_top'
+    analysis_name = 'linus_decoding'
     print(f'{tiff_3d.shape=}')
     num_bins=100
     dot_radius=1

@@ -178,8 +178,10 @@ def run_analysis(json_name, position):
             pass
         elif 'non barcoded'== data['decoding']:
             analysis.set_non_barcoded_decoding_true()
-        elif 'lampfish' == data['decoding']:
+        elif 'lampfish' in data['decoding']:
             analysis.set_lampfish_decoding_true()
+            if 'pixel' in data['decoding']:
+                analysis.set_lampfish_pixel_decoding_true()
         elif 'individual' in data['decoding'].keys(): 
             analysis.set_decoding_individual(data['decoding']['individual'])
     #----------------------------------------------------------  
@@ -427,6 +429,13 @@ def run_analysis(json_name, position):
     if 'decoding method' in data.keys():
         if data['decoding method'] == 'syndrome':
             analysis.set_syndrome_decoding_true()
+    #----------------------------------------------------------
+    
+    #Cellpose Radius
+    #----------------------------------------------------
+    if 'nuclei radius' in data.keys():
+        if data['nuclei radius'] != 'none':
+            analysis.set_nuclei_radius_arg(data['nuclei radius'])
     #----------------------------------------------------------
     
     #Writ

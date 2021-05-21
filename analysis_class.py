@@ -139,6 +139,8 @@ class Analysis:
         self.debug_dot_detection = False
         self.synd_decoding = False
         self.lampfish_decoding = False
+        self.lampfish_pixel = False
+        self.nuclei_radius = 0
         #--------------------------------------------------------------
         
         
@@ -393,6 +395,15 @@ class Analysis:
     def set_lampfish_decoding_true(self):
         self.lampfish_decoding = True
         print("    Set Lampfish Decoding to True")
+
+    def set_lampfish_pixel_decoding_true(self):
+        self.lampfish_pixel = True
+        print("    Set Lampfish Pixel Decoding to True")
+        
+    def set_nuclei_radius_arg(self, nuclei_radius):
+        self.nuclei_radius = float(nuclei_radius)
+        
+        print("    Set Nuclei Radius to", str(self.nuclei_radius))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -492,11 +503,22 @@ class Analysis:
         #Declare Segmentation
         #--------------------------------------------------------------------------------
         if self.segmentation != False:
+            #Get Number of Z slices
+            #--------------------------------------------------------------------------------
+            subdirs = os.listdir(self.data_dir)
+            hyb_dirs = [sub_dir for sub_dir in subdirs if 'Hyb' in sub_dir]         
+            assert len(hyb_dirs) > 0, "There are not HybCycle Directories in the experiment directory."
+            hyb_dir = hyb_dirs[0]
+            sample_tiff_src = os.path.join(self.data_dir, hyb_dir, self.position)
+            sample_tiff = tiffy.load(sample_tiff_src, self.num_wav, self.num_z)
+            num_zslices = sample_tiff.shape[0]
+            #--------------------------------------------------------------------------------
+            
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Segmentation')
             segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
-                        self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
+                        self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, num_zslices, \
                         self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
-                        self.get_nuclei_seg, self.get_cyto_seg, self.num_wav)
+                        self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius)
         
             self.labeled_img = segmenter.retrieve_labeled_img()
             print('Shape after Seg in Analysis Class: ' +  str(self.labeled_img.shape))
@@ -607,7 +629,7 @@ class Analysis:
             decoder = Decoding(self.data_dir, self.position, self.decoded_dir, self.locations_dir, self.position_dir, self.barcode_dst, \
                 self.barcode_key_src, self.decoding_with_previous_dots, self.decoding_with_previous_locations, self.fake_barcodes, \
                 self.decoding_individual, self.min_seeds, self.allowed_diff, self.dimensions, self.num_zslices, self.segmentation, \
-                self.decode_only_cells, self.labeled_img, self.num_wav, self.synd_decoding)
+                self.decode_only_cells, self.labeled_img, self.num_wav, self.synd_decoding, self.lampfish_pixel)
         #--------------------------------------------------------------------------------
         
         
@@ -699,7 +721,7 @@ class Analysis:
             segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
                 self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
                 self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
-                self.get_nuclei_seg, self.get_cyto_seg, self.num_wav)
+                self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius)
                 
             print(f'{self.labeled_img.shape=}')
             if self.decoding_across == True or \
@@ -767,7 +789,7 @@ class Analysis:
             
             if not self.decoding_individual == 'all':
                 for channel in self.decoding_individual:
-                    comb_pos_genes(self.analysis_dir, channel)
+                    combine_pos_genes(self.analysis_dir, channel)
             
         
             send_analysis_to_onedrive(self.analysis_dir)

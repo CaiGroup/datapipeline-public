@@ -2,6 +2,7 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 def get_ratio_visualization(locs_src, dst):
     
@@ -12,3 +13,7 @@ def get_ratio_visualization(locs_src, dst):
     plt.figure()
     sns.histplot(data=df_locs, x="ratio", hue="hyb",bins=300).set_title('Ratio')
     plt.savefig(dst)
+    
+if sys.argv[1] == 'debug_ratio_vis':
+    get_ratio_visualization(locs_src = 'foo/lampfish_decoding.csv',
+                            dst= 'foo/ratio_visual.png')

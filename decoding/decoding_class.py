@@ -36,7 +36,8 @@ class Decoding:
     def __init__(self, data_dir, position, decoded_dir, locations_dir, position_dir, barcode_dst, barcode_src, \
                     bool_decoding_with_previous_dots, bool_decoding_with_previous_locations, \
                     bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions, \
-                    num_zslices, segmentation, decode_only_cells, labeled_img, num_wav, synd_decoding):
+                    num_zslices, segmentation, decode_only_cells, labeled_img, num_wav, synd_decoding, \
+                    lampfish_pixel):
         
         self.data_dir = data_dir
         self.position = position
@@ -58,6 +59,7 @@ class Decoding:
         self.labeled_img = labeled_img
         self.num_wav = num_wav
         self.synd_decoding = synd_decoding
+        self.lampfish_pixel = lampfish_pixel
          
     def labeled_img_from_tiff_dir(self):
         glob_me = os.path.join(self.data_dir, '*')
@@ -589,12 +591,7 @@ class Decoding:
         #--------------------------------------------------------------------
         os.makedirs(self.decoded_dir, exist_ok=True)
         pos = int(self.position.split('MMStack_Pos')[1].split('.ome.tif')[0])
-        ch1_locs_dst = os.path.join(self.decoded_dir, 'lampfish_ratio_results_just_ch1.csv')
-        #--------------------------------------------------------------------
-
-        #Get first channel
-        #--------------------------------------------------------------------
-        lampfish.get_ratio_first_channel(offsets_path, locations_path, self.data_dir, pos, ch1_locs_dst, self.num_wav)
+        ratio_locs_dst = os.path.join(self.decoded_dir, 'lampfish_ratio_results.csv')
         #--------------------------------------------------------------------
 
         #Get Channel Offsets
@@ -603,16 +600,16 @@ class Decoding:
         lampfish.get_channel_offsets(self.data_dir, self.position, channel_offsets_dst, self.num_wav)
         #--------------------------------------------------------------------
         
-        #Get Second channel
+        #Get first channel
         #--------------------------------------------------------------------
-        ch2_locs_dst = os.path.join(self.decoded_dir, 'lampfish_ratio_result.csv')
-        lampfish_ch2.get_ratio_second_channel(offsets_path, channel_offsets_dst, ch1_locs_dst, self.data_dir, pos, ch2_locs_dst, self.num_wav)
+        lampfish.get_ratio_of_channels(offsets_path, channel_offsets_dst, locations_path, self.data_dir, pos, \
+                                        ratio_locs_dst, self.num_wav, self.lampfish_pixel)
         #--------------------------------------------------------------------
 
         #Get Analytics
         #--------------------------------------------------------------------
         ratio_visual_dst = os.path.join(self.decoded_dir, 'lampfish_ratio_visual.png')
-        lampfish_analytics.get_ratio_visualization(ch2_locs_dst, ratio_visual_dst)
+        lampfish_analytics.get_ratio_visualization(ratio_locs_dst, ratio_visual_dst)
         #--------------------------------------------------------------------
 
 if sys.argv[1] == 'debug_decoding_class_synd':
@@ -686,7 +683,8 @@ elif sys.argv[1] == 'debug_decoding_class_lampfish_test':
                         decode_only_cells = True, 
                         labeled_img = None, 
                         num_wav = 4, 
-                        synd_decoding = True)
+                        synd_decoding = True, 
+                        lampfish_pixel=False)
                         #lampfish_decoding = True)
     print('Made Decoding Class')
     
