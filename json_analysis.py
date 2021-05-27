@@ -438,6 +438,20 @@ def run_analysis(json_name, position):
             analysis.set_nuclei_radius_arg(data['nuclei radius'])
     #----------------------------------------------------------
     
+    #Cellpose Cell Prob Threshold
+    #----------------------------------------------------
+    if 'cell prob threshold' in data.keys():
+        if data['cell prob threshold'] != 'none':
+            analysis.set_cell_prob_threshold_arg(data['cell prob threshold'])
+    #----------------------------------------------------------
+    
+    #Cellpose Cell Prob Threshold
+    #----------------------------------------------------
+    if 'flow threshold' in data.keys():
+        if data['flow threshold'] != 'none':
+            analysis.set_flow_threshold_arg(data['flow threshold'])
+    #----------------------------------------------------------
+    
     #Writ
     #----------------------------------------------------------
     analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)

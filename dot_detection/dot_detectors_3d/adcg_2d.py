@@ -77,7 +77,7 @@ def get_adcg_dots(tiff_2d):
     
     adcg_wrap_path = os.path.join(os.getcwd(), 'dot_detection/dot_detectors_3d/adcg', 'adcg_wrapper.sh')
     
-    cmd = 'sbatch --wait ' + adcg_wrap_path + ' ' + tiff_txt_path + ' ' + locs_result_path
+    cmd = 'sbatch --wait ' + adcg_wrap_path + ' ' + tiff_txt_path + ' ' + locs_result_path + ' --output ' + str(os.path.dirname(locs_result_path))
     print(f'{cmd=}')
     
     os.system(cmd)
@@ -235,13 +235,13 @@ if sys.argv[1] != 'debug_adcg':
                           
 else:                        
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_1/MMStack_Pos0.ome.tif'
-    offset = [1,1]
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_10/MMStack_Pos0.ome.tif'
+    offset = [0,0]
     channels = [1]
     analysis_name = 'linus_decoding'
     rand_dir = '/home/nrezaee/temp'
     visualize_dots = True
-    z_slice = 0
+    z_slice = 1
     get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, False, False, channels, False, 4, z_slice, rand_dir)
     
     

@@ -68,17 +68,32 @@ def save_shrinked(shrinked):
     
     return rand_list, rand_dir, dapi_tiff_dst
     
-def submit_seg_job(rand_dir, rand_list, num_z, nuclei_radius):
+def submit_seg_job(rand_dir, rand_list, num_z, nuclei_radius, flow_threshold, cell_prob_threshold):
     
     print("Running Segmentation with SLURM GPU's")
+
+    
+    #Set Cellpose Parameters
+    #---------------------------------------------------------------------------
+    diameter_param = ' --diameter ' + str(float(nuclei_radius)*2)
+    flow_thresh_param = ' --flow_threshold ' + str(flow_threshold)
+    cell_prob_thresh_param = ' --cellprob_threshold ' + str(cell_prob_threshold)
+    #---------------------------------------------------------------------------
+    
+    #Set command and default params
+    #---------------------------------------------------------------------------
+    sing_and_cellpose_cmd = 'singularity  exec --bind /central/scratch/$USER --nv /groups/CaiLab/personal/nrezaee/tensorflow-20.02-tf1-py3.sif python -m cellpose '
+    default_params = ' --img_filter dapi_channel --pretrained_model cyto --use_gpu --no_npy --save_tif --dir '
+    #---------------------------------------------------------------------------
     
     #Determine whether or not to run 2d or 3d segmentation
     #---------------------------------------------------------------------------
-    diameter = str(float(nuclei_radius)*2)
     if num_z >= 4:
-        command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /groups/CaiLab/personal/nrezaee/tensorflow-20.02-tf1-py3.sif python -m cellpose  --do_3D --img_filter dapi_channel --pretrained_model cyto --diameter ' + diameter + ' --use_gpu --no_npy --save_tif --dir '
+        command_for_cellpose= sing_and_cellpose_cmd + ' --do_3D' + diameter_param + flow_thresh_param + \
+                            cell_prob_thresh_param + default_params
     if num_z < 4:
-        command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /groups/CaiLab/personal/nrezaee/tensorflow-20.02-tf1-py3.sif python -m cellpose   --img_filter dapi_channel --pretrained_model cyto --diameter ' + diameter + ' --use_gpu --no_npy --save_tif --dir '
+        command_for_cellpose= sing_and_cellpose_cmd + diameter_param + flow_thresh_param + \
+                            cell_prob_thresh_param + default_params
     #---------------------------------------------------------------------------
     
     #Make cellpose command
@@ -132,7 +147,7 @@ def get_3d_from_2d(src, num_z):
     tf.imwrite(src, tiff_3d)
     #---------------------------------------------------------------------------
     
-def get_labeled_img_cellpose(tiff_path, num_wav, dst=None, nuclei_radius=0):
+def get_labeled_img_cellpose(tiff_path, num_wav, dst=None, nuclei_radius=0, flow_threshold =.4, cell_prob_threshold=0):
 
 
     #Getting Tiff
@@ -154,7 +169,7 @@ def get_labeled_img_cellpose(tiff_path, num_wav, dst=None, nuclei_radius=0):
     #Submit job and wait for it to finish
     #---------------------------------------------------------------------------
     num_z = len(shrinked)
-    submit_seg_job(rand_dir, rand_list, num_z, nuclei_radius)
+    submit_seg_job(rand_dir, rand_list, num_z, nuclei_radius, flow_threshold, cell_prob_threshold)
 
     while not are_jobs_finished(rand_list):
         print('Waiting for Segmenation to Finish')

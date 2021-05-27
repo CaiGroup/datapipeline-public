@@ -19,6 +19,7 @@ import warnings
 import glob
 import numpy as np
 import pandas as pd
+import re
 from helpers.excel2dict import get_dict_from_excel
 
 
@@ -32,19 +33,32 @@ def Diff(li1, li2):
     return (list(list(set(li1)-set(li2)) + list(set(li2)-set(li1))))
     
 def get_specific_positions(spec_positions, positions):
-    spec_positions = spec_positions.replace(" ", "").split(',')
-    while '' in spec_positions: spec_positions.remove('')
-    print(f'{spec_positions=}')
-    spec_positions = [str(int(float(spec_position))) for spec_position in spec_positions]
-
-    new_positions = []
+    """
+    Inputs:
+        spec_postions: list of numbers
+        positions: list of MMStack_Pos{n}.ome.tif's
+    Outpus:
+        list of MMStack_Pos{n}.ome.tif's in spec_positions
+    """
     
+    
+    #Split positions to get position numbers
+    positions_split = [re.split('Pos|,|.ome.tif', position) 
+                       for position in positions]
+    
+    #Check if position number in .ome.tif's and add to list
+    spec_positions_split = []
     for spec_position in spec_positions:
-        new_positions.append([position for position in positions \
-                     if spec_position in position][0])
-        
+        for position_split in positions_split:
+            if spec_position in position_split:
+                print(f'{position_split=}')
+                spec_positions_split.append(position_split)
     
-    return new_positions
+    #Combine splitted positions
+    result_positions = [spec_position_split[0] + 'Pos' + spec_position_split[1] \
+                    + '.ome.tif' for spec_position_split in spec_positions_split]
+    
+    return result_positions
     
 
 
@@ -188,11 +202,13 @@ def hasNumbers(inputString):
     
 def get_positions_in_data(data, main_dir):
 
+    #Get single position
+    #----------------------------------------------------------
     if 'decoding with previous locations variable' in data.keys():
         if data['decoding with previous locations variable'] == 'true':
             
             positions = ['MMStack_Pos0.ome.tif']
-            
+
     else:
         
         exp_dir = os.path.join(main_dir, "personal", data["personal"], "raw", data["experiment_name"])
@@ -285,7 +301,7 @@ def get_slurm_params(json_name, data, position):
         time = data['clusters']["time"]
         
     else:
-        time = '05:00:00'
+        time = '10:00:00'
         
     print("    time:", time, flush=True)
 

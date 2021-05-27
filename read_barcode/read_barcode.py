@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import tempfile
 import sys
+from read_barcode.make_off_barcodes import get_off_barcodes
 
 def combine_barcodes(barcode_src1, barcode_src2):
     
@@ -29,10 +30,12 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
     
     
     print(f'{bool_fake_barcodes=}')
+    
     #Fake Barcodes
     #------------------------------------------------------------------
     if bool_fake_barcodes == True:
         
+        #Get Off barcodes
         #------------------------------------------------------------------
         barcode_key_dir = os.path.dirname(barcode_src)
         
@@ -40,13 +43,21 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
         if os.path.basename(barcode_src) == 'barcode.csv':
             fake_barcodes_path = os.path.join(barcode_key_dir, 'fake_barcode.csv')
         elif 'channel' in os.path.basename(barcode_src):
-            fake_barcode_file =  os.path.basename(barcode_src).split('.')[0] + '_fake.csv'
-            fake_barcodes_path = os.path.join(barcode_key_dir, fake_barcode_file)
+            fake_barcode_path =  os.path.basename(barcode_src).split('.')[0] + '_fake.csv'
+            fake_barcodes_path = os.path.join(barcode_key_dir, fake_barcode_path)
         else:
             raise Exception("The barcode source is wrong.")
         #------------------------------------------------------------------
         
+        #Create off barcodes if they dont exist
+        #------------------------------------------------------------------
+        print(f'{fake_barcodes_path=}')
+        if not os.path.exists(fake_barcodes_path):
+            get_off_barcodes(barcode_src, fake_barcodes_path)
+        #------------------------------------------------------------------
         
+        
+        #Combine On And Off Barcodes
         #------------------------------------------------------------------
         df_combined_barcodes = combine_barcodes(barcode_src, fake_barcodes_path) 
         
@@ -94,9 +105,9 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
 
 if sys.argv[1] == 'debug_add_fakes':
     
-    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/sim_dots_non_uni/barcode_key/channel_1.csv'
+    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/test1-big/barcode_key/channel_2.csv'
     barcode_dst = '/groups/CaiLab/personal/nrezaee/raw/sim_dots_non_uni/barcode_key/channel_1.mat'
-    bool_fake_barcodes = False
+    bool_fake_barcodes = True
     
     read_barcode(barcode_src, barcode_dst, bool_fake_barcodes)
     

@@ -208,11 +208,26 @@ if sys.argv[1] != 'debug_matlab_3d':
         
 else:
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei-misaligned/HybCycle_1/MMStack_Pos0.ome.tif'
-    offset = [3,4]
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_1/MMStack_Pos0.ome.tif'
+    offset = [0,0]
     channels = [1]
     analysis_name = 'takei_align'
+    visualize_dots = True
+    back_sub = False
+    chromatic = False
+    gaussian = False
+    rad_center = False
+    strictness = 5
+    z_slices = None
+    nbins= 100
+    threshold= 300
+    num_wav = 4
     rand_dir = '/home/nrezaee/temp'
-    radial_center = False
-    get_dots_for_tiff(tiff_src, offset, analysis_name, True, False, channels, False, False, radial_center, 0, None, 10, \
-                    300, 2, rand_dir)
+    get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, back_sub, channels, \
+                    chromatic, gaussian, rad_center, strictness, z_slices, nbins, \
+                    threshold, num_wav, rand_dir)
+                    
+                    
+                    
+                    
+                    

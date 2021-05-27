@@ -73,7 +73,7 @@ def get_debug():
     
     
 def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cyto_channel_num, get_nuclei_img, \
-                     get_cyto_img, num_wav, nuclei_radius, num_z):
+                     get_cyto_img, num_wav, nuclei_radius, num_z, flow_threshold, cell_prob_threshold):
     
     #Get the cytoplasm labeled image if bool cyto match is true
     #-------------------------------------------------------------
@@ -101,7 +101,7 @@ def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cy
             #-------------------------------------------------------------
             if get_nuclei_img == True:
                 labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
-                label_img = get_labeled_img_cellpose(tiff_for_segment, dst = labeled_img_path, num_wav = num_wav, nuclei_radius=nuclei_radius)
+                label_img = get_labeled_img_cellpose(tiff_for_segment, num_wav, labeled_img_path, nuclei_radius, flow_threshold, cell_prob_threshold)
             else:
                 labeled_img_path = None
             #-------------------------------------------------------------
@@ -218,7 +218,8 @@ def post_process(edge_delete_dist, dist_between_nuclei, label_img_src, labeled_c
         
     
 def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist, dist_between_nuclei, bool_cyto_match, \
-        area_tol, cyto_channel_num, get_nuclei_img, get_cyto_img, num_wav, nuclei_radius, num_z, debug = False):
+        area_tol, cyto_channel_num, get_nuclei_img, get_cyto_img, num_wav, nuclei_radius, num_z, flow_threshold, 
+        cell_prob_threshold, debug = False):
     
     #Get Post Process Dir and tiff
     #-------------------------------------------------------------
@@ -238,7 +239,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     else:
         labeled_img_path, labeled_cyto_path = get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, \
                                                 cyto_channel_num, get_nuclei_img, get_cyto_img, num_wav, nuclei_radius, \
-                                                num_z)
+                                                num_z, flow_threshold, cell_prob_threshold)
     #-------------------------------------------------------------
     
     
@@ -272,7 +273,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     
 if sys.argv[1] == 'debug_post':
     print('=---------------------------------------')
-    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/2021_0512_mouse_hydrogel/'
+    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/'
     segment_results_path = '/home/nrezaee/temp2'
     position  = 'MMStack_Pos0.ome.tif'
     edge = 0
@@ -286,8 +287,11 @@ if sys.argv[1] == 'debug_post':
     num_z=3
     num_wav=4
     nuclei_radius = 0
+    cell_prob_threshold= .5
+    flow_threshold = .5
     save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol, \
-                cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, debug=debug)
+                cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold, cell_prob_threshold, 
+                debug=debug)
 
     
     

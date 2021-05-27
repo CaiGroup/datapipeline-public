@@ -152,17 +152,35 @@ def false_pos_rate_across_z(df, dst):
         save_to_file_z(num_reals_z, num_fakes_z, ratio_z, z, dst)
         
 def get_off_on_visuals(decoded_genes_src, dst):
+    """
+    Input:
+        gene_locations_assigned_to_cell.csv
+        dst
+    
+    Output:
+        Save png file with visuals of on and off
+    
+    """
+    #Read csv file and get real and fake ids
+    #------------------------------------------------------
     df = pd.read_csv(decoded_genes_src)
     fake_ids = [ gene for gene in df.gene if 'fake' in gene]
     real_ids = [ gene for gene in df.gene if 'fake' not in gene]
-
+    #------------------------------------------------------
+    
+    #Get fake and real df's
+    #------------------------------------------------------
     df_fake = df[df.gene.isin(fake_ids)]
     df_real = df[df.gene.isin(real_ids)]
+    #------------------------------------------------------
     
+    #Plot fakes and real's
+    #------------------------------------------------------
     plt.figure(figsize=(30,30))
     plt.scatter(df_fake.x, df_fake.y, s=1, color='red')
     plt.scatter(df_real.x, df_real.y, s=.3, color='blue')
     plt.savefig(dst)
+    
         
 def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, on_barcode_src, off_barcode_src, dst, upto = None):
     

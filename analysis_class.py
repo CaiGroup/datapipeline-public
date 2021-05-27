@@ -8,10 +8,15 @@ import logging
 import time
 from datetime import datetime
 from load_tiff import tiffy
+
+#Import things to be done after all positions
+#-----------------------------------------------------
 from helpers.send_email_notif import send_finished_notif, are_logs_finished
 from helpers.combine_all_pos_locs import combine_locs_csv_s
 from helpers.combine_decoded_genes_all_pos import combine_pos_genes
 from helpers.sync_specific_analysis import send_analysis_to_onedrive
+from helpers.get_correlation_plots import get_correlated_positions
+#-----------------------------------------------------
 
 #Alignment Scripts
 #----------------------------
@@ -141,6 +146,8 @@ class Analysis:
         self.lampfish_decoding = False
         self.lampfish_pixel = False
         self.nuclei_radius = 0
+        self.cell_prob_threshold = 0
+        self.flow_threshold = .4
         #--------------------------------------------------------------
         
         
@@ -404,6 +411,16 @@ class Analysis:
         self.nuclei_radius = float(nuclei_radius)
         
         print("    Set Nuclei Radius to", str(self.nuclei_radius))
+        
+    def set_flow_threshold_arg(self, flow_threshold):
+        self.flow_threshold = float(flow_threshold)
+        
+        print("    Set Flow Probability Threshold to", str(self.nuclei_radius))
+        
+    def set_cell_prob_threshold_arg(self, cell_prob_threshold):
+        self.cell_prob_threshold = float(cell_prob_threshold)
+        
+        print("    Set Cell Probabiliy Threshold to", str(self.cell_prob_threshold))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -518,7 +535,7 @@ class Analysis:
             segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
                         self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, num_zslices, \
                         self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
-                        self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius)
+                        self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold )
         
             self.labeled_img = segmenter.retrieve_labeled_img()
             print('Shape after Seg in Analysis Class: ' +  str(self.labeled_img.shape))
@@ -721,7 +738,7 @@ class Analysis:
             segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
                 self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
                 self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
-                self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius)
+                self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold )
                 
             print(f'{self.labeled_img.shape=}')
             if self.decoding_across == True or \
@@ -775,24 +792,38 @@ class Analysis:
             timer_tools.logg_elapsed_time(self.start_time, 'Ending False Positive Rate')
         #--------------------------------------------------------------------------------
         
-        
+        #Label analysis as finished 
+        #--------------------------------------------------------------------------------
         timer_tools.logg_elapsed_time(self.start_time, 'Finished with Analysis of Position')
+        #--------------------------------------------------------------------------------
         
+        
+        #Send email for finished analysis
+        #--------------------------------------------------------------------------------
         print(f'{self.email=}')
         if self.email != 'none':
             send_finished_notif(self.analysis_dir, self.email)
+        #--------------------------------------------------------------------------------
             
+        #Check if all positions are finished
+        #--------------------------------------------------------------------------------
         if are_logs_finished(self.analysis_dir):
             
+            #Combine all dots
             if self.dot_detection != False:
                 combine_locs_csv_s(self.analysis_dir)
             
+            #Combine all decoded genes
             if not self.decoding_individual == 'all':
                 for channel in self.decoding_individual:
                     combine_pos_genes(self.analysis_dir, channel)
-            
-        
-            send_analysis_to_onedrive(self.analysis_dir)
+                
+                #Get pearson correlation of positions
+                get_correlated_positions
+        #--------------------------------------------------------------------------------
+                    
+        #Send Analysis to onedrive    
+        send_analysis_to_onedrive(self.analysis_dir)
 
     #--------------------------------------------------------------------------------
     #End of running the parameters

@@ -147,7 +147,7 @@ def run_alignment(exp_name, personal, position, align_function, num_wav):
         
         while not are_jobs_finished(rand_list):
             print('Waiting for Alignment Jobs to Finish')
-            time.sleep(2)
+            time.sleep(30)
         
         offsets = combine_offsets(rand_list)
         

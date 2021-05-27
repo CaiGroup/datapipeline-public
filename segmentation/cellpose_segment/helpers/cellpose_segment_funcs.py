@@ -26,7 +26,7 @@ def get_plotted_assigned_genes(assigned_genes_csv_src, dst, label_img):
     #-------------------------------------------------
     df_genes = pd.read_csv(assigned_genes_csv_src)
     cellIDs = list(df_genes.cellID.unique())
-    cellIDs.remove(0)
+    #cellIDs.remove(0)
     
     #-------------------------------------------------
 

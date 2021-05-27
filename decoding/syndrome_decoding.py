@@ -11,7 +11,9 @@ def get_random(n=16):
     return ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(n))
     
 def get_cost_with_on_off(csv_src, png_dst):
-    
+    """
+    Makes chart comparing the cost of on and off barcodes
+    """
     #Separate On/Off
     #---------------------------------------------------------------
     df = pd.read_csv(csv_src)
@@ -40,8 +42,12 @@ def get_cost_with_on_off(csv_src, png_dst):
     #---------------------------------------------------------------
 
 def process_decoding_results(decoded_results_src, barcode_src, dst):
+    """
+    Add x,y, and z to results
+    Replace "value" with gene name
+    Save to dst
+    """
     
-    print(f'{decoded_results_src=}')
     #Get Average X, Y, and Z
     #---------------------------------------------------------------
     df_new_res = pd.read_csv(decoded_results_src)
@@ -67,23 +73,30 @@ def process_decoding_results(decoded_results_src, barcode_src, dst):
     
     #Save results
     #---------------------------------------------------------------
-    df_new_res = df_new_res[['gene', 'x', 'y', 'cost', 'xs', 'ys', 'cc', 'cc_size']]
+    df_new_res = df_new_res[['gene', 'x', 'y', 'z', 'cost', 'xs', 'ys', 'cc', 'cc_size']]
     df_new_res.to_csv(dst, index=False)
     #---------------------------------------------------------------
     return df_new_res
     
-def process_locations_src(locations_src, locations_dst):
+def process_locations_src(locations_src, barcode_src, locations_dst):
     """
     Change Locations csv file to fit decoding format 
     Save to randomized temp directory
     """
     df_locs = pd.read_csv(locations_src)
     
-    #Temp changes
+    #Get right hybs
     #------------------------------------
-    df_locs['hyb'] = df_locs['hyb'] + 1
-    df_locs = df_locs[df_locs.hyb != 65]
+    df_locs['hyb'] = pd.factorize(df_locs.hyb)[0] + 1
+    
+    df_bars = pd.read_csv(barcode_src)
+    pseudos = np.max(np.array(df_bars.iloc[:,-4:]))
+    hybs_for_decoding = list(range(1, pseudos*4 + 1))
+    df_locs = df_locs.loc[df_locs['hyb'].isin(hybs_for_decoding)]
+    print(f'{hybs_for_decoding=}')
     #------------------------------------
+    
+    
     
     df_locs['s'] = 1
     df_locs_int_to_w = df_locs.rename(columns={"int": "w"})
@@ -107,6 +120,10 @@ def process_barcode(barcode_src, barcode_dst):
     print(f'{barcode_dst=}')
     
 def combine_with_fake(barcode_src, temp_dir):
+    """
+    Combine ON and off barcodes
+    Save to dst
+    """
     
     #Load On and Off Barcode
     #---------------------------------------------------------------
@@ -141,13 +158,14 @@ def run_syndrome_decoding(locations_src, barcode_src, dst_dir, bool_fake_barcode
     #Save locations
     #---------------------------------------------------------------
     locs_path = os.path.join(temp_dir, 'locs_for_sim_anneal.csv')
-    process_locations_src(locations_src, locs_path)
+    process_locations_src(locations_src, barcode_src, locs_path)
     #---------------------------------------------------------------
     
     
     #Save barcode for Syndrome decoding
     #---------------------------------------------------------------
     if bool_fake_barcodes:
+        print(f'{barcode_src=}')
         barcode_src = combine_with_fake(barcode_src, temp_dir)
     barcode_path = os.path.join(temp_dir, 'codewords_for_sim_anneal.txt')
     process_barcode(barcode_src, barcode_path)
@@ -168,6 +186,7 @@ def run_syndrome_decoding(locations_src, barcode_src, dst_dir, bool_fake_barcode
     results_csv = os.path.join(dst_dir, 'mpaths_decode_w_neg_ctrl_lvf112.0_lwvf4.0dr0.csv')
     processed_results_csv = os.path.join(dst_dir, 'pre_seg_unfiltered.csv')
     process_decoding_results(results_csv, barcode_src, processed_results_csv)
+    print(f'{processed_results_csv=}')
     #---------------------------------------------------------------
     
     #See On/Off cost analytics
@@ -195,8 +214,27 @@ elif sys.argv[1] == 'debug_fake_barcodes':
         os.mkdir(temp_dir)
     combine_with_fake(barcode_src, temp_dir)
         
+elif sys.argv[1] == 'debug_synd_anthony':
+    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/anthony_0512_2021/barcode_key/channel_2.csv'
+    locations_src = '/groups/CaiLab/analyses/nrezaee/anthony_0512_2021/anthony_strict_35_synd_pos0/MMStack_Pos10/Dot_Locations/locations.csv'
+    dst_dir = 'foo'
+    bool_fake_barcodes = True
+    if not os.path.exists(dst_dir):
+        os.mkdir(dst_dir)
+        
+    run_syndrome_decoding(locations_src, barcode_src, dst_dir, bool_fake_barcodes)
     
-    
+elif sys.argv[1] == 'debug_process_locs':
+    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/anthony_0512_2021/barcode_key/channel_2.csv'
+    locations_src = '/groups/CaiLab/analyses/nrezaee/anthony_0512_2021/anthony_strict_35_synd_pos0/MMStack_Pos10/Dot_Locations/locations.csv'
+    locations_dst = 'foo/locs.csv'
+    process_locations_src(locations_src, barcode_src, locations_dst)
+
+elif sys.argv[1] == 'debug_process_results':
+    results_src = 'foo/mpaths_decode_w_neg_ctrl_lvf112.0_lwvf4.0dr0.csv'
+    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/anthony_0512_2021/barcode_key/channel_2.csv'
+    dst = 'foo/results.csv'
+    process_decoding_results(results_src, barcode_src, dst)
     
     
     

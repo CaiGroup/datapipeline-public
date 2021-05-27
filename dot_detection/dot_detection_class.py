@@ -411,7 +411,7 @@ class Dot_Detection:
                 
         while not are_jobs_finished(rand_list):
             print("Waiting for Dot Detection Jobs to Finish")
-            time.sleep(2)
+            time.sleep(30)
         
 
         df_locs = combine_locs(rand_list)

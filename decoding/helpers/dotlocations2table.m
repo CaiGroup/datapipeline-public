@@ -32,6 +32,8 @@ function [T, T_unfiltered] = dotlocations2table(dotlocations, barcodekeyNames, m
 % - number of columns, and the values are different for various versions
 %
 % date: 11/5/2020
+
+    save('foo.mat', 'dotlocations', 'barcodekeyNames', 'minNumSeeds')
  
     % initialize variables
     x = [];
@@ -61,8 +63,15 @@ function [T, T_unfiltered] = dotlocations2table(dotlocations, barcodekeyNames, m
     end
     
     % unfiltered
-    T_unfiltered = table(gene, x, y, z, intensity, seeds);
+    size(gene)
+    size(x)
+    size(y)
+    size(z)
+    size(intensity)
+    size(seeds)
+    
+    T_unfiltered = table(gene, x, y, z, intensity);
          
     % filter the table with minimum number of seedes
-    T = T_unfiltered(T_unfiltered.seeds >= minNumSeeds,:);
+    T = T_unfiltered %(T_unfiltered.seeds >= minNumSeeds,:);
 end
