@@ -2,14 +2,20 @@ import os
 import pandas as pd
 import tempfile
 import sys
-from read_barcode.make_off_barcodes import get_off_barcodes
+
+if sys.argv[1] == 'debug_add_fakes':
+    from make_off_barcodes import get_off_barcodes
+else:
+    from read_barcode.make_off_barcodes import get_off_barcodes
 
 def combine_barcodes(barcode_src1, barcode_src2):
     
     barcode1 = pd.read_csv(barcode_src1)
     barcode2 = pd.read_csv(barcode_src2)
     
+    barcode2.columns = barcode1.columns
     combined_barcodes = barcode1.append(barcode2).reset_index(drop=True)
+    
     
     #combined_barcodes = combined_barcodes[combined_barcodes.columns[1:]]
     
@@ -53,6 +59,7 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
         #------------------------------------------------------------------
         print(f'{fake_barcodes_path=}')
         if not os.path.exists(fake_barcodes_path):
+            
             get_off_barcodes(barcode_src, fake_barcodes_path)
         #------------------------------------------------------------------
         
@@ -105,8 +112,8 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
 
 if sys.argv[1] == 'debug_add_fakes':
     
-    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/test1-big/barcode_key/channel_2.csv'
-    barcode_dst = '/groups/CaiLab/personal/nrezaee/raw/sim_dots_non_uni/barcode_key/channel_1.mat'
+    barcode_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_debug/BarcodeKey/channel_2.csv'
+    barcode_dst = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_debug/BarcodeKey/channel_2.mat'
     bool_fake_barcodes = True
     
     read_barcode(barcode_src, barcode_dst, bool_fake_barcodes)

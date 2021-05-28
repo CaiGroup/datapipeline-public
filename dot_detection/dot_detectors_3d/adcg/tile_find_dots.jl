@@ -8,10 +8,10 @@ using Statistics
 
 #parameters
 sigma_lb = 1.0
-sigma_ub = 2.5
+sigma_ub = 1.4
 tau = 2.0*10^12
-final_loss_improvement = 10000.0
-min_weight = 3000.0
+final_loss_improvement = 1000.0
+min_weight = 600.0
 max_iters = 200
 max_cd_iters = 10
 

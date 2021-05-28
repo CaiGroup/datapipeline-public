@@ -65,7 +65,13 @@ def process_decoding_results(decoded_results_src, barcode_src, dst):
     df_bars = pd.read_csv(barcode_src)
     genes = []
     for gene_index in df_new_res.value:
-        genes.append(df_bars.iloc[gene_index -1 ].gene)
+        print(f'{gene_index=}')
+        print(f'{df_bars.shape=}')
+        print(f'{df_bars.iloc[gene_index -1]=}')
+        print(f'{df_bars.iloc[gene_index -1, 0]=}')
+        print(f'{type(df_bars.iloc[gene_index -1, 0])=}')
+        genes.append(df_bars.iloc[gene_index -1, 0])
+        # genes.append(df_bars.iloc[gene_index -1].gene)
         
     df_new_res['gene'] = genes
     del df_new_res['value']
@@ -91,33 +97,53 @@ def process_locations_src(locations_src, barcode_src, locations_dst):
     
     df_bars = pd.read_csv(barcode_src)
     pseudos = np.max(np.array(df_bars.iloc[:,-4:]))
-    hybs_for_decoding = list(range(1, pseudos*4 + 1))
+    hybs_for_decoding = list(range(1, int(pseudos)*4 + 1))
     df_locs = df_locs.loc[df_locs['hyb'].isin(hybs_for_decoding)]
     print(f'{hybs_for_decoding=}')
     #------------------------------------
     
     
-    
+    #Set s to 1 for now
+    #------------------------------------
     df_locs['s'] = 1
+    #------------------------------------
+    
+    #Make small changes
+    #------------------------------------
     df_locs_int_to_w = df_locs.rename(columns={"int": "w"})
     del df_locs_int_to_w['ch']
+    #------------------------------------
+    
+    #Save to dst
+    #------------------------------------
     dst = os.path.join(locations_dst, 'sim_anneal_locs.csv')
     df_locs_int_to_w.to_csv(locations_dst, index=False)
     print(f'{locations_dst=}')
+    #------------------------------------
     
 def process_barcode(barcode_src, barcode_dst):
     """
     Change Barcode csv file to fit decoding format
     Save to randomized temp directory
     """
+    #Read barcode in 
+    #------------------------------------
     df_barcode = pd.read_csv(barcode_src)
+    #------------------------------------
+    
+    #Get Max dataframe
+    #------------------------------------
     hyb_cols = df_barcode.columns[-4:]
     max_pseudo = df_barcode[hyb_cols].to_numpy().max()
+    #------------------------------------
+    
+    #Change max pseudo to zero
+    #------------------------------------
     for hyb_col in hyb_cols:
         df_barcode[hyb_col] = np.where((df_barcode[hyb_col] == max_pseudo), 0, df_barcode[hyb_col])
-    
-    df_barcode[hyb_cols].to_csv(barcode_dst, sep='\t', index=False, header=False)
+    df_barcode[hyb_cols].astype(np.int8).to_csv(barcode_dst, sep='\t', index=False, header=False)
     print(f'{barcode_dst=}')
+    #------------------------------------
     
 def combine_with_fake(barcode_src, temp_dir):
     """
@@ -231,8 +257,8 @@ elif sys.argv[1] == 'debug_process_locs':
     process_locations_src(locations_src, barcode_src, locations_dst)
 
 elif sys.argv[1] == 'debug_process_results':
-    results_src = 'foo/mpaths_decode_w_neg_ctrl_lvf112.0_lwvf4.0dr0.csv'
-    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/anthony_0512_2021/barcode_key/channel_2.csv'
+    results_src = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6_synd_pos0/MMStack_Pos0/Decoded/Channel_1/mpaths_decode_w_neg_ctrl_lvf112.0_lwvf4.0dr0.csv'
+    barcode_src = '/groups/CaiLab/personal/temp/temp_decode/3FSG69S11UXMR2EM/barcode.csv'
     dst = 'foo/results.csv'
     process_decoding_results(results_src, barcode_src, dst)
     

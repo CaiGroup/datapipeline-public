@@ -48,43 +48,58 @@ from dot_detection.radial_center.radial_center_fitting import get_radial_centere
 
 def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
 
+    #Get channel and hyb
+    #-------------------------------------------------------------------
     channel_array = np.full((len(dots_in_channel[1])), channel + 1)
-    
     hyb = int(tiff_src.split('HybCycle_')[1].split('/MMStack')[0])
-    
     hyb_array = np.full((len(dots_in_channel[1])), hyb)
-
+    #-------------------------------------------------------------------
+    
+    #Set channel and hyb
+    #-------------------------------------------------------------------
     df = pd.DataFrame(data = dots_in_channel[0], columns=['x', 'y', 'z'])
     df['ch'] = channel_array
     df['hyb'] = hyb_array
     df['int'] = dots_in_channel[1]
     df = df.reindex(columns=['hyb', 'ch', 'x','y','z','int'])
-
+    #-------------------------------------------------------------------
+    
     return df
 
 def get_adcg_dots(tiff_2d):
     
+    #Set and Make rand dir
+    #-------------------------------------------------------------------
     rand = get_random_list(1)[0]
-    
     temp_dir = os.path.join('/groups/CaiLab/personal/nrezaee/temp/temp_adcg', rand)
     os.mkdir(temp_dir)
+    #-------------------------------------------------------------------
     
+    #Set and save paths
+    #-------------------------------------------------------------------
     tiff_txt_path = os.path.join(temp_dir, 'tiff_2d.txt')
     locs_result_path = os.path.join(temp_dir, 'locs.csv')
-    
-    
+    output_path = os.path.join(temp_dir, 'adcg_output.out')
     np.savetxt(tiff_txt_path, tiff_2d)
+    #-------------------------------------------------------------------
     
+    #Set and run cmd
+    #-------------------------------------------------------------------
     adcg_wrap_path = os.path.join(os.getcwd(), 'dot_detection/dot_detectors_3d/adcg', 'adcg_wrapper.sh')
-    
-    cmd = 'sbatch --wait ' + adcg_wrap_path + ' ' + tiff_txt_path + ' ' + locs_result_path + ' --output ' + str(os.path.dirname(locs_result_path))
+    cmd = 'sbatch --wait ' + '--output ' + str(output_path)  + ' ' + adcg_wrap_path + ' ' + tiff_txt_path + ' ' + locs_result_path 
     print(f'{cmd=}')
-    
     os.system(cmd)
+    #-------------------------------------------------------------------
     
+    #Read Dataframe 
+    #-------------------------------------------------------------------
     df_points = pd.read_csv(locs_result_path)
+    #-------------------------------------------------------------------
     
+    #Remove temp directory
+    #-------------------------------------------------------------------
     shutil.rmtree(temp_dir)
+    #-------------------------------------------------------------------
     
     return df_points
     
@@ -123,14 +138,19 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
         channels = range(tiff.shape[1]-1)
     else:
         channels = [int(channel)-1 for channel in channels_to_detect_dots]
+    #-------------------------------------------------------------------
     
+    #Loop through channels
+    #-------------------------------------------------------------------
     for channel in channels:
         
         tiff_3d = tiff[:, channel,:,:]
-
         dots_in_channel = None
-        
+
         print(f'{tiff_3d.shape=}')
+        
+        #Get Right z slices
+        #-------------------------------------------------------------------
         if z_slices == 'all':
             pass
         
@@ -138,56 +158,76 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             print(f'{z_slices=}')
             print(f'{tiff_3d[z_slices,:,:].shape=}')
             tiff_3d= np.array([tiff_3d[z_slices,:,:]])
-
-            #tiff_3d = tiff_3d[np.newaxis, ...]
+        #-------------------------------------------------------------------
+            
 
         
         #Loops through Z-stacks for Dot Detection
         #---------------------------------------------------------------------
         df_points_3d = pd.DataFrame(columns = ['x', 'y', 'z', 'int'])
-        print(f'{tiff_3d.shape=}')
         for z in range(tiff_3d.shape[0]):
-            
             tiff_2d = tiff_3d[z, :, :]
             
+            #Run adcg on 2d slice
+            #-------------------------------------------------------------------
             df_points_2d = get_adcg_dots(tiff_2d)
-            print(f'{df_points_2d=}')
+            #-------------------------------------------------------------------
             
-            # del df_points_2d['int']
-            
+            #Change weight to intensity
+            #-------------------------------------------------------------------
             df_points_2d = df_points_2d.rename(columns={'w': 'int'})
             df_points_2d['int'] = df_points_2d['int']/1000
+            #-------------------------------------------------------------------
             
+            #Set z column
+            #-------------------------------------------------------------------
             z_array = np.full((df_points_2d.shape[0]), z)
-        
             df_points_2d['z'] = z_array
+            #-------------------------------------------------------------------
             
+            #Show dots on png
+            #-------------------------------------------------------------------
             if bool_visualize_dots == True and z == tiff_shape[0]//2:
                 get_visuals(tiff_src, df_points_2d, tiff_2d, analysis_name)
+            #-------------------------------------------------------------------
             
+            #Add 2d points to 3d dataframe
+            #-------------------------------------------------------------------
             df_points_3d = df_points_3d.append(df_points_2d)
+            #-------------------------------------------------------------------
             
         
+        #Get channel and hyb arrays
+        #-------------------------------------------------------------------
         channel_array = np.full((df_points_3d.shape[0]), channel + 1)
         hyb = int(tiff_src.split('HybCycle_')[1].split('/MMStack')[0])
         hyb_array = np.full((df_points_3d.shape[0]), hyb)
+        #-------------------------------------------------------------------
         
+        #Put channel and hyb in dataframe
+        #-------------------------------------------------------------------
         df_points_3d['ch'] = channel_array
         df_points_3d['hyb'] = hyb_array
+        #-------------------------------------------------------------------
         
+        #Add points 3d to tiff with all channels
+        #-------------------------------------------------------------------
         df_tiff = df_tiff.append(df_points_3d)
-        print(f'{df_tiff.shape=}')
+        #-------------------------------------------------------------------
         
+        #Add offset to x and y
+        #-------------------------------------------------------------------
         if offset != [0,0,0]:
             print('Shitfing Locations')
             df_tiff['x'] = df_tiff['x'] + offset[1]
             df_tiff['y'] = df_tiff['y'] + offset[0]
-
+        #-------------------------------------------------------------------
         
-    csv_path = rand_dir +'/locs.csv'
-    print(f'{csv_path=}')
+    #Save to path
+    #-------------------------------------------------------------------
+    csv_path = os.path.join(rand_dir, 'locs.csv')
     df_tiff.to_csv(csv_path, index=False)
-
+    #-------------------------------------------------------------------
   
 print(f'{sys.argv[1]=}')
 if sys.argv[1] != 'debug_adcg':
@@ -235,13 +275,13 @@ if sys.argv[1] != 'debug_adcg':
                           
 else:                        
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_10/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_11/MMStack_Pos0.ome.tif'
     offset = [0,0]
     channels = [1]
     analysis_name = 'linus_decoding'
     rand_dir = '/home/nrezaee/temp'
     visualize_dots = True
-    z_slice = 1
+    z_slice = 'all'
     get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, False, False, channels, False, 4, z_slice, rand_dir)
     
     

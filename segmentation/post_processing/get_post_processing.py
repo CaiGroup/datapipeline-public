@@ -19,6 +19,16 @@ from segmentation.post_processing.get_cyto_labeled_img import get_labeled_cyto_c
 
 from segmentation.post_processing.nuccymatch import get_matched_3d_img
 
+def switch_low_z_to_right_shape(labeled_src):
+    label_img = tf.imread(labeled_src)
+    
+    label_img = np.swapaxes(label_img, 0, 2)
+    label_img = np.swapaxes(label_img, 1, 2)
+    
+    tf.imwrite(labeled_src, label_img)
+    return label_img
+    
+
 def make_distance_between_cells(label_img_src, dist_between_nuclei, post_process_dir):
     
     #Specify directory and files
@@ -135,15 +145,12 @@ def get_tiff_for_segment(tiff_dir, position, num_z):
     #-------------------------------------------------------------
     glob_me = os.path.join(tiff_dir, '*')
     all_dirs = glob.glob(glob_me)
-    print(f'{all_dirs=}')
     #-------------------------------------------------------------
     
     #Check to see if segmentation is specified
     #-------------------------------------------------------------
     bool_seg_dir = [('segmentation' == a_dir.rsplit('/', 1)[-1]) for a_dir in all_dirs]
-    print(f'{bool_seg_dir=}')
     bool_labeled_img_dir = [('Labeled_Images' == a_dir.rsplit('/', 1)[-1]) for a_dir in all_dirs]
-    print(f'{bool_seg_dir=}')
     #-------------------------------------------------------------
 
     #If labeled image is already specified
@@ -251,6 +258,15 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
         labeled_img_path = label_img_post_processed_dst
     #-------------------------------------------------------------
     
+    print('7777777777777777777777777777777777777777777')
+    label_img = tf.imread(labeled_img_path)
+    print(f'{label_img.shape=}')
+    if num_z < 4:
+        switch_low_z_to_right_shape(labeled_img_path)
+        print('88888888888888888888888888888888888888888')
+        label_img = tf.imread(labeled_img_path)
+        print(f'{label_img.shape=}')
+        
     # Match the nuclei and cytoplasm
     #-------------------------------------------------------------
     if bool_cyto_match:
@@ -269,6 +285,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
         else:
             return labeled_img_path
     #-------------------------------------------------------------
+
 
     
 if sys.argv[1] == 'debug_post':

@@ -132,23 +132,33 @@ def expand_img(masked_file_path, tiff, dst):
     #---------------------------------------------------------------------------
     
 def get_3d_from_2d(src, num_z):
-    
     #Stack 2d into 3d
     #---------------------------------------------------------------------------
     tiff_2d = tf.imread(src)
     tiff_3d = []
     for z in range(num_z):
         tiff_3d.append(tiff_2d)
+    tiff_3d = np.array(tiff_3d)
     #---------------------------------------------------------------------------
 
     #Save tif
     #---------------------------------------------------------------------------
     #tiff_3d = np.swapaxes(tiff_3d, 0, 2)
+    print(f'{tiff_3d.shape=}')
     tf.imwrite(src, tiff_3d)
     #---------------------------------------------------------------------------
     
+def switch_low_z_to_right_shape(labeled_src):
+    label_img = tf.imread(labeled_src)
+    
+    label_img = np.swapaxes(label_img, 0, 2)
+    label_img = np.swapaxes(label_img, 1, 2)
+    
+    tf.imwrite(labeled_src, label_img)
+    return label_img
+    
+    
 def get_labeled_img_cellpose(tiff_path, num_wav, dst=None, nuclei_radius=0, flow_threshold =.4, cell_prob_threshold=0):
-
 
     #Getting Tiff
     #----------------------------------------------
@@ -169,6 +179,8 @@ def get_labeled_img_cellpose(tiff_path, num_wav, dst=None, nuclei_radius=0, flow
     #Submit job and wait for it to finish
     #---------------------------------------------------------------------------
     num_z = len(shrinked)
+    print(f'{num_z=}')
+    print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
     submit_seg_job(rand_dir, rand_list, num_z, nuclei_radius, flow_threshold, cell_prob_threshold)
 
     while not are_jobs_finished(rand_list):
@@ -190,9 +202,19 @@ def get_labeled_img_cellpose(tiff_path, num_wav, dst=None, nuclei_radius=0, flow
     if dst == None:
         temp_path = os.path.join(rand_dir, 'expanded.tif')
         labeled_img = expand_img(masked_file_path, tiff, temp_path)
+        
     else:
         labeled_img = expand_img(masked_file_path, tiff, dst)
+        
+    if num_z < 4:
+        labeled_img = switch_low_z_to_right_shape(dst)
+        
+    print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+    print(f'{labeled_img.shape=}')
+        
     #---------------------------------------------------------------------------
+    
+ 
     
     shutil.rmtree(rand_dir)
 

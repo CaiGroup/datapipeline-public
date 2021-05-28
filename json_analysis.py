@@ -452,6 +452,9 @@ def run_analysis(json_name, position):
             analysis.set_flow_threshold_arg(data['flow threshold'])
     #----------------------------------------------------------
     
+    
+    
+    
     #Writ
     #----------------------------------------------------------
     analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)

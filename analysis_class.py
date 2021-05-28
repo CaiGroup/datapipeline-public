@@ -8,6 +8,7 @@ import logging
 import time
 from datetime import datetime
 from load_tiff import tiffy
+import shutil
 
 #Import things to be done after all positions
 #-----------------------------------------------------
@@ -148,6 +149,10 @@ class Analysis:
         self.nuclei_radius = 0
         self.cell_prob_threshold = 0
         self.flow_threshold = .4
+        self.min_weight_adcg = 600.0
+        final_loss_adcg = 1000.0
+        max_iters_adcg = 200
+        max_cd_iters = 10
         #--------------------------------------------------------------
         
         
@@ -421,8 +426,22 @@ class Analysis:
         self.cell_prob_threshold = float(cell_prob_threshold)
         
         print("    Set Cell Probabiliy Threshold to", str(self.cell_prob_threshold))
+        
+    def set_min_weight_adcg_arg(self, min_weight_adcg):
+        self.min_weight_adcg = float(min_weight_adcg)
+        
+        print("    Set Min Weight ADCG to", str(self.min_weight_adcg))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
+    
+    def move_directory_contents(self, src, dest):
+        """
+        Basically just move files
+        """
+        os.makedirs(dest, exist_ok=True)
+        src_with_asterisk = os.path.join(src, '*')
+        os.system('cp ' + src_with_asterisk + ' ' + dest)
+                
     
     
     #Set functions for analysis
@@ -628,6 +647,8 @@ class Analysis:
             self.locs_src = self.run_dot_detection()
         #--------------------------------------------------------------------------------
         
+        #Run Fiducial Alignment 
+        #--------------------------------------------------------------------------------
         if self.align == 'fiducial_markers':
             dst_fiducials_dir = os.path.join(self.position_dir, 'Alignment')
             try:
@@ -636,13 +657,18 @@ class Analysis:
                 pass
             
             fiducial_alignment.get_fiducial_offset(self.data_dir, self.position, dst_fiducials_dir, self.locs_src, self.num_wav)
-        
+        #--------------------------------------------------------------------------------
             
         #Declare Decoding Class if needed
         #--------------------------------------------------------------------------------
         if self.decoding_across == True or self.decoding_individual != 'all' \
         or self.decoding_with_previous_dots == True or self.decoding_with_previous_locations == True or self.decoding_non_barcoded == True \
         or self.lampfish_decoding:
+            
+            self.move_directory_contents(self.barcode_key_src, self.barcode_dst)
+            
+            self.barcode_key_src = self.barcode_dst
+            
             decoder = Decoding(self.data_dir, self.position, self.decoded_dir, self.locations_dir, self.position_dir, self.barcode_dst, \
                 self.barcode_key_src, self.decoding_with_previous_dots, self.decoding_with_previous_locations, self.fake_barcodes, \
                 self.decoding_individual, self.min_seeds, self.allowed_diff, self.dimensions, self.num_zslices, self.segmentation, \

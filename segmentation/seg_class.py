@@ -157,10 +157,6 @@ class Segmentation:
 
         # Get Segmentation Dirs
         #----------------------------------------------
-        if not os.path.exists(self.seg_data_dir):
-            os.makedirs(self.seg_data_dir)
-
-        
         for channel_num in self.decoding_individual:
             
             # Get Segmentation Dirs

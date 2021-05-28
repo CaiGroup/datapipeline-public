@@ -24,10 +24,6 @@ from helpers.excel2dict import get_dict_from_excel
 
 
 main_dir = '/groups/CaiLab'
-# if os.environ.get('DATA_PIPELINE_MAIN_DIR') is not None:
-#     main_dir = os.environ['DATA_PIPELINE_MAIN_DIR']
-# else:
-#     raise Exception("The Main Directory env variable is not set. Set DATA_PIPELINE_MAIN_DIR!!!!!!!!")
 
 def Diff(li1, li2):
     return (list(list(set(li1)-set(li2)) + list(set(li2)-set(li1))))
@@ -63,6 +59,11 @@ def get_specific_positions(spec_positions, positions):
 
 
 def check_if_all_hybs_are_present(path_to_experiment_dir):
+    """
+    Runs a check to see if all hybs are in an experiment
+    Input Example
+        /groups/CaiLab/personal/nrezaee/2020-08-08-takei
+    """
     #Get all files in path
     #-------------------------------------------------
     hyb_dirs = glob.glob(path_to_experiment_dir)
@@ -105,31 +106,35 @@ def check_if_all_hybs_are_present(path_to_experiment_dir):
     return bool_present, diff_hybs
     
 def read_json(json_name, source_of_jsons):
+    """
+    Read json file and make the keys lowercase 
+    except for personl and experiment name
+    """
     
+    #Set json_path and get open it
+    #-----------------------------------------------------
     json_file_path = os.path.join(source_of_jsons, json_name)
-    
     with open(json_file_path) as json_file: 
         non_lowercase_data = json.load(json_file) 
-        
+    #-----------------------------------------------------
+    
+    #Make everything lowercase
+    #-----------------------------------------------------
     data = {}
-
     for key, value in non_lowercase_data.items():
         if type(value) == str:
-            
             if key.lower() == 'personal' or key.lower() == 'experiment_name':
                 data[key.lower()] = value
-                
             else:
-            
                 data[key.lower()] = value.lower()
-            
         else:
             data[key.lower()] = value
+    #-----------------------------------------------------
     
     return data, json_file_path
     
 def read_xlsx(json_name, source_of_jsons):
-
+    
     json_file_path = os.path.join(args.source_of_jsons, json_name)
     data = get_dict_from_excel(json_file_path)
     
@@ -150,28 +155,40 @@ def read_xlsx(json_name, source_of_jsons):
     return data, json_file_path
         
 def make_analysis_dirs(data):
+    """
+    Make directories from input 
+    """
     
-    print(11)
+    #Make personal directory
+    #-----------------------------------------------------
     personal_dir = os.path.join(main_dir, 'analyses', data['personal'])
     if not os.path.isdir(personal_dir):
         os.mkdir(personal_dir)
+    #-----------------------------------------------------
     
+    #Make experiment directory
+    #-----------------------------------------------------
     exp_analyses_dir = os.path.join(main_dir, 'analyses', data['personal'], data['experiment_name'])
     if not os.path.isdir(exp_analyses_dir):
         os.mkdir(exp_analyses_dir)
-        
+    #-----------------------------------------------------
+    
+    #Get analyses
+    #-----------------------------------------------------
     analyses_in_exp = os.listdir(exp_analyses_dir)
     analysis_name = json_name.split('.json')[0]
-    print(19)
-    
-    
+    #-----------------------------------------------------
     
     return analyses_in_exp, analysis_name, exp_analyses_dir
     
 def check_if_analysis_exists(analyses_in_exp, analysis_name, source_of_jsons, exp_analyses_dir, data):
+    """
+    This function will throw an error if an analysis exists under the same name
+    
+    """
 
+    #Check if analysis name has already been used
     for analysis in analyses_in_exp:
-        
         if analysis == analysis_name:
             
             #Remove json in json source directory
@@ -187,6 +204,10 @@ def check_if_analysis_exists(analyses_in_exp, analysis_name, source_of_jsons, ex
             raise Exception(exception_message)
             
 def move_json_file_to_analysis_dir(json_name, main_dir, data):
+    """
+    Move json to analysis directory
+    The json is copied over to save the parameters
+    """
 
     #Move the json file analyses directory
     #----------------------------------------------------------
@@ -201,6 +222,10 @@ def hasNumbers(inputString):
     return any(char.isdigit() for char in inputString)
     
 def get_positions_in_data(data, main_dir):
+    """
+    Check to see if specific positions are specified in the json
+    Then get those positions and return
+    """
 
     #Get single position
     #----------------------------------------------------------
@@ -233,6 +258,9 @@ def get_positions_in_data(data, main_dir):
     
 
 def get_slurm_params(json_name, data, position):
+    """
+    Set slurm parameters for job which are specified in the json file
+    """
 
     #Running in Slurm Variable to True
     #--------------------------------------------------------------
@@ -304,8 +332,8 @@ def get_slurm_params(json_name, data, position):
         time = '10:00:00'
         
     print("    time:", time, flush=True)
-
     #--------------------------------------------------------------
+    
     #Define output file
     #--------------------------------------------------------------
     output_dir = os.path.join(main_dir, 'analyses/', data['personal'], data['experiment_name'], \
@@ -316,48 +344,76 @@ def get_slurm_params(json_name, data, position):
     
     output_file_path = os.path.join(output_dir, 'slurm_output.out')
     #--------------------------------------------------------------
+    
     return batch_name, nodes, ntasks, mem_per_cpu, time, output_file_path, running_in_slurm 
     
 def check_if_all_hybs_exist(data):
-
+    """
+    Check to see if all hybs exist in data directory
+    """
+    
+    #Glob all hybs
+    #--------------------------------------------------------------
     data_dir = os.path.join('/groups/CaiLab/personal/', data['personal'], 'raw', data['experiment_name'])
     glob_me = os.path.join(data_dir, '*')
+    #--------------------------------------------------------------
+    
+    #Check to see if a hyb isnt present
+    #--------------------------------------------------------------
     bool_present, diff_hybs = check_if_all_hybs_are_present(glob_me)
-    
     if bool_present == False:
-    
         str_hybs = ','.join(str(e) for e in diff_hybs)
         warning_message = "Warning the following Hybs seem to be missing from the dataset: " + str_hybs 
         print(warning_message)
-
+    #--------------------------------------------------------------
+    
+    
 def create_multiple_jsons_for_thresholds(json_src):
+    """
+    Create multiple jsons for thresholds if "multiple" or "multiple low"
+    """
+    
+    #Open Json
+    #--------------------------------------------------------------
     with open(json_src) as json_file:
         data = json.load(json_file)
+    #--------------------------------------------------------------
         
+    #Check for multiple strictnesses
+    #--------------------------------------------------------------
     if 'strictness' in data.keys():
         if data['strictness'] == 'multiple':
             for i in range(0,10,2):
-                print(i)
                 
+                #Make json with strictness
+                #--------------------------------------------------------------
                 new_json_src = json_src.split('.json')[0] + '_______strict_'+str(i)+'.json'
                 data['strictness'] = i
-                print(f'{new_json_src=}')
                 with open(new_json_src, 'w') as outfile:
                     json.dump(data, outfile)
-                    
+                #--------------------------------------------------------------
+            os.remove(json_src)
+                
         elif data['strictness'] == 'multiple low':
             for i in range(-5,5,2):
-                print(i)
+                
+                #Make json with strictness
+                #--------------------------------------------------------------
                 new_json_src = json_src.split('.json')[0] + '_______strict_'+str(i)+'.json'
                 data['strictness'] = i
-                print(f'{new_json_src=}')
                 with open(new_json_src, 'w') as outfile:
                     json.dump(data, outfile)
+                #--------------------------------------------------------------
                 
-    
             os.remove(json_src)
+    #--------------------------------------------------------------
     
-def check_for_multiple_thresholds_dir(json_srcs, main_dir):
+    
+def check_for_multiple_thresholds(json_srcs, main_dir):
+    """
+    Check if multiple strictnesses in json file
+    
+    """
 
     for json_src in json_srcs:
         json_full_src = os.path.join(main_dir, json_src)
@@ -373,7 +429,7 @@ args = parser.parse_args()
 if args.source_of_jsons == None:
     args.source_of_jsons = os.path.join(main_dir, 'json_analyses')
     
-check_for_multiple_thresholds_dir(os.listdir(args.source_of_jsons) , args.source_of_jsons)
+check_for_multiple_thresholds(os.listdir(args.source_of_jsons) , args.source_of_jsons)
 #----------------------------------------------------------
 
 
