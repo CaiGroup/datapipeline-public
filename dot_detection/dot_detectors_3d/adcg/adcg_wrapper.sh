@@ -13,4 +13,4 @@
 
 module load julia/1.5.2
 
-julia dot_detection/dot_detectors_3d/adcg/tile_find_dots.jl $1 $2
+julia dot_detection/dot_detectors_3d/adcg/tile_find_dots.jl $1 $2 $3 $4

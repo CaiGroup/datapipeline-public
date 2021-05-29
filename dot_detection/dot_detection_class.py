@@ -45,7 +45,8 @@ class Dot_Detection:
                    background_subtraction, decoding_individual, chromatic_abberration, \
                    dot_detection, gaussian_fitting, strictness_dot_detection, dimensions, \
                    radial_center, num_zslices, nbins, threshold, num_wav, z_slices, \
-                   dot_radius, radius_step, num_radii, debug_dot_detection):
+                   dot_radius, radius_step, num_radii, debug_dot_detection, min_weight_adcg, 
+                   final_loss_adcg):
 
         self.experiment_name = experiment_name
         self.personal = personal
@@ -72,6 +73,8 @@ class Dot_Detection:
         self.radius_step = radius_step
         self.num_radii = num_radii
         self.debug_dot_detection = debug_dot_detection
+        self.min_weight_adcg = min_weight_adcg
+        self.final_loss_adcg = final_loss_adcg
         
         
         #Set Directories
@@ -365,7 +368,8 @@ class Dot_Detection:
                     '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
                             '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
-                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,'--z_slices', z_slice]
+                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,
+                            '--z_slices', z_slice, '--min_weight_adcg', self.min_weight_adcg, '--final_loss_adcg', self.final_loss_adcg]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     

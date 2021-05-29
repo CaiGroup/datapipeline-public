@@ -445,6 +445,13 @@ def run_analysis(json_name, position):
             analysis.set_cell_prob_threshold_arg(data['cell prob threshold'])
     #----------------------------------------------------------
     
+    #Min Weight ADCG 
+    #----------------------------------------------------
+    if 'min weight adcg' in data.keys():
+        if data['min weight adcg'] != 'none':
+            analysis.set_min_weight_adcg_arg(data['min weight adcg'])
+    #----------------------------------------------------------
+    
     #Cellpose Cell Prob Threshold
     #----------------------------------------------------
     if 'flow threshold' in data.keys():
@@ -452,7 +459,12 @@ def run_analysis(json_name, position):
             analysis.set_flow_threshold_arg(data['flow threshold'])
     #----------------------------------------------------------
     
-    
+    #Final Improvement ADCG 
+    #----------------------------------------------------
+    if 'final improvement adcg' in data.keys():
+        if data['final improvement adcg'] != 'none':
+            analysis.set_final_improv_adcg_arg(data['final improvement adcg'])
+    #----------------------------------------------------------
     
     
     #Writ

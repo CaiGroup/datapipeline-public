@@ -66,7 +66,7 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
     
     return df
 
-def get_adcg_dots(tiff_2d):
+def get_adcg_dots(tiff_2d, min_weight, final_loss):
     
     #Set and Make rand dir
     #-------------------------------------------------------------------
@@ -86,7 +86,8 @@ def get_adcg_dots(tiff_2d):
     #Set and run cmd
     #-------------------------------------------------------------------
     adcg_wrap_path = os.path.join(os.getcwd(), 'dot_detection/dot_detectors_3d/adcg', 'adcg_wrapper.sh')
-    cmd = 'sbatch --wait ' + '--output ' + str(output_path)  + ' ' + adcg_wrap_path + ' ' + tiff_txt_path + ' ' + locs_result_path 
+    cmd = 'sbatch --wait ' + '--output ' + str(output_path)  + ' ' + adcg_wrap_path + ' ' + tiff_txt_path  \ 
+        + ' ' + locs_result_path + ' ' + min_weight + ' ' + final_loss
     print(f'{cmd=}')
     os.system(cmd)
     #-------------------------------------------------------------------
@@ -106,7 +107,7 @@ def get_adcg_dots(tiff_2d):
     
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool_normalization, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, num_wav, \
-                      z_slices, rand_dir):
+                      z_slices, rand_dir, min_weight, final_loss):
     
     
     #Getting Background Src
@@ -170,7 +171,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             
             #Run adcg on 2d slice
             #-------------------------------------------------------------------
-            df_points_2d = get_adcg_dots(tiff_2d)
+            df_points_2d = get_adcg_dots(tiff_2d, min_weight)
             #-------------------------------------------------------------------
             
             #Change weight to intensity
@@ -251,6 +252,8 @@ if sys.argv[1] != 'debug_adcg':
     parser.add_argument("--rand")
     parser.add_argument("--z_slices")
     parser.add_argument("--num_wav")
+    parser.add_argument("--min_weight_adcg")
+    parser.add_argument("--final_loss_adcg")
     
     
     
@@ -271,18 +274,22 @@ if sys.argv[1] != 'debug_adcg':
     
     print(f'{args.z_slices=}')
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), args.norm, \
-                          args.back_subtract, channels, args.chromatic, args.num_wav, args.z_slices, args.rand)
+                          args.back_subtract, channels, args.chromatic, args.num_wav, args.z_slices, 
+                          args.rand, args.min_weight_adcg, args.final_loss_adcg)
                           
 else:                        
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_11/MMStack_Pos0.ome.tif'
-    offset = [0,0]
-    channels = [1]
-    analysis_name = 'linus_decoding'
-    rand_dir = '/home/nrezaee/temp'
-    visualize_dots = True
-    z_slice = 'all'
-    get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, False, False, channels, False, 4, z_slice, rand_dir)
+    get_dots_for_tiff(tiff_src ='/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_11/MMStack_Pos0.ome.tif', 
+                        offset = [0,0],
+                        analysis_name = 'linus_decoding', 
+                        visualize_dots = True, 
+                        bool_normalization = False, 
+                        bool_background_subtraction = False, 
+                        channels = [1], 
+                        bool_chromatic = False, 
+                        num_wav = 4, 
+                        z_slice = 'all', 
+                        rand_dir = '/tmp/nrezaee')
     
     
 

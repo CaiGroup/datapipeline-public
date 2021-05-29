@@ -431,6 +431,11 @@ class Analysis:
         self.min_weight_adcg = float(min_weight_adcg)
         
         print("    Set Min Weight ADCG to", str(self.min_weight_adcg))
+        
+    def set_final_improv_adcg_arg(self, final_improv_adcg):
+        self.final_loss_adcg = float(final_improv_adcg)
+        
+        print("    Set Final Improvement ADCG to", str(self.final_loss_adcg))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -453,7 +458,8 @@ class Analysis:
                                                self.background_subtraction, self.decoding_individual, self.chromatic_abberration, \
                                                self.dot_detection, self.gaussian_fitting, self.strictness_dot_detection, self.dimensions, \
                                                self.radial_center, self.num_zslices, self.nbins, self.threshold, self.num_wav, self.num_z, \
-                                               self.dot_radius, self.radius_step, self.num_radii, self.debug_dot_detection)
+                                               self.dot_radius, self.radius_step, self.num_radii, self.debug_dot_detection, self.min_weight_adcg, 
+                                               self.final_loss_adcg)
                    
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 
