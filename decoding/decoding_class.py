@@ -424,7 +424,7 @@ class Decoding:
             if self.seg == False:
                 #Run decoding for individual channel
                 #--------------------------------------------------------------------
-                decoding.decoding(barcode_dst, locations_path, decoding_dst_for_channel, self.allowed_diff, self.min_seeds, self.decoding_individual.index(channel), \
+                decoding_non_parallel.decoding(barcode_dst, locations_path, decoding_dst_for_channel, self.allowed_diff, self.min_seeds, self.decoding_individual.index(channel), \
                                   len(self.decoding_individual))
                 #--------------------------------------------------------------------
             else:

@@ -150,9 +150,9 @@ class Analysis:
         self.cell_prob_threshold = 0
         self.flow_threshold = .4
         self.min_weight_adcg = 600.0
-        final_loss_adcg = 1000.0
-        max_iters_adcg = 200
-        max_cd_iters = 10
+        self.final_loss_adcg = 1000.0
+        self.max_iters_adcg = 200
+        self.max_cd_iters = 10
         #--------------------------------------------------------------
         
         

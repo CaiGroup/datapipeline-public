@@ -2,22 +2,24 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
     
     warning('off','all')
     
-    
+    %Show allowed diff and number of rounds
+    %--------------------------------------------------------------------
     allowed_diff
-    
     num_of_rounds
+    %--------------------------------------------------------------------
     
-    %Loading .mats
-    %-----------------------
+    %Loading location file
+    %--------------------------------------------------------------------
     [filepath,name,ext] = fileparts(locations_src);
     locations_src
     [points, intensities] = read_locs_csv(locations_src);
+    %--------------------------------------------------------------------
 
-    
-    
+    %Reading Barcode key file
+    %--------------------------------------------------------------------
     barcodekey_info = load(barcode_src);
     barcodekey = barcodekey_info.barcodekey.barcode;
-    %-----------------------
+    %--------------------------------------------------------------------
     
     %Check for individual Decoding to get the right locations
     %--------------------------------------------------------------------
@@ -29,15 +31,17 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
     
     %Get the right locations for individual decoding
     %--------------------------------------------------------------------
-        disp(channel_index)
-        disp(number_of_individual_channels_to_decode)
-        disp(total_num_of_channels)
+        channel_index
+        number_of_individual_channels_to_decode
+        total_num_of_channels
         
         
-        
-        spotslocation = points(channel_index:number_of_individual_channels_to_decode:end,:)
-        
-        spotsintensity = intensities(channel_index:number_of_individual_channels_to_decode:end,:)
+        %Get every other channel
+        %--------------------------------------------------------------------
+        save('foo.mat', 'points')
+        spotslocation = points(channel_index:number_of_individual_channels_to_decode:end)
+        spotsintensity = intensities(channel_index:number_of_individual_channels_to_decode:end)
+        %--------------------------------------------------------------------
         
         shape_locations = size(spotslocation);
         
@@ -66,15 +70,10 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
     %Set Variables for point structure function
     %--------------------------------------------------------------------
     spotsintensityscaled = [];
-    
     numPseudoChannels = total_num_of_channels/num_of_rounds;
-
     z_slice = [];
-    
     total_num_of_channels
-    
     numPseudoChannels
-    
     %--------------------------------------------------------------------
     
 
@@ -83,8 +82,12 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
     [points, numpointspercell] = orgcell2points(spotslocation, spotsintensity, spotsintensityscaled, num_of_rounds, numPseudoChannels, z_slice)
     %--------------------------------------------------------------------
     
+
+    %Save Point to path
+    %--------------------------------------------------------------------
     points_path = fullfile(dest, 'points.mat')
     save(points_path, 'points') 
+    %--------------------------------------------------------------------
     
     %Set variables for Decoding Function
     %--------------------------------------------------------------------
@@ -97,7 +100,6 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
 
     if strcmp(minseeds, 'number_of_rounds - 1')
         minseeds = num_of_rounds - 1
-        disp('hi')
     else
         minseeds = str2double(minseeds)
     end
@@ -109,9 +111,11 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
     [consensuscell, copynumfinal ] = BarcodeNoMiji_v8( numPseudoChannels, points, num_of_rounds, barcodekey,radius,allowed_diff);
     
     [dotlocations_unfiltered] = PointLocations_v2(num_of_rounds, channels, points, consensuscell,copynumfinal, radius);
-
-
-
+    %--------------------------------------------------------------------
+    
+    
+    %Save the variables
+    %--------------------------------------------------------------------
     cc_path = fullfile(dest, 'consensuscell.mat')
     save(cc_path, 'consensuscell') 
     
@@ -120,7 +124,11 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
 
     dotlocations_unfiltered_path = fullfile(dest, 'dotlocations_unfiltered.mat')
     save(dotlocations_unfiltered_path, 'dotlocations_unfiltered') 
+    %--------------------------------------------------------------------
     
+    
+    %Filter the seeds
+    %--------------------------------------------------------------------
     [seeds] = numseeds(dotlocations_unfiltered);
 
     [finalPosList, PosList, dotlocations] = filterseeds_v3(seeds, dotlocations_unfiltered, minseeds);
@@ -132,7 +140,6 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
     [dotlocations_table_filtered, dotlocations_table_unfiltered] = dotlocations2table(dotlocations, barcodekey_info.barcodekey.names, minseeds);
     %--------------------------------------------------------------------
     
-    %dotlocations_table = table2cell(dotlocations_table)
 
     %Save results
     %--------------------------------------------------------------------
