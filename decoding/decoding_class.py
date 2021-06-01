@@ -29,7 +29,6 @@ from decoding import decoding_non_barcoded
 from decoding import syndrome_decoding
 #----------------------------
 
-
 #Analysis Class to set and run parameters for analyses
 #=====================================================================================
 class Decoding:

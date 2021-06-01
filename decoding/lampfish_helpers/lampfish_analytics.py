@@ -5,14 +5,26 @@ import matplotlib.pyplot as plt
 import sys
 
 def get_ratio_visualization(locs_src, dst):
-    
+    """
+    Get visuals of ratio from locs_src
+    Inputs:
+        locs_src : locations of lampfish results
+        dst : where the destination of the plot will be
+    Output:
+        Save png file to dst
+    """
+    #Read in locations src and remove cases on the edges which cause inf
+    #--------------------------------------------------
     df_locs = pd.read_csv(locs_src)
-    #df_locs['ratio'] = df_locs['sum_3x3_int_ch1']/(df_locs['sum_3x3_int_ch2'] + df_locs['sum_3x3_int_ch1'])
     df_locs = df_locs[df_locs['ratio'] != np.inf]
-    #color = sns.color_palette()[2:10]
+    #--------------------------------------------------
+    
+    #Plot figure
+    #--------------------------------------------------
     plt.figure()
     sns.histplot(data=df_locs, x="ratio", hue="hyb",bins=300).set_title('Ratio')
     plt.savefig(dst)
+    #--------------------------------------------------
     
 if sys.argv[1] == 'debug_ratio_vis':
     get_ratio_visualization(locs_src = 'foo/lampfish_decoding.csv',

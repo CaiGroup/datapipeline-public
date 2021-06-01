@@ -20,6 +20,7 @@ import shutil
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+sys.path.insert(0, os.getcwd())
 
 
 #Import some helpers
@@ -36,17 +37,16 @@ from timer import timer_tools
 
 
 main_dir = '/groups/CaiLab'
-
 #Dot Detection class for setting dot detection
 #=====================================================================================
 class Dot_Detection:
-    def __init__(self, experiment_name, personal, position, locations_dir, \
-                   analysis_name, visualize_dots, normalization, \
-                   background_subtraction, decoding_individual, chromatic_abberration, \
-                   dot_detection, gaussian_fitting, strictness_dot_detection, dimensions, \
-                   radial_center, num_zslices, nbins, threshold, num_wav, z_slices, \
-                   dot_radius, radius_step, num_radii, debug_dot_detection, min_weight_adcg, 
-                   final_loss_adcg):
+    def __init__(self, experiment_name, personal, position, locations_dir, 
+                   analysis_name, visualize_dots, normalization, background_subtraction,
+                   decoding_individual, chromatic_abberration, dot_detection, gaussian_fitting, 
+                   strictness_dot_detection, dimensions, radial_center, num_zslices, 
+                   nbins, threshold, num_wav, z_slices, 
+                   dot_radius, radius_step, num_radii, debug_dot_detection,
+                   min_weight_adcg, final_loss_adcg, test1, test2):
 
         self.experiment_name = experiment_name
         self.personal = personal
@@ -455,12 +455,28 @@ if sys.argv[1] == 'debug_dot_class':
     nbins = 100
     threshold = 300
     num_wav = 4
+    z_slices = None
+    dot_radius = 1
+    radius_step = 2
+    num_radii = 2
+    debug_dot_detection = False
+    min_weight_adcg = 1000
+    final_loss_adcg = 1000
     
     dot_detection = Dot_Detection = (experiment_name, personal, position, locations_dir, \
-                   analysis_name, visualize_dots, normalization, \
-                   background_subtraction, decoding_individual, chrom, \
-                   dot_detection, gauss, strict, dim, \
-                   rad, num_z, nbins, threshold, num_wav)
+                  analysis_name, visualize_dots, normalization, \
+                  background_subtraction, decoding_individual, chrom, \
+                  dot_detection, gauss, strict, dim, \
+                  rad, num_z, nbins, threshold, num_wav,
+                  z_slices, 
+                   dot_radius,
+                   radius_step, 
+                   num_radii, 
+                   debug_dot_detection,
+                   min_weight_adcg, 
+                   final_loss_adcg)
+                   
+    print(f'{dot_detection=}')
                    
     
                    

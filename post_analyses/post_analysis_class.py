@@ -4,7 +4,7 @@ import sys
 import scipy.io as sio
 import numpy as np
 import glob
-
+sys.path.insert(0, os.getcwd())
 
 
 #Analysis
@@ -99,12 +99,14 @@ class Post_Analyses:
     #Run False Positive Rate Analysis for Segmented Genes
     #--------------------------------------------------------------------------------
     def run_false_positive_rate_analysis_indiv(self):
+        print('Channels in post analyses:')
+        print(f'{self.channels=}')
 
         #RUn for Segmentation
         #----------------------------------------------------------------------------------
         if self.segmentation != False:
             for channel in self.channels:
-                
+                print(f'{channel=}')
                 on_barcode_path = os.path.join(self.barcode_key_src, 'channel_' +str(channel)+'.csv')
                 
                 off_barcode_path = os.path.join(self.barcode_key_src, 'channel_' +str(channel)+'_fake.csv')
@@ -121,7 +123,7 @@ class Post_Analyses:
 
                 dst_file_path = os.path.join(dst_dir,'false_positives_after_segmentation.txt')
                 
-            get_false_pos_rate_post_seg(genes_assigned_to_cell_src, on_barcode_path, off_barcode_path, dst_file_path)
+                get_false_pos_rate_post_seg(genes_assigned_to_cell_src, on_barcode_path, off_barcode_path, dst_file_path)
         #----------------------------------------------------------------------------------
     #--------------------------------------------------------------------------------
         
@@ -168,6 +170,19 @@ class Post_Analyses:
                 get_hamming_analysis(genes_assigned_to_cell_src, barcode_src, dest_file_path)
     #--------------------------------------------------------------------------------
     
+if sys.argv[1] == 'debug_post_analyses_class':
+    print('Debugging')
+    post_analysis = Post_Analyses(position_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult__3_ch/MMStack_Pos0/', 
+                                false_pos_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult__3_ch/MMStack_Pos0/False_Positive_Rate_Analysis/', 
+                                seg_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult__3_ch/MMStack_Pos0/Segmentation/',
+                                hamming_dir = None,
+                                bool_fake_barcodes = True, 
+                                barcode_key_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult__3_ch/BarcodeKey/', 
+                                num_zslices= None, 
+                                segmentation = 'cellpose', 
+                                channels = [1,2,3])
+    
+    post_analysis.run_false_positive_rate_analysis_indiv()
     
     
     

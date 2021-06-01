@@ -9,7 +9,9 @@ import time
 from datetime import datetime
 from load_tiff import tiffy
 import shutil
+# sys.path.insert(0, os.getcwd())
 
+print('Current Directory:', os.getcwd())
 #Import things to be done after all positions
 #-----------------------------------------------------
 from helpers.send_email_notif import send_finished_notif, are_logs_finished
@@ -23,6 +25,7 @@ from helpers.get_correlation_plots import get_correlated_positions
 #----------------------------
 from align_scripts import run_alignment
 from align_scripts import fiducial_alignment
+from align_scripts.dapi_visual_check.dapi_visual_check import get_stacked_dapi_s_align_check
 #----------------------------
 
 #Align Error Script
@@ -32,7 +35,8 @@ from align_errors import align_errors
 
 #Dot Detection Script
 #----------------------------
-from dot_detection.dot_detection_class import Dot_Detection
+print('Current Directory:', os.getcwd())
+from dot_detection import dot_detection_class2
 #----------------------------
 
 #Barcode Script
@@ -453,14 +457,16 @@ class Analysis:
     #--------------------------------------------------------------------
     def run_dot_detection(self):
         
-        dot_detector = Dot_Detection(self.experiment_name, self.personal, self.position, self.locations_dir, \
-                                               self.analysis_name, self.visualize_dots, self.normalization, \
-                                               self.background_subtraction, self.decoding_individual, self.chromatic_abberration, \
-                                               self.dot_detection, self.gaussian_fitting, self.strictness_dot_detection, self.dimensions, \
-                                               self.radial_center, self.num_zslices, self.nbins, self.threshold, self.num_wav, self.num_z, \
-                                               self.dot_radius, self.radius_step, self.num_radii, self.debug_dot_detection, self.min_weight_adcg, 
-                                               self.final_loss_adcg)
-                   
+        #print(f'{Dot_Detection=}')
+        dot_detector = dot_detection_class2.Dot_Detection(self.experiment_name, self.personal, self.position, self.locations_dir, 
+                                               self.analysis_name, self.visualize_dots, self.normalization, self.background_subtraction, 
+                                               self.decoding_individual, self.chromatic_abberration, self.dot_detection, self.gaussian_fitting, 
+                                               self.strictness_dot_detection, self.dimensions, self.radial_center, self.num_zslices, 
+                                               self.nbins, self.threshold, self.num_wav, self.num_z, 
+                                               self.dot_radius, self.radius_step, self.num_radii, self.debug_dot_detection,
+                                               self.min_weight_adcg, self.final_loss_adcg)
+                                              
+                                               
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 
         
@@ -622,9 +628,16 @@ class Analysis:
                     offsets_path = os.path.join(path, 'offsets.json')
                     with open(offsets_path, 'w') as jsonfile:
                         json.dump(offset, jsonfile)
-                    
-                            
                     #-----------------------------------------------------
+                    
+                    #Get Visual Check for DAPI 
+                    #-------------------------------------------------
+                    dapi_check_dir = os.path.join(self.position_dir, 'Alignment_Checks')
+                    os.makedirs(dapi_check_dir, exist_ok=True)
+                    dapi_check_dst = os.path.join(dapi_check_dir, 'Aligned_and_Stacked_DAPI_S.tif')
+                    get_stacked_dapi_s_align_check(offsets_path, dapi_check_dst, self.num_wav)
+                    #-------------------------------------------------
+                    
                     timer_tools.logg_elapsed_time(self.start_time, 'Ending Alignment')
             #--------------------------------------------------------------------------------
             #End of Alignement

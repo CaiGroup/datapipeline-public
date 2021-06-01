@@ -14,14 +14,19 @@ from align_scripts.helpers.combine_offs import combine_offsets
 from align_scripts.helpers.combine_offs import combine_align_errors
 #-------------------------------------------------
 
+#Import DAPI Visual Check
+#-------------------------------------------------
+from align_scripts import dapi_visual_check
+#-------------------------------------------------
 
 
 main_dir = '/groups/CaiLab'
 
 
 def get_and_sort_hybs(path_to_experiment_dir):
-    
-    
+    """
+    Gets and sorts the hybs
+    """
     #Get all files in path
     #-------------------------------------------------
     hyb_dirs = glob.glob(path_to_experiment_dir)
@@ -63,33 +68,43 @@ def get_and_sort_hybs(path_to_experiment_dir):
     
 def get_fixed_and_movings(exp_name, personal, position, main_dir):
     
-    exp_dir = os.path.join(main_dir, 'personal',personal, 'raw', exp_name)
-    
-    #offsets = {}
-    
+    #Get Fixed File Path and Sub Dirs
+    #-------------------------------------------------
+    exp_dir = os.path.join(main_dir, 'personal', personal, 'raw', exp_name)
     sub_dirs = get_and_sort_hybs(os.path.join(exp_dir,'*'))
-    
     fixed_hyb = sub_dirs[0].split(os.sep)[-1]
-    
     fixed_file_path = os.path.join(exp_dir, fixed_hyb, position)    
+    #-------------------------------------------------
     
     return sub_dirs, fixed_file_path
 
 def run_alignment(exp_name, personal, position, align_function, num_wav):
+    """
+    Run alignmnet on a position and experiment
+    """
     
-    
+    #Get Subdirectories and fixed file path
+    #-------------------------------------------------
     sub_dirs, fixed_file_path = get_fixed_and_movings(exp_name, personal, position, main_dir)
+    #-------------------------------------------------
     
+    #Get random list for parallelization and where to store rand dirs
+    #-------------------------------------------------
     rand_list = get_random_list(len(sub_dirs))
-    
-    
-    cwd = os.getcwd()
-    align_dir = os.path.join(cwd, 'align_scripts',)
-    
     temp_dir = os.path.join(main_dir, 'personal', 'temp', 'temp_align')
+    #-------------------------------------------------
     
+    #Get the directory with alignment scripts
+    #-------------------------------------------------
+    cwd = os.getcwd()
+    align_dir = os.path.join(cwd, 'align_scripts')
+    #-------------------------------------------------
+    
+    #If no alignment set to "no_align"
+    #-------------------------------------------------
     if align_function == 'no_align':
         offsets = {}
+    #-------------------------------------------------
     
     #Run alignment
     #-----------------------------------------------------------------
@@ -116,49 +131,77 @@ def run_alignment(exp_name, personal, position, align_function, num_wav):
             pass
         #-----------------------------------------------------------------
         
+        #If there is no alignment
+        #-------------------------------------------------
         if align_function == 'no_align':
             key = os.path.join(hyb, position)
             offsets[key] = [0,0,0]
-            
+        #-------------------------------------------------
+        
+        #Have to wait for dot detection to finish if there is fiducial alignment
+        #-------------------------------------------------
         elif align_function == 'fiducial_markers':
             pass 
+        #-------------------------------------------------
         
-            
+        
+        #Run DAPI Alignment
+        #-------------------------------------------------
         else:
             print(f'{tiff_file_path=}')
+            
+            #Make Command and assign to bash script
+            #-------------------------------------------------
             list_cmd = ['python', align_dir+ '/'+align_function+ '.py', '--fixed_src', fixed_file_path, '--moving_src', tiff_file_path, '--rand', rand_dir, '--num_wav', str(num_wav)]
-        
-    
             cmd = ' '.join(list_cmd)
-    
+            #-------------------------------------------------
+            
+            #Write command to bash script to run in parallel
+            #-------------------------------------------------
             script_name = os.path.join(rand_dir, 'align.sh')
             out_file_path = script_name = os.path.join(rand_dir, 'slurm_align.out')
             with open(script_name , 'w') as f:
                 f.write('#!/bin/bash \n')
                 f.write(cmd)
+            #-------------------------------------------------    
             
-    
+            #Run Batch script command
+            #-------------------------------------------------
             call_me = ['sbatch', '--output', out_file_path, '--job-name', rand_list[sub_dirs.index(sub_dir)], "--time", "0:20:00","--mem-per-cpu", "9G", "--ntasks", '1', script_name ]
             print(f'{" ".join(call_me)=}')
             subprocess.call(call_me)
-
+            #-------------------------------------------------
+    
+    #Only run if Align param is not no align
+    #-------------------------------------------------
     if align_function != 'no_align':
         print(f'{rand_list=}')
         
+        #Wait for all jobs to finish
+        #-------------------------------------------------
         while not are_jobs_finished(rand_list):
             print('Waiting for Alignment Jobs to Finish')
             time.sleep(30)
+        #-------------------------------------------------
         
+        #Combine all offsets
+        #-------------------------------------------------
         offsets = combine_offsets(rand_list)
+        #-------------------------------------------------
         
+        #Combine align errors
+        #-------------------------------------------------
         align_errors = combine_align_errors(rand_list)
+        #-------------------------------------------------
         
  
-        #Delete Temp files
+        #Delete Temp Directories
+        #-------------------------------------------------
         for rand in rand_list:
             rand_dir = os.path.join(temp_dir, rand)
             shutil.rmtree(rand_dir)
-            
+        #-------------------------------------------------
+        
         return offsets, align_errors
         
     else:

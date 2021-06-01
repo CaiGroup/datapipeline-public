@@ -10,8 +10,8 @@ using Statistics
 sigma_lb = 1.0
 sigma_ub = 1.4
 tau = 2.0*10^12
-min_weight = ARGS[3]
-final_loss_improvement = ARGS[4]
+min_weight = parse(Float64, ARGS[3])
+final_loss_improvement = parse(Float64, ARGS[4])
 max_iters = 200
 max_cd_iters = 10
 

@@ -86,8 +86,8 @@ def get_adcg_dots(tiff_2d, min_weight, final_loss):
     #Set and run cmd
     #-------------------------------------------------------------------
     adcg_wrap_path = os.path.join(os.getcwd(), 'dot_detection/dot_detectors_3d/adcg', 'adcg_wrapper.sh')
-    cmd = 'sbatch --wait ' + '--output ' + str(output_path)  + ' ' + adcg_wrap_path + ' ' + tiff_txt_path  \ 
-        + ' ' + locs_result_path + ' ' + min_weight + ' ' + final_loss
+    cmd = 'sbatch --wait ' + '--output ' + output_path  + ' ' + adcg_wrap_path + ' ' + tiff_txt_path  \
+            + ' ' + locs_result_path + ' ' + min_weight + ' ' + final_loss
     print(f'{cmd=}')
     os.system(cmd)
     #-------------------------------------------------------------------
@@ -171,7 +171,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             
             #Run adcg on 2d slice
             #-------------------------------------------------------------------
-            df_points_2d = get_adcg_dots(tiff_2d, min_weight)
+            df_points_2d = get_adcg_dots(tiff_2d, min_weight, final_loss)
             #-------------------------------------------------------------------
             
             #Change weight to intensity
@@ -282,14 +282,16 @@ else:
     get_dots_for_tiff(tiff_src ='/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_11/MMStack_Pos0.ome.tif', 
                         offset = [0,0],
                         analysis_name = 'linus_decoding', 
-                        visualize_dots = True, 
+                        bool_visualize_dots = True, 
                         bool_normalization = False, 
                         bool_background_subtraction = False, 
-                        channels = [1], 
+                        channels_to_detect_dots = [1], 
                         bool_chromatic = False, 
                         num_wav = 4, 
-                        z_slice = 'all', 
-                        rand_dir = '/tmp/nrezaee')
+                        z_slices = 'all', 
+                        rand_dir = '/tmp/nrezaee',
+                        min_weight = str(2000),
+                        final_loss = str(1000))
     
     
 
