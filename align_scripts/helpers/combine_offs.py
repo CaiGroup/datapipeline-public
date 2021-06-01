@@ -8,14 +8,39 @@ def combine_offsets(rand_list):
     offsets = {}
     
     for rand in rand_list:
+        
+        #Check for Hyb* in directory
+        #---------------------------------------------
         glob_rand_dir = os.path.join(temp_dir, rand, 'Hyb*')
+        
         print(f'{glob_rand_dir=}')
         
-        off_pkl = glob.glob(glob_rand_dir)[0]
-
+        off_pkls = glob.glob(glob_rand_dir)
+        #---------------------------------------------
+        
+        #Check to see if background instead of hyb
+        #---------------------------------------------
+        if len(off_pkls) == 0:
+            glob_rand_dir = os.path.join(temp_dir, rand, 'final_background*')
+            print(f'{glob_rand_dir=}')
+            off_pkls = glob.glob(glob_rand_dir)
+            assert len(off_pkls) == 1, "Aligning the final background messed up"
+            off_pkl = off_pkls[0]
+        #---------------------------------------------
+        
+        #It is a hyb or error
+        #---------------------------------------------
+        elif len(off_pkls) == 1:
+            off_pkl = glob.glob(glob_rand_dir)[0]
+        else:
+            raise Exception(' There is more than one .pkl for offset')
+        #---------------------------------------------
             
+        #Get offset from pickle
+        #---------------------------------------------
         with open(off_pkl, 'rb') as fp:
             offset = pickle.load(fp)
+        #---------------------------------------------
     
         #Save Offset
         #---------------------------------------------
@@ -38,7 +63,7 @@ def combine_align_errors(rand_list):
     offsets = {}
     
     for rand in rand_list:
-        glob_rand_dir = os.path.join(temp_dir, rand, 'align_error_Hyb*')
+        glob_rand_dir = os.path.join(temp_dir, rand, 'align_error_*')
         print(f'{glob_rand_dir=}')
         
         off_pkl = glob.glob(glob_rand_dir)[0]

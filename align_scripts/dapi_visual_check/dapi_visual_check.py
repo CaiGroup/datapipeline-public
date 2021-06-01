@@ -9,7 +9,7 @@ sys.path.insert(0, '/home/nrezaee/data-pipeline')
 from load_tiff import tiffy
 from scipy.ndimage import shift
     
-def get_stacked_dapi_s_align_check(offset_path, dst, num_wav=4, num_dapi_stacked= 4):
+def get_stacked_dapi_s_align_check(offset_path, dst, num_wav=4, num_dapi_stacked= 10):
     """
     Creates a stacked Dapi img to check alignment
     """
@@ -30,7 +30,11 @@ def get_stacked_dapi_s_align_check(offset_path, dst, num_wav=4, num_dapi_stacked
     
     #Get random hyb dirs to test for offsets
     #--------------------------------------------------------
-    rand_hyb_dirs = random.sample(all_hyb_dirs, num_dapi_stacked)
+    if len(all_hyb_dirs) >= num_dapi_stacked:
+        rand_hyb_dirs = random.sample(all_hyb_dirs, num_dapi_stacked)
+    else:
+        rand_hyb_dirs = random.sample(all_hyb_dirs, len(all_hyb_dirs))
+        
     print(f'{rand_hyb_dirs=}')
     #--------------------------------------------------------
     
@@ -83,10 +87,16 @@ def get_stacked_dapi_s_align_check(offset_path, dst, num_wav=4, num_dapi_stacked
     print(f'{stacked_dapi_s.shape=}')
     
     tf.imwrite(dst, stacked_dapi_s,imagej=True)
+    print(f'{dst=}')
     #--------------------------------------------------------
     
 if sys.argv[1] == 'debug_align_visual_check':
     offset_path = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_debug_2_strict_8/MMStack_Pos0/offsets.json'
+    dst = 'foo.tif'
+    get_stacked_dapi_s_align_check(offset_path, dst)
+
+elif sys.argv[1] == 'debug_align_visual_check_small':
+    offset_path = '/groups/CaiLab/analyses/nrezaee/test1/align_test2/MMStack_Pos0/offsets.json'
     dst = 'foo.tif'
     get_stacked_dapi_s_align_check(offset_path, dst)
 

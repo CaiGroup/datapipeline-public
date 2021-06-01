@@ -193,7 +193,7 @@ class Analysis:
         
     def set_background_subtraction_true(self):
         self.background_subtraction = True
-        background_file = os.path.join(self.data_dir, 'background',self.position)
+        background_file = os.path.join(self.data_dir, 'final_background',self.position)
         assert os.path.isfile(background_file), "The background file for subtraction is missing at " + str(background_file) 
         print("    Set Background Subtraction", flush=True)
         

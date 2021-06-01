@@ -11,7 +11,7 @@ sys.path.append(os.getcwd())
 from load_tiff import tiffy
 from dot_detection.helpers.visualize_dots import get_visuals_3d
 from dot_detection.helpers.shift_locations import shift_locations
-from dot_detection.helpers.background_subtraction import get_background
+from dot_detection.helpers.background_subtraction import get_background, get_back_sub_check
 from dot_detection.dot_detectors_3d.hist_jump_helpers.jump_helpers import hist_jump_threshed_3d
 from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
 from dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
@@ -100,9 +100,9 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             # tiff_3d = run_back_sub(background, tiff_3d, channel, offset)
             print(f'{background.shape=}')
             print(f'{channel=}')
-            tiff_3d = tiff_3d.astype(np.int32) - background[:, channel].astype(np.int32)*30
+            tiff_3d = tiff_3d.astype(np.int32) - background[:, channel].astype(np.int32)*.001
             tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
-            tf.imwrite('foo.tif', tiff_3d)
+            get_back_sub_check(tiff_src, analysis_name, tiff_3d)
         #---------------------------------------------------------------------
 
         print((channel+1), end = " ", flush =True)
@@ -238,7 +238,7 @@ else:
     analysis_name = 'linus_decoding'
     rand_dir = '/home/nrezaee/temp'
     vis_dots = True
-    back_sub = False
+    back_sub = True
     chromatic = False
     gauss = False
     rad = False

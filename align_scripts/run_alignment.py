@@ -32,6 +32,11 @@ def get_and_sort_hybs(path_to_experiment_dir):
     hyb_dirs = glob.glob(path_to_experiment_dir)
     #-------------------------------------------------
     
+    #Get background
+    #-------------------------------------------------
+    back_dir = [hyb_dir for hyb_dir in hyb_dirs if 'final_background' in hyb_dir]
+    print(f'{back_dir=}')
+    #-------------------------------------------------
     
     #Remove anything that is not a Hyb
     #-------------------------------------------------
@@ -63,6 +68,13 @@ def get_and_sort_hybs(path_to_experiment_dir):
         sorted_hyb_dirs[index].insert(1, split_word)
         sorted_hyb_dirs[index] = ''.join(sorted_hyb_dirs[index])
     #-------------------------------------------------
+    
+    #Add background to dirs to align
+    #-------------------------------------------------
+    if len(back_dir) ==1:
+        sorted_hyb_dirs.append(back_dir[0])
+    #-------------------------------------------------
+    print(f'{sorted_hyb_dirs=}')
     
     return sorted_hyb_dirs
     
@@ -181,7 +193,7 @@ def run_alignment(exp_name, personal, position, align_function, num_wav):
         #-------------------------------------------------
         while not are_jobs_finished(rand_list):
             print('Waiting for Alignment Jobs to Finish')
-            time.sleep(30)
+            time.sleep(5)
         #-------------------------------------------------
         
         #Combine all offsets
