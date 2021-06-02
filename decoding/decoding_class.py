@@ -183,7 +183,7 @@ class Decoding:
             
             print('Shape in Decoding Class: ' +  str(self.labeled_img.shape))
             decoding_parallel.decoding(barcode_file_path, locations_path, self.labeled_img, self.decoded_dir, self.allowed_diff, \
-                    self.min_seeds, start_time, decode_only_cells = self.decode_only_cells)
+                    self.min_seeds, decode_only_cells = self.decode_only_cells)
                     
  
         print("Finished Decoding Across Channels")

@@ -1,7 +1,9 @@
 function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, dest, num_of_rounds, total_num_of_channels, channel_index, number_of_individual_channels_to_decode, allowed_diff, minseeds)  
     
+    disp('kvcjsf')
     warning('off','all')
     
+    disp(5)
     %Show allowed diff and number of rounds
     %--------------------------------------------------------------------
     allowed_diff
@@ -31,9 +33,11 @@ function [consensuscell, copynumfinal ] = decoding(barcode_src, locations_src, d
     
     %Get the right locations for individual decoding
     %--------------------------------------------------------------------
+        disp('hi')
         channel_index
         number_of_individual_channels_to_decode
         total_num_of_channels
+        disp('bye')
         
         
         %Get every other channel

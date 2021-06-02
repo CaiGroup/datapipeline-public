@@ -128,8 +128,8 @@ def save_points_int_to_csv(points, intensities, csv_dst):
     
     return None
     
-def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_seeds, start_time, channel_index = None, \
-        number_of_individual_channels_for_decoding=None, roi_path=None, decode_only_cells = False, ):
+def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_seeds, channel_index = None, \
+        number_of_individual_channels_for_decoding=None, roi_path=None, decode_only_cells = False, start_time = None):
     
     print(f'{barcode_src=}')
     print(f'{locations_src=}')
