@@ -36,7 +36,7 @@ from align_errors import align_errors
 #Dot Detection Script
 #----------------------------
 print('Current Directory:', os.getcwd())
-from dot_detection import dot_detection_class2
+from dot_detection.dot_detection_class3 import Dot_Detection
 #----------------------------
 
 #Barcode Script
@@ -458,7 +458,7 @@ class Analysis:
     def run_dot_detection(self):
         
         #print(f'{Dot_Detection=}')
-        dot_detector = dot_detection_class2.Dot_Detection(self.experiment_name, self.personal, self.position, self.locations_dir, 
+        dot_detector = Dot_Detection(self.experiment_name, self.personal, self.position, self.locations_dir, 
                                                self.analysis_name, self.visualize_dots, self.normalization, self.background_subtraction, 
                                                self.decoding_individual, self.chromatic_abberration, self.dot_detection, self.gaussian_fitting, 
                                                self.strictness_dot_detection, self.dimensions, self.radial_center, self.num_zslices, 
@@ -611,11 +611,11 @@ class Analysis:
                         
      
                                            
-                        offset = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, 'no_align', self.num_wav)
+                        offset = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, 'no_align', self.num_wav, self.start_time)
                     
                     else:
                         
-                        offset, align_errors = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, self.align, self.num_wav)
+                        offset, align_errors = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, self.align, self.num_wav, self.start_time)
                         offsets_path = os.path.join(path, 'offsets.json')
                         print("        Saving to", offsets_path, flush=True)
                         
@@ -691,7 +691,7 @@ class Analysis:
             decoder = Decoding(self.data_dir, self.position, self.decoded_dir, self.locations_dir, self.position_dir, self.barcode_dst, \
                 self.barcode_key_src, self.decoding_with_previous_dots, self.decoding_with_previous_locations, self.fake_barcodes, \
                 self.decoding_individual, self.min_seeds, self.allowed_diff, self.dimensions, self.num_zslices, self.segmentation, \
-                self.decode_only_cells, self.labeled_img, self.num_wav, self.synd_decoding, self.lampfish_pixel)
+                self.decode_only_cells, self.labeled_img, self.num_wav, self.synd_decoding, self.lampfish_pixel, self.start_time)
         #--------------------------------------------------------------------------------
         
         

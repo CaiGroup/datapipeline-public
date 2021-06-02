@@ -36,7 +36,7 @@ class Decoding:
                     bool_decoding_with_previous_dots, bool_decoding_with_previous_locations, \
                     bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions, \
                     num_zslices, segmentation, decode_only_cells, labeled_img, num_wav, synd_decoding, \
-                    lampfish_pixel):
+                    lampfish_pixel, start_time):
         
         self.data_dir = data_dir
         self.position = position
@@ -59,6 +59,7 @@ class Decoding:
         self.num_wav = num_wav
         self.synd_decoding = synd_decoding
         self.lampfish_pixel = lampfish_pixel
+        self.start_time = start_time
          
     def labeled_img_from_tiff_dir(self):
         glob_me = os.path.join(self.data_dir, '*')
@@ -182,7 +183,7 @@ class Decoding:
             
             print('Shape in Decoding Class: ' +  str(self.labeled_img.shape))
             decoding_parallel.decoding(barcode_file_path, locations_path, self.labeled_img, self.decoded_dir, self.allowed_diff, \
-                    self.min_seeds, decode_only_cells = self.decode_only_cells)
+                    self.min_seeds, start_time, decode_only_cells = self.decode_only_cells)
                     
  
         print("Finished Decoding Across Channels")

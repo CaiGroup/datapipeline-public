@@ -61,8 +61,12 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
     
     #Getting Background Src
     #--------------------------------------------------------------------
-   # back_src = get_background(tiff_src)
+    if bool_background_subtraction == True:
+            background_src = get_background(tiff_src)
+            print(f'{background_src=}')
+            background = tiffy.load(background_src, num_wav)
     #--------------------------------------------------------------------
+    
     
     #Reading Tiff File
     #--------------------------------------------------------------------
@@ -94,7 +98,18 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
         dots_in_channel = None
         tiff_3d = tiff[:, channel,:,:]
-
+        
+        #Background Subtraction
+        #---------------------------------------------------------------------
+        if bool_background_subtraction == True:
+            # tiff_3d = run_back_sub(background, tiff_3d, channel, offset)
+            print(f'{background.shape=}')
+            print(f'{channel=}')
+            tiff_3d = tiff_3d.astype(np.int32) - background[:, channel].astype(np.int32)*.7
+            tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
+            get_back_sub_check(tiff_src, analysis_name, tiff_3d)
+        #---------------------------------------------------------------------
+        
         print((channel+1), end = " ", flush =True)
         
 

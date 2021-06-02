@@ -90,7 +90,7 @@ def get_fixed_and_movings(exp_name, personal, position, main_dir):
     
     return sub_dirs, fixed_file_path
 
-def run_alignment(exp_name, personal, position, align_function, num_wav):
+def run_alignment(exp_name, personal, position, align_function, num_wav, start_time):
     """
     Run alignmnet on a position and experiment
     """

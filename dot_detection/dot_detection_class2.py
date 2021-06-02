@@ -35,7 +35,6 @@ from timer import timer_tools
 #--------------------------------------------------------------------------------
 
 
-
 main_dir = '/groups/CaiLab'
 #Dot Detection class for setting dot detection
 #=====================================================================================
@@ -87,7 +86,14 @@ class Dot_Detection:
         #--------------------------------------------------------------
         
     def get_z_slices_check_img(self, df,dst_dir):
+        
+        #Get the number of dots in each z
+        #------------------------------------------------------
         z_s = np.array(np.round(df.z))+1
+        #------------------------------------------------------
+        
+        #Plot and save the figure
+        #------------------------------------------------------
         plt.figure()
         plt.title("Number of Dots Across Z's", fontsize=20)
         plt.xlabel("Z Slice")
@@ -95,11 +101,19 @@ class Dot_Detection:
         plt.xticks(list(set(z_s)))
         plt.hist(z_s)
         plt.savefig(os.path.join(dst_dir, 'Dots_Across_Z_Slices.png'))
-        
+        #------------------------------------------------------
+    
     def get_heatmap_of_xy(self, df, dst_dir):
+        
+        #Get size and tiles across
+        #------------------------------------------------------
         size = int(np.round(df[['x','y']].values.max()))
         tiles_across = 16
         print(f'{size=}')
+        #------------------------------------------------------
+        
+        #Get the heatmap sections
+        #------------------------------------------------------
         heatmap_sections = []
         step_size = int(np.round(size/tiles_across))
         for x in range(0,size,step_size):
@@ -111,11 +125,17 @@ class Dot_Detection:
                 heatmap_slide.append(df_square.shape[0])
     
             heatmap_sections.append(heatmap_slide)
+        #------------------------------------------------------
+        
+        #Run some quick reformatting
+        #------------------------------------------------------
         heatmap_sections.reverse()
-    
         heatmap_sections = np.array(heatmap_sections)
         heatmap_sections = np.rot90(heatmap_sections,2).T
+        #------------------------------------------------------
     
+        #Plot the heatmap
+        #------------------------------------------------------
         colormap = sns.color_palette("Greens")
         plt.figure()
         plt.title('Map of Locations Across X and Y', fontsize=15)
@@ -124,22 +144,37 @@ class Dot_Detection:
         map_xy.set_yticklabels(list(range(0,size,step_size)), fontsize = 5)
         
         plt.savefig(os.path.join(dst_dir, 'Map_of_XY_Locations.png'))
-    
+        #------------------------------------------------------
+        
     def get_location_checks(self, locations_csv_src):
+        
+        #Make dst dir
+        #------------------------------------------------------
         dst_dir = os.path.join(os.path.dirname(locations_csv_src), 'Location_Checks')
         if not os.path.exists(dst_dir):
             os.mkdir(dst_dir)
+        #------------------------------------------------------
+        
+        #Read dataframe and get checks
+        #------------------------------------------------------
         df = pd.read_csv(locations_csv_src)
         self.get_z_slices_check_img(df,dst_dir)
         self.get_heatmap_of_xy(df, dst_dir)
+        #------------------------------------------------------
     
         
     def save_locations_shape(self, locs_csv_src):
         
+        #Open new file and locations
+        #------------------------------------------------------
         dst = os.path.join(os.path.dirname(locs_csv_src), 'Locations_Shape.txt')
         f = open(dst, "a")
         df = pd.read_csv(locs_csv_src)
+        #------------------------------------------------------
         
+        
+        #Get locations shape for each hybcycle and channel
+        #------------------------------------------------------
         hybs = df.hyb.unique()
         chs = df.ch.unique()
         i = 0
@@ -150,12 +185,18 @@ class Dot_Detection:
                 i+=1
         
         f.close()
+        #------------------------------------------------------
         
     def get_ave_over_hyb_ch_z(self, src, dst):
         
+        #Read csv and make new csv
+        #------------------------------------------------------
         df = pd.read_csv(src)
         df_aves = pd.DataFrame(columns = ['hyb', 'ch', 'z', 'ave_int', 'n_dots'])
-    
+        #------------------------------------------------------
+        
+        #Get Average over hyb, ch, z
+        #------------------------------------------------------
         for hyb in df.hyb.unique():
             for ch in df.ch.unique():
                 for z in df.z.unique():
@@ -163,8 +204,12 @@ class Dot_Detection:
                     dict_ave_row = {'hyb':hyb,'ch':ch,'z':z, 'ave_int':df_hyb_ch_z.int.mean(), \
                                     'n_dots':df_hyb_ch_z.shape[0]}
                     df_aves = df_aves.append(dict_ave_row, ignore_index = True)
-                    
+        #------------------------------------------------------
+        
+        #Save to csv
+        #------------------------------------------------------
         df_aves.to_csv(dst, index=False)
+        #------------------------------------------------------
     
  
     def run_dot_detection_2d(self):
@@ -199,6 +244,49 @@ class Dot_Detection:
             
         return locations_path
 
+
+    def add_strictness_to_locations(self, locs_src, strict_src):
+        
+        #Read into dataframes
+        #-------------------------------------------------
+        df_locs = pd.read_csv(locs_src)
+        df_strict = pd.read_csv(strict_src)
+        #-------------------------------------------------
+        
+        #Add Strictness columns
+        #-------------------------------------------------
+        df_locs['strictness'] = None
+        for i in range(df_strict.shape[0]-1):
+            
+            #Get thresholds
+            #-------------------------------------------------
+            lower_thresh = df_strict.iloc[i,:].threshold
+            higher_thresh = df_strict.iloc[i+1,:].threshold
+            #-------------------------------------------------
+            
+            #Apply threshold
+            #-------------------------------------------------
+            strictness = df_strict.iloc[i,:].strictness
+            df_locs.loc[(df_locs.int > lower_thresh) & (df_locs.int < higher_thresh), 'strictness']=strictness
+            #-------------------------------------------------
+            
+        #Save file to csv 
+        #-------------------------------------------------
+        df_locs.to_csv(locs_src, index=False)
+        #-------------------------------------------------
+        
+        
+    def add_strict_to_output(self, dot_locs_dir):
+    `   """
+        Add strictness to output
+        """
+        strict_csv = os.path.join(dot_locs_dir, 'Biggest_Jump_Histograms', 'strictnesses.csv')
+        locs_csv = os.path.join(dot_locs_dir, 'locations.csv')
+        
+        print(f'{strict_csv=}')
+        assert os.path.isfile(strict_csv)
+        add_strictness_to_locations(locs_csv, strict_csv)
+        
     def run_dot_detection(self):
         
         if self.dimensions == 2:
@@ -209,34 +297,39 @@ class Dot_Detection:
         
         #Run Dot Detection
         #--------------------------------------------------------------------
-            
         df_locs = self.get_dot_locations()
-
         #--------------------------------------------------------------------
-        
         
         #Set path to save locations
         #--------------------------------------------------------------------
         if not os.path.exists(self.locations_dir):
             os.makedirs(self.locations_dir)
         
-    
         locations_path = os.path.join(self.locations_dir, 'locations.csv')
         #--------------------------------------------------------------------
-    
         
         #Save Locations
         #--------------------------------------------------------------------
         print("        Saving Locations to", locations_path, flush=True)
-        
-
         df_locs.to_csv(locations_path, index = False)
         self.save_locations_shape(locations_path)
+        #--------------------------------------------------------------------
         
+        #Get Ave Bright analysis
+        #--------------------------------------------------------------------
         bright_analysis_dst = os.path.join(self.locations_dir, 'Average_Brightness_Analysis.csv')
         self.get_ave_over_hyb_ch_z(locations_path, bright_analysis_dst)
+        #--------------------------------------------------------------------
+        
+        #Get locations checks 
+        #--------------------------------------------------------------------
         self.get_location_checks(locations_path)
         #self.save_locs_shape(locations_path)
+        #--------------------------------------------------------------------
+        
+        #Add strictness column
+        #--------------------------------------------------------------------
+        self.add_strict_to_output(self.locations_dir)
         #--------------------------------------------------------------------
         
         return locations_path
