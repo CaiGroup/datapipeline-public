@@ -1,48 +1,6 @@
 import pandas as pd 
 import matplotlib.pyplot as plt
 
-def get_n_dots_for_each_channel_plot(locs_src, dst):
-    #Read in locations
-    #----------------------------------------------------------
-    df_locs = pd.read_csv(locs_src)
-    #----------------------------------------------------------
-    
-    #Get the number of dots for each hyb and ch
-    #----------------------------------------------------------
-    df_n_dots = pd.DataFrame(columns = ['hyb', 'ch', 'n_dots'])
-    for hyb in df_locs.hyb.unique():
-        for ch in df_locs.ch.unique():
-            df_hyb_ch = df_locs[(df_locs.hyb == hyb) & (df_locs.ch == ch)]
-            df_n_dots = df_n_dots.append({'hyb':hyb, 'ch':ch, 'n_dots':df_hyb_ch.shape[0]}, ignore_index=True)
-    #----------------------------------------------------------
-    
-    #Declare the subplots
-    #----------------------------------------------------------
-    fig, axs = plt.subplots(2)
-    fig.suptitle('Number of Dots Across Channels and Hybs', fontsize=15)
-    fig.tight_layout(pad=2.0)
-    plt.xlabel('HybCycles', fontsize=12)
-    fig.text(0, 0.5, 'Number of Dots', va='center', rotation='vertical', 
-            fontsize=12)
-    #----------------------------------------------------------
-    
-    
-    #Make the barcharts
-    #----------------------------------------------------------
-    for ch_i in range(len(df_n_dots.ch.unique())):
-        print(f'{ch_i=}')
-        df_n_dots_ch = df_n_dots[df_n_dots.ch == df_n_dots.ch.unique()[ch_i]]
-        axs[ch_i].bar(range(len(df_n_dots_ch.n_dots)), df_n_dots_ch.n_dots)
-        axs[ch_i].set_title('Channel ' + str(df_n_dots.ch.unique()[ch_i]),
-                           fontsize=10)
-    #----------------------------------------------------------
-    
-    #Save plot
-    #----------------------------------------------------------
-    plt.savefig(dst)
-    #----------------------------------------------------------
-    
-
 def get_z_slices_check_img(self, df,dst_dir):
     
     #Get the number of dots in each z
@@ -119,3 +77,67 @@ def get_location_checks(self, locations_csv_src):
     self.get_z_slices_check_img(df,dst_dir)
     self.get_heatmap_of_xy(df, dst_dir)
     #------------------------------------------------------
+    
+    
+def get_n_dots_for_each_channel_plot(locs_src, dst):
+    #Read in locations
+    #----------------------------------------------------------
+    df_locs = pd.read_csv(locs_src)
+    #----------------------------------------------------------
+    
+    #Get the number of dots for each hyb and ch
+    #----------------------------------------------------------
+    df_n_dots = pd.DataFrame(columns = ['hyb', 'ch', 'n_dots'])
+    for hyb in df_locs.hyb.unique():
+        for ch in df_locs.ch.unique():
+            df_hyb_ch = df_locs[(df_locs.hyb == hyb) & (df_locs.ch == ch)]
+            df_n_dots = df_n_dots.append({'hyb':hyb, 'ch':ch, 'n_dots':df_hyb_ch.shape[0]}, ignore_index=True)
+    #----------------------------------------------------------
+    
+    #Declare the subplots
+    #----------------------------------------------------------
+    fig, axs = plt.subplots(len(df_n_dots.ch.unique()))
+    fig.suptitle('Number of Dots Across Channels and Hybs', fontsize=15)
+    fig.tight_layout(pad=2.0)
+    plt.xlabel('HybCycles', fontsize=12)
+    fig.text(0, 0.5, 'Number of Dots', va='center', rotation='vertical', 
+            fontsize=12)
+    #----------------------------------------------------------
+    
+    
+    #Make the barcharts
+    #----------------------------------------------------------
+    if len(df_n_dots.ch.unique()) > 1:
+        for ch_i in range(len(df_n_dots.ch.unique())):
+            print(f'{ch_i=}')
+            df_n_dots_ch = df_n_dots[df_n_dots.ch == df_n_dots.ch.unique()[ch_i]]
+            axs[ch_i].bar(range(len(df_n_dots_ch.n_dots)), df_n_dots_ch.n_dots)
+            axs[ch_i].set_title('Channel ' + str(df_n_dots.ch.unique()[ch_i]),
+                               fontsize=10)
+    elif len(df_n_dots.ch.unique()) == 1:
+        ch_i = 0
+        print(f'{ch_i=}')
+        df_n_dots_ch = df_n_dots[df_n_dots.ch == df_n_dots.ch.unique()[ch_i]]
+        axs.bar(range(len(df_n_dots_ch.n_dots)), df_n_dots_ch.n_dots)
+        axs.set_title('Channel ' + str(df_n_dots.ch.unique()[ch_i]))
+    #----------------------------------------------------------
+    
+    #Save plot
+    #----------------------------------------------------------
+    plt.savefig(dst)
+    #----------------------------------------------------------
+    
+import sys
+
+if sys.argv[1] == 'debug_n_dots_check':
+    locs_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/test/MMStack_Pos8/Dot_Locations/locations.csv'
+    dst = 'foo.png'
+    get_n_dots_for_each_channel_plot(locs_src, dst)
+
+
+
+
+
+
+
+

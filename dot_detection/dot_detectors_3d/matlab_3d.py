@@ -105,7 +105,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             # tiff_3d = run_back_sub(background, tiff_3d, channel, offset)
             print(f'{background.shape=}')
             print(f'{channel=}')
-            tiff_3d = tiff_3d.astype(np.int32) - background[:, channel].astype(np.int32)*.7
+            tiff_3d = tiff_3d.astype(np.int32) - background[:, channel].astype(np.int32)*.95
             tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
             get_back_sub_check(tiff_src, analysis_name, tiff_3d)
         #---------------------------------------------------------------------
