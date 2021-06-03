@@ -22,7 +22,7 @@ def max_intensity_projection(cyto_3d):
     IM_MAX= np.max(cyto_3d, axis=0)
     return IM_MAX
 
-def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, debug = False, cell_prob_threshold = 0, cell_flow_threshold = .4):
+def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, debug = False, cell_prob_threshold = 0, cell_flow_threshold = .4, cyto_radius = 0):
 
 
     #Getting Tiff
@@ -59,21 +59,19 @@ def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, d
     #----------------------------------------------
 
 
-    
-    
     #Commands to be run for cellpose
     #----------------------------------------------
     sing_and_cellpose_cmd = 'singularity  exec --bind /central/scratch/$USER --nv /home/nrezaee/sandbox/cellpose/gpu/tensorflow-20.02-tf1-py3.sif python -m cellpose '
     persistent_params = ' --img_filter dapi_channel_2d --pretrained_model cyto --use_gpu --no_npy --save_png '
     cyto_cell_prob_thresh_cmd = ' --cellprob_threshold ' + str(cell_prob_threshold)
     cyto_flow_thresh_cmd = ' --flow_threshold ' + str(cell_flow_threshold) 
+    diameter_cmd = ' --diameter ' + str(cyto_radius)
     #----------------------------------------------
-    
     
     
     #Combinining commands
     #----------------------------------------------
-    command_for_cellpose= sing_and_cellpose_cmd + persistent_params + cyto_cell_prob_thresh_cmd + cyto_flow_thresh_cmd + ' --diameter 0 --dir '
+    command_for_cellpose= sing_and_cellpose_cmd + persistent_params + cyto_cell_prob_thresh_cmd + cyto_flow_thresh_cmd + diameter_cmd + ' --dir '
     command_for_cellpose_with_dir = command_for_cellpose + rand_dir
     print(f'{command_for_cellpose_with_dir=}')
     #----------------------------------------------
@@ -127,5 +125,6 @@ if sys.argv[1] == 'debug_cellpose_cyto':
     labeled_img = get_labeled_cyto_cellpose(tiff_path='/groups/CaiLab/personal/nrezaee/raw/intron_pos0/HybCycle_0/MMStack_Pos0.ome.tif',
                                             num_wav = 4,
                                             dst = 'foo.tif',
-                                            debug = True)
+                                            debug = True, 
+                                            cyto_radius = 10)
 

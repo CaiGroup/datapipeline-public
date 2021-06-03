@@ -160,6 +160,7 @@ class Analysis:
         self.max_iters_adcg = 200
         self.max_cd_iters = 10
         self.nuclei_channel_num = -1
+        self.cyto_radius = 0
         #--------------------------------------------------------------
         
         
@@ -590,7 +591,7 @@ class Analysis:
                         self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, num_zslices, \
                         self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
                         self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold,
-                        self.nuclei_channel_num, self.cyto_flow_threshold, self.cyto_cell_prob_threshold)
+                        self.nuclei_channel_num, self.cyto_flow_threshold, self.cyto_cell_prob_threshold, self.cyto_radius)
         
             self.labeled_img = segmenter.retrieve_labeled_img()
             print('Shape after Seg in Analysis Class: ' +  str(self.labeled_img.shape))
@@ -808,7 +809,7 @@ class Analysis:
                 self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
                 self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
                 self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold, 
-                self.nuclei_channel_num, self.cyto_flow_threshold, self.cyto_cell_prob_threshold)
+                self.nuclei_channel_num, self.cyto_flow_threshold, self.cyto_cell_prob_threshold, self.cyto_radius)
                 
             print(f'{self.labeled_img.shape=}')
             if self.decoding_across == True or \
