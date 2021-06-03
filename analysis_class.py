@@ -157,6 +157,7 @@ class Analysis:
         self.final_loss_adcg = 1000.0
         self.max_iters_adcg = 200
         self.max_cd_iters = 10
+        self.nuclei_channel_num = -1
         #--------------------------------------------------------------
         
         
@@ -440,6 +441,11 @@ class Analysis:
         self.final_loss_adcg = float(final_improv_adcg)
         
         print("    Set Final Improvement ADCG to", str(self.final_loss_adcg))
+
+    def set_nuclei_channel_arg(self, nuclei_arg):
+        self.nuclei_channel_num = int(float(nuclei_arg))
+        
+        print("    Set Nuclei Channel Number to", str(self.nuclei_channel_num))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -566,7 +572,8 @@ class Analysis:
             segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
                         self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, num_zslices, \
                         self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
-                        self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold )
+                        self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold,
+                        self.nuclei_channel_num)
         
             self.labeled_img = segmenter.retrieve_labeled_img()
             print('Shape after Seg in Analysis Class: ' +  str(self.labeled_img.shape))
@@ -783,7 +790,8 @@ class Analysis:
             segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
                 self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
                 self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
-                self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold )
+                self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold, 
+                self.nuclei_channel_num)
                 
             print(f'{self.labeled_img.shape=}')
             if self.decoding_across == True or \

@@ -466,6 +466,13 @@ def run_analysis(json_name, position):
             analysis.set_final_improv_adcg_arg(data['final improvement adcg'])
     #----------------------------------------------------------
     
+    #Set Nuclei Channel Number
+    #----------------------------------------------------
+    if 'nuclei channel number' in data.keys():
+        if data['nuclei channel number'] != 'none':
+            analysis.set_nuclei_channel_arg(data['nuclei channel number'])
+    #----------------------------------------------------------
+    
     
     #Writ
     #----------------------------------------------------------

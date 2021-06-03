@@ -29,11 +29,11 @@ def correct_labeled_img(labeled_img):
 
     return labeled_img
     
-def get_shrinked(tiff):
+def get_shrinked(tiff, dapi_channel):
     
+    print(f'{dapi_channel=}')
     #Get dapi_tiff
     #------------------------------------
-    dapi_channel = -1
     dapi_tiff = tiff[:,dapi_channel,:,:].astype(np.int16)
     #------------------------------------
     
@@ -158,7 +158,7 @@ def switch_low_z_to_right_shape(labeled_src):
     return label_img
     
     
-def get_labeled_img_cellpose(tiff_path, num_wav, dst=None, nuclei_radius=0, flow_threshold =.4, cell_prob_threshold=0):
+def get_labeled_img_cellpose(tiff_path, num_wav, nuclei_channel_num, dst=None, nuclei_radius=0, flow_threshold =.4, cell_prob_threshold=0):
 
     #Getting Tiff
     #----------------------------------------------
@@ -170,7 +170,7 @@ def get_labeled_img_cellpose(tiff_path, num_wav, dst=None, nuclei_radius=0, flow
     
     #Shrink and save tif
     #---------------------------------------------------------------------------
-    shrinked = get_shrinked(tiff)
+    shrinked = get_shrinked(tiff, nuclei_channel_num)
     #shrinked.shape = [z,x,y]
     rand_list, rand_dir, dapi_tiff_dst = save_shrinked(shrinked)
     #---------------------------------------------------------------------------
@@ -224,7 +224,8 @@ if sys.argv[1] == 'debug_cellpose':
     labeled_img = get_labeled_img_cellpose(tiff_path = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_1/MMStack_Pos0.ome.tif', 
                                             num_wav = 4,
                                             dst = '/home/nrezaee/temp/labeled_img_thresh_3.tif', 
-                                            nuclei_radius=20)
+                                            nuclei_radius=20, 
+                                            nuclei_channel_num= -1)
     print(f'{labeled_img.shape=}')
     
     

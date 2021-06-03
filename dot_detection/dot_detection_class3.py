@@ -31,6 +31,7 @@ from dot_detection.dot_detectors_2d.dot_detector_2d import find_dots
 from dot_detection.helpers.multiprocessed_points import combine_multiprocessed_points
 from dot_detection.rand_list import are_jobs_finished, get_random_list
 from dot_detection.helpers.combine_multi_dots import combine_locs
+from dot_detection.location_checks import get_location_checks
 from timer import timer_tools
 #--------------------------------------------------------------------------------
 
@@ -331,6 +332,13 @@ class Dot_Detection:
         #--------------------------------------------------------------------
         self.add_strict_to_output(self.locations_dir)
         #--------------------------------------------------------------------
+        
+        #Add Location Check for number of dots
+        #--------------------------------------------------------------------
+        n_dots_check_dst = os.path.join(self.locations_dir, 'Number_of_Dots_Across_Hyb_and_Ch.png')
+        get_location_checks.get_n_dots_for_each_channel_plot(locations_path, n_dots_check_dst):
+        #--------------------------------------------------------------------
+        
         
         return locations_path
         

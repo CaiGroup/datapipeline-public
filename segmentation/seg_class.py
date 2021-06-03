@@ -26,10 +26,11 @@ main_dir = '/groups/CaiLab'
 #Analysis Class to set and run parameters for analyses
 #=====================================================================================
 class Segmentation:
-    def __init__(self, data_dir, position, seg_dir, decoded_dir, locations_dir, barcode_dst, barcode_src, \
-                    bool_fake_barcodes, bool_decoding_individual, num_z_slices, seg_type, seg_data_dir, dimensions, num_zslices, \
-                    labeled_img, edge_dist, dist_between_nuclei, bool_cyto_match, area_tol, cyto_channel_num, \
-                    get_nuclei_img, get_cyto_img, num_wav, nuclei_radius, flow_threshold, cell_prob_threshold):
+    def __init__(self, data_dir, position, seg_dir, decoded_dir, locations_dir, barcode_dst, barcode_src, 
+                    bool_fake_barcodes, bool_decoding_individual, num_z_slices, seg_type, seg_data_dir, dimensions, num_zslices, 
+                    labeled_img, edge_dist, dist_between_nuclei, bool_cyto_match, area_tol, cyto_channel_num, 
+                    get_nuclei_img, get_cyto_img, num_wav, nuclei_radius, flow_threshold, cell_prob_threshold,
+                    nuclei_channel_num):
 
         self.data_dir = data_dir
         self.position = position
@@ -59,6 +60,7 @@ class Segmentation:
         self.nuclei_radius = nuclei_radius
         self.flow_threshold = flow_threshold
         self.cell_prob_threshold = cell_prob_threshold
+        self.nuclei_channel_num = nuclei_channel_num
         
     def combine_seg_z_s(seg_channel_dir):
     
@@ -178,8 +180,6 @@ class Segmentation:
             decoded_genes_path = decoded_genes_paths[0]
             #----------------------------------------------
             
-     
-            
             if 'roi' in self.seg_type:
                 
                 barcode_path = os.path.join(self.barcode_src, 'channel_' +str(channel_num)+'.csv')
@@ -212,7 +212,7 @@ class Segmentation:
         
         label_img_path = save_labeled_img(self.data_dir, self.seg_dir, self.position, self.edge_dist, self.dist_between_nuclei,  \
             self.bool_cyto_match, self.area_tol, self.cyto_channel_num, self.get_nuclei_img, self.get_cyto_img, self.num_wav, \
-            self.nuclei_radius, self.num_zslices, self.flow_threshold, self.cell_prob_threshold)
+            self.nuclei_radius, self.num_zslices, self.flow_threshold, self.cell_prob_threshold, self.nuclei_channel_num)
         
         print(f'{label_img_path=}')
         get_label_img_visuals(label_img_path, self.data_dir, self.position, self.num_wav)
