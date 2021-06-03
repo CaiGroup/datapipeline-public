@@ -22,7 +22,7 @@ def max_intensity_projection(cyto_3d):
     IM_MAX= np.max(cyto_3d, axis=0)
     return IM_MAX
 
-def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, debug = False):
+def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, debug = False, cell_prob_threshold = 0, cell_flow_threshold = .4):
 
 
     #Getting Tiff
@@ -59,13 +59,27 @@ def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, d
     #----------------------------------------------
 
 
-    #Save Command to file and run
+    
+    
+    #Commands to be run for cellpose
     #----------------------------------------------
-    print("Running Segmentation with SLURM GPU's")
-
-    command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /home/nrezaee/sandbox/cellpose/gpu/tensorflow-20.02-tf1-py3.sif python -m cellpose  --img_filter dapi_channel_2d --pretrained_model cyto --diameter 0 --use_gpu --no_npy --save_png --dir '
+    sing_and_cellpose_cmd = 'singularity  exec --bind /central/scratch/$USER --nv /home/nrezaee/sandbox/cellpose/gpu/tensorflow-20.02-tf1-py3.sif python -m cellpose '
+    persistent_params = ' --img_filter dapi_channel_2d --pretrained_model cyto --use_gpu --no_npy --save_png '
+    cyto_cell_prob_thresh_cmd = ' --cellprob_threshold ' + str(cell_prob_threshold)
+    cyto_flow_thresh_cmd = ' --flow_threshold ' + str(cell_flow_threshold) 
+    #----------------------------------------------
+    
+    
+    
+    #Combinining commands
+    #----------------------------------------------
+    command_for_cellpose= sing_and_cellpose_cmd + persistent_params + cyto_cell_prob_thresh_cmd + cyto_flow_thresh_cmd + ' --diameter 0 --dir '
     command_for_cellpose_with_dir = command_for_cellpose + rand_dir
     print(f'{command_for_cellpose_with_dir=}')
+    #----------------------------------------------
+    
+    #Write command to .sh script and run
+    #----------------------------------------------
     script_name = os.path.join(rand_dir, 'seg.sh')
     with open(script_name , 'w') as f:
         f.write('#!/bin/bash \n')
@@ -75,49 +89,43 @@ def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, d
     call_me = ['sbatch', '--job-name', rand_list[0], "--time", "1:00:00", "--mem-per-cpu", "10G", script_name]
     subprocess.call(call_me)
     #----------------------------------------------
-    
+
+    #Wait to see if job is finished
+    #----------------------------------------------
     while not are_jobs_finished(rand_list):
         print('Waiting for Segmenation to Finish')
-        time.sleep(1)
-    
+        time.sleep(2)
     #----------------------------------------------
     
     print(f'{rand_dir=}')
-    #Change name of masked file
+    #Read in masked file
+    #----------------------------------------------
+    masked_file_path = os.path.join(rand_dir, 'dapi_channel_2d_cp_masks.png')
+    labeled_img = imageio.imread(masked_file_path)
+    print(f'{labeled_img.shape=}')
     #----------------------------------------------
     
     
-    masked_file_path = os.path.join(rand_dir, 'dapi_channel_2d_cp_masks.png')
-    
-    labeled_img = imageio.imread(masked_file_path)
-    print(f'{labeled_img=}')
-    
-    # labeled_img = expand_img(labeled_img)
+    #Get resize script
+    #----------------------------------------------
     if debug:
         resize_script = os.path.join('/home/nrezaee/test_cronjob_multi_dot', 'segmentation/cellpose_segment/helpers/nucsmoothresize')
     else:
         resize_script = os.path.join(os.getcwd(), 'segmentation/cellpose_segment/helpers/nucsmoothresize')
-    
+    #----------------------------------------------
 
-    if dst == None:
-        temp_path = os.path.join(rand_dir, 'expanded.tif')
-        
-        cmd = ' '.join(['sh', resize_script, masked_file_path, str(tiff.shape[2]), temp_path])
-        print(f'{cmd=}')
-        os.system(cmd)
-        labeled_img = tifffile.imread(temp_path)
-        
-    else:
-        subprocess.call(['sh', resize_script, masked_file_path, str(tiff.shape[2]), dst])
-        labeled_img = imageio.imread(dst) 
+
+    subprocess.call(['sh', resize_script, masked_file_path, str(tiff.shape[2]), dst])
+    labeled_img = imageio.imread(dst) 
     
 
     return labeled_img
 
-# tiff_path = '/groups/CaiLab/personal/nrezaee/raw/intron_pos0/HybCycle_0/MMStack_Pos0.ome.tif'
-# mini_tiff_path = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_1/MMStack_Pos0.ome.tif'
-# dst = 'labeled_cyto.tif'
 
-# labeled_img = get_labeled_cyto_cellpose(tiff_path, dst, debug = True)
-# print(f'{np.unique(labeled_img)=}')
-    
+if sys.argv[1] == 'debug_cellpose_cyto':
+
+    labeled_img = get_labeled_cyto_cellpose(tiff_path='/groups/CaiLab/personal/nrezaee/raw/intron_pos0/HybCycle_0/MMStack_Pos0.ome.tif',
+                                            num_wav = 4,
+                                            dst = 'foo.tif',
+                                            debug = True)
+

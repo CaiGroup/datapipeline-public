@@ -473,6 +473,26 @@ def run_analysis(json_name, position):
             analysis.set_nuclei_channel_arg(data['nuclei channel number'])
     #----------------------------------------------------------
     
+    #Cyto Cellpose Flow Threshold
+    #----------------------------------------------------
+    if 'cyto flow threshold' in data.keys():
+        if data['cyto flow threshold'] != 'none':
+            analysis.set_cyto_flow_threshold_arg(data['cyto flow threshold'])
+    #----------------------------------------------------------
+    
+    #Cyto Cellpose Prob Threshold
+    #----------------------------------------------------
+    if 'cyto cell prob threshold' in data.keys():
+        if data['cyto cell prob threshold'] != 'none':
+            analysis.set_cyto_cell_prob_threshold_arg(data['cyto cell prob threshold'])
+    #----------------------------------------------------------
+    
+    #Cyto Radius
+    #----------------------------------------------------
+    if 'cyto radius' in data.keys():
+        if data['cyto radius'] != 'none':
+            analysis.set_cyto_radius_arg(data['cyto radius'])
+    #----------------------------------------------------------
     
     #Writ
     #----------------------------------------------------------
