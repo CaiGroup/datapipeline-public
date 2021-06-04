@@ -8,7 +8,7 @@ import sys
 
 
 
-sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
+sys.path.insert(0, os.getcwd())
 from segmentation.cellpose_segment.helpers.get_cellpose_labeled_img import get_labeled_img_cellpose
 from segmentation.cellpose_segment.helpers import cellpose_segment_funcs
 from segmentation.cellpose_segment.helpers.reorder_hybs import get_and_sort_hybs

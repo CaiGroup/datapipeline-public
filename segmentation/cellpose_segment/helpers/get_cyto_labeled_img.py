@@ -12,7 +12,7 @@ import sys
 import time
 import imageio
 
-sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
+sys.path.insert(0, os.getcwd())
 from helpers.rand_list import get_random_list, are_jobs_finished
 
 

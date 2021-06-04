@@ -3,7 +3,7 @@ import numpy as np
 import warnings
 
 import sys
-sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
+sys.path.insert(0, os.getcwd())
 from load_tiff import tiffy
 import load_tiff
 

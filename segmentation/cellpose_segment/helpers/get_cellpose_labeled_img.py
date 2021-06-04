@@ -13,7 +13,7 @@ import time
 import shutil
 import tifffile as tf
 
-sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
+sys.path.insert(0, os.getcwd())
 from helpers.rand_list import get_random_list, are_jobs_finished
 from load_tiff import tiffy
 
@@ -119,7 +119,7 @@ def expand_img(masked_file_path, tiff, dst):
     
     #Create and run resize script
     #---------------------------------------------------------------------------
-    resize_script = os.path.join('/home/nrezaee/test_cronjob_multi_dot/segmentation/cellpose_segment/helpers/nucsmoothresize')
+    resize_script = os.path.join(os.getcwd(), 'segmentation/cellpose_segment/helpers/nucsmoothresize')
     cmd = ' '.join(['sh', resize_script, masked_file_path, str(tiff.shape[2]), dst])
     print(f'{cmd=}')
     os.system(cmd)

@@ -12,7 +12,7 @@ import sys
 import time
 import imageio
 
-sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
+sys.path.insert(0, os.getcwd())
 from helpers.rand_list import get_random_list, are_jobs_finished
 
 
@@ -107,7 +107,7 @@ def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, d
     #Get resize script
     #----------------------------------------------
     if debug:
-        resize_script = os.path.join('/home/nrezaee/test_cronjob_multi_dot', 'segmentation/cellpose_segment/helpers/nucsmoothresize')
+        resize_script = os.path.join(os.getcwd(), 'segmentation/cellpose_segment/helpers/nucsmoothresize')
     else:
         resize_script = os.path.join(os.getcwd(), 'segmentation/cellpose_segment/helpers/nucsmoothresize')
     #----------------------------------------------

@@ -5,7 +5,7 @@ import scipy.ndimage
 import json
 import glob
 import sys
-sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
+sys.path.insert(0, os.getcwd())
 from load_tiff import tiffy
 from align_scripts.mean_squares_blur import preprocess_align
 

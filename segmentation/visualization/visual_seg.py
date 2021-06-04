@@ -6,7 +6,7 @@ import numpy as np
 from skimage import feature
 
 import sys
-sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
+sys.path.insert(0, os.getcwd())
 from helpers.reorder_hybs import get_and_sort_hybs
 from load_tiff import tiffy
 

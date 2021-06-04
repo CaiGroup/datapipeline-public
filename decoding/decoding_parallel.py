@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 import sys
-sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
+sys.path.insert(0, os.getcwd())
 
 debug = False
 
