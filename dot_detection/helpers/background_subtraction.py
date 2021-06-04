@@ -1,9 +1,13 @@
 import cv2
 import os
 import glob
+import json
 import sys
+import cv2
 import tifffile as tf
 import numpy as np
+from scipy.ndimage import shift
+import imageio as io
 
 def apply_background_subtraction(background, tiff_2d, z, channel):
     background_2d = background[z, channel,:,:]
@@ -49,7 +53,8 @@ def get_back_sub_check(tiff_src, analysis_name, back_img_3d):
     #Get and save middle z of back_sub
     #------------------------------------------------
     middle_z = back_img_3d.shape[0]//2
-    tf.imwrite(back_sub_dst, np.log(back_img_3d[middle_z]))
+    io.imwrite(back_sub_dst, back_img_3d[middle_z].astype(np.uint8))
+    print('Saved Back Sub Check')
     #------------------------------------------------
     
 if sys.argv[1] == 'debug_back_sub_check':
@@ -59,4 +64,78 @@ if sys.argv[1] == 'debug_back_sub_check':
     back_img_3d = tf.imread(tiff_src)[:, 0]
     
     get_back_sub_check(tiff_src, analysis_name, back_img_3d)
+    
+    
+def shift_each_2d_in_3d(back_3d, offset):
+    
+    for i in range(len(back_3d)): 
+        back_3d[i] = shift(back_3d[i], offset)
+        
+    return back_3d
+    
+def get_shifted_background(back_3d, tiff_src, analysis_name):
+    """
+    Get offset src and shift background
+    """
+
+    #Get offsets_src
+    #-------------------------------------------------------------
+    splitted_tiff_src = (tiff_src).split(os.sep)
+    
+    personal = splitted_tiff_src[4]
+    exp_name = splitted_tiff_src[6]
+    hyb = splitted_tiff_src[7]
+    pos_with_ome = splitted_tiff_src[-1]
+    pos = splitted_tiff_src[-1].split('.ome')[0]
+    
+    offsets_src = os.path.join('/groups/CaiLab/analyses', personal, exp_name, analysis_name, pos, 'offsets.json')
+    
+    print(f'{offsets_src=}')
+    #-------------------------------------------------------------
+    
+    #Read in offset
+    #-------------------------------------------------------------
+    with open(offsets_src) as f:
+        offsets = json.load(f)
+    #-------------------------------------------------------------
+    
+    #Get background offset 
+    #-------------------------------------------------------------
+    back_offset_keys = [offset_key for offset_key in offsets.keys() if 'final_background' in offset_key]
+    assert len(back_offset_keys) == 1, "There is more than or less than one background aligned in offsets"
+    back_offset = np.array(offsets[back_offset_keys[0]])
+    print(f'{back_offset=}')
+    #-------------------------------------------------------------
+    
+    #Get hyb offset_key
+    #-------------------------------------------------------------
+    hyb_offset_key = hyb + '/' + splitted_tiff_src[-1]
+    hyb_offset = np.array(offsets[hyb_offset_key])
+    print(f'{hyb_offset=}')
+    #-------------------------------------------------------------
+    
+    #Shift image
+    #-------------------------------------------------------------
+    print("Shifting Background")
+    print(f'{back_3d.shape=}')
+    back_minus_hyb_offset =  back_offset - hyb_offset
+    print(f'{back_minus_hyb_offset=}')
+    
+    if len(back_offset) == 3:
+        shifted_back = shift(back_3d, back_minus_hyb_offset)
+    elif len(back_offset) == 2:
+        shifted_back = shift_each_2d_in_3d(back_3d, back_minus_hyb_offset)
+    #-------------------------------------------------------------
+    
+    return shifted_back
+
+if sys.argv[1] == 'debug_shift_background':
+    tiff_src = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5/final_background/MMStack_Pos8.ome.tif'
+    analysis_name = 'test'
+    tiff = tf.imread(tiff_src)
+    back_tiff = tiff[:,0]
+    shifted_back = get_shifted_background(back_tiff, tiff_src, analysis_name)
+    print(f'{shifted_back.shape=}')
+    
+
     

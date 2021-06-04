@@ -11,8 +11,9 @@ from load_tiff import tiffy
 from align_scripts.align_errors import get_align_errors
 from align_scripts.helpers.saving_offset import save_offset
 from align_scripts.helpers.saving_align_errors import save_align_errors
+from timer import timer_tools
 
-def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir, num_wav):
+def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir, num_wav, start_time):
     
     print(f'{type(num_wav)=}')
     fixed_np = tiffy.load(fixed_image_src, num_wav)
@@ -62,8 +63,6 @@ def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir, num_wav):
     
     offset_neg = np.negative(offset_flip)
     
-    #offset_neg = np.insert(offset_neg, 0, 0, axis=0)
-    
     save_offset(moving_image_src, offset_neg, rand_dir)
     
     print(f'{offset_neg=}')
@@ -71,7 +70,9 @@ def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir, num_wav):
     
     save_align_errors(moving_image_src, align_error, rand_dir)
     
-        
+    timer_tools.logg_elapsed_time(start_time, 'Done Aligning ' + moving_image_src)
+    
+    logging.info('hello')
 
 import argparse
 
@@ -80,7 +81,8 @@ parser.add_argument("--fixed_src")
 parser.add_argument("--moving_src")
 parser.add_argument("--rand_dir")
 parser.add_argument("--num_wav")
+parser.add_argument("--start_time")
 
 args, unknown = parser.parse_known_args()
 
-mean_squares_2d(args.fixed_src, args.moving_src, args.rand_dir, float(args.num_wav))
+mean_squares_2d(args.fixed_src, args.moving_src, args.rand_dir, float(args.num_wav), args.start_time)

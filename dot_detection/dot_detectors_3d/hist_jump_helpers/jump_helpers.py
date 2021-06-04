@@ -17,7 +17,6 @@ def save_strictnesses(threshs, cumul_of_dots, thresh, df_dst):
     df = pd.DataFrame(list(zip(cumul_of_dots, threshs)),
                columns =['cumulative number of dots', 'threshold'])
     
-    print(f'{df=}')
     index_of_thresh = df[df.threshold == thresh].index[0]
     strictnesses = list(range(index_of_thresh - df.shape[0], index_of_thresh))
     strictnesses.reverse()
@@ -40,7 +39,6 @@ def get_hist(intense, strictness, hist_png_path, num_bins):
     plt.title("Biggest Jump Histogram")
     plt.xlabel("Threshold")
     plt.ylabel("Cumalative Number of Dots")
-    print(f'{len(intense)=}')
     bins = np.arange(np.min(intense), np.max(intense), (np.max(intense) - np.min(intense))/num_bins)
     y, x, ignore = plt.hist(intense, bins=bins, cumulative=-1)
     #-------------------------------------------------------
@@ -116,7 +114,6 @@ def apply_thresh(dot_analysis, threshold):
     dot_analysis[0] = np.delete(dot_analysis[0], indexes, axis =0)
     dot_analysis[1] = np.delete(dot_analysis[1], indexes)
     #-------------------------------------------------------
-    print(f'{len(indexes)=}')
     return dot_analysis
 
     
@@ -135,7 +132,6 @@ def apply_reverse_thresh(dot_analysis, threshold):
                 indexes.append(i)
         dot_analysis[0] = np.delete(dot_analysis[0], indexes, axis =0)
         dot_analysis[1] = np.delete(dot_analysis[1], indexes)
-        print(f'{len(indexes)=}')
         return dot_analysis
     #-------------------------------------------------------
     
@@ -144,7 +140,6 @@ def remove_unneeded_intensities(intensities, percent_remove, num_bins):
     #Get hist_plot
     #-------------------------------------------------------
     plt.figure()
-    print(f'{len(intensities)=}')
     bins = np.arange(np.min(intensities), np.max(intensities), (np.max(intensities) - np.min(intensities))/num_bins)
     y, x, ignore = plt.hist(intensities, bins=bins, cumulative=-1)
     #-------------------------------------------------------

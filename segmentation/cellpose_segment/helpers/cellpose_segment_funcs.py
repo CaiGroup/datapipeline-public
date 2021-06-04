@@ -46,9 +46,9 @@ def get_plotted_assigned_genes(assigned_genes_csv_src, dst, label_img):
     #-------------------------------------------------
     
 if sys.argv[1] == 'debug_plotted_assigned_genes':
-    genes_csv = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv'
+    genes_csv = '/groups/CaiLab/analyses/alinares/2021_0512_mouse_hydrogel/anthony_test_1/MMStack_Pos6/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv'
     dst = 'foo/assigned.png'
-    labeled_img_src = '/home/nrezaee/temp/labeled_img_thresh_3.tif'
+    labeled_img_src = '/groups/CaiLab/analyses/alinares/2021_0512_mouse_hydrogel/anthony_test_1/MMStack_Pos6/Segmentation/labeled_img_post.tif'
     labeled_img = tf.imread(labeled_img_src)
     get_plotted_assigned_genes(genes_csv, dst, labeled_img)
 

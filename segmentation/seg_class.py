@@ -219,7 +219,7 @@ class Segmentation:
             self.cyto_flow_threshold, self.cyto_cell_prob_threshold, self.cyto_radius)
         
         print(f'{label_img_path=}')
-        get_label_img_visuals(label_img_path, self.data_dir, self.position, self.num_wav)
+        # get_label_img_visuals(label_img_path, self.data_dir, self.position, self.num_wav)
         
         labeled_img = tf.imread(label_img_path)
         

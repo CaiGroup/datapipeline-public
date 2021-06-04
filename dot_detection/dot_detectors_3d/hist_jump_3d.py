@@ -11,25 +11,12 @@ sys.path.append(os.getcwd())
 from load_tiff import tiffy
 from dot_detection.helpers.visualize_dots import get_visuals_3d
 from dot_detection.helpers.shift_locations import shift_locations
-from dot_detection.helpers.background_subtraction import get_background, get_back_sub_check
+from dot_detection.helpers.background_subtraction import get_background, get_back_sub_check, get_shifted_background
 from dot_detection.dot_detectors_3d.hist_jump_helpers.jump_helpers import hist_jump_threshed_3d
 from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
 from dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
+from dot_detection.preprocessing.preprocess import preprocess_img, get_preprocess_check
 
-
-def run_back_sub(background, tiff_3d, channel, offset):
-    
-    print(f'{type(offset)=}')
-    print(f'{type(offset)=}')
-    background2d = scipy.ndimage.interpolation.shift(background[:,channel,:,:], np.negative(offset))[0,:,:]
-    
-    background3d = np.full((tiff_3d.shape[0], background2d.shape[0], background2d.shape[0]), background2d)
-
-    tiff_3d = cv2.subtract(tiff_3d, background3d)
-    tiff_3d[tiff_3d < 0] = 0
-
-    
-    return tiff_3d
 
 warnings.filterwarnings("ignore")
 
@@ -60,6 +47,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             background_src = get_background(tiff_src)
             print(f'{background_src=}')
             background = tiffy.load(background_src, num_wav)
+            print(f'{background.shape=}')
     #--------------------------------------------------------------------
     
     #Reading Tiff File
@@ -97,16 +85,23 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         #Background Subtraction
         #---------------------------------------------------------------------
         if bool_background_subtraction == True:
-            # tiff_3d = run_back_sub(background, tiff_3d, channel, offset)
             print(f'{background.shape=}')
             print(f'{channel=}')
-            tiff_3d = tiff_3d.astype(np.int32) - background[:, channel].astype(np.int32)*.95
+            
+            back_3d = get_shifted_background(background[:, channel], tiff_src, analysis_name)
+            tiff_3d = tiff_3d.astype(np.int32) - back_3d.astype(np.int32)*.99
             tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
             get_back_sub_check(tiff_src, analysis_name, tiff_3d)
         #---------------------------------------------------------------------
-
-        print((channel+1), end = " ", flush =True)
         
+        #Run Preprocessing
+        #---------------------------------------------------------------------
+        tiff_3d = preprocess_img(tiff_3d)
+        get_preprocess_check(tiff_src, analysis_name, tiff_3d)
+        #---------------------------------------------------------------------
+        
+        
+
         #Check if 2d Dot Detection
         #---------------------------------------------------------------------
         if z_slices == 'all':
@@ -118,10 +113,6 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
 
         #Threshold on Biggest Jump
         #---------------------------------------------------------------------
-        #strictness = 5
-        print(f'{strictness=}')
-        print(f'{tiff_3d.shape=}')
-        print(f'{threshold=}')
         dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, dot_radius, \
                         threshold, dot_radius, num_radii))
 
@@ -131,26 +122,25 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
         #Gaussian Fit the dots
         #---------------------------------------------------------------------
-        print(f'{bool_gaussian_fitting=}')
         if bool_gaussian_fitting == True:
             dot_analysis = get_gaussian_fitted_dots(tiff_src, channel, dot_analysis[0])
         #---------------------------------------------------------------------
         
         #Center the dots
         #---------------------------------------------------------------------
-        print(f'{bool_radial_center=}')
         if bool_radial_center == True:
             dot_analysis = get_radial_centered_dots(tiff_src, channel, dot_analysis[0])
         #---------------------------------------------------------------------
         
+        #Switch the x,y,z into right positions
+        #-------------------------------------------------------
         dot_analysis[0][:, [0,2]] = dot_analysis[0][:, [2,0]]
+        #-------------------------------------------------------
         
-        print(f'{dot_analysis[0]=}')
         
         #Visualize Dots
         #--------------------------------------------------------------------
         median_z = tiff_3d.shape[0]//2
-        print(f'{bool_visualize_dots=}')
         if bool_visualize_dots == True:# and z == median_z:
             get_visuals_3d(tiff_src, dot_analysis, tiff_3d[median_z], analysis_name, median_z)
         #---------------------------------------------------------------------
@@ -160,11 +150,13 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         #---------------------------------------------------------------------
         dot_analysis[0] = shift_locations(dot_analysis[0], np.array(offset), tiff_src, bool_chromatic)
         #---------------------------------------------------------------------
+        
         #Add dots to main dots in tiff
         #---------------------------------------------------------------------
         df_ch = add_hyb_and_ch_to_df(dot_analysis, tiff_src, channel)
         df_tiff = df_tiff.append(df_ch)
         print(f'{df_tiff.shape=}')
+        #---------------------------------------------------------------------
         
     tf.imwrite('foo.tif', tiff)
     
@@ -232,10 +224,10 @@ if sys.argv[1] != 'debug_hist_3d':
 else:
     
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_1/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5/HybCycle_10/MMStack_Pos8.ome.tif'
     offset = [0,0,0]
     channels = 'all'
-    analysis_name = 'linus_decoding'
+    analysis_name = 'test'
     rand_dir = '/home/nrezaee/temp'
     vis_dots = True
     back_sub = True
@@ -248,7 +240,7 @@ else:
     num_z = 'None'
     nbins = 100
     dot_radius = 1
-    threshold = .001
+    threshold = .01
     num_radii = 2
     radius_step = 1
     get_dots_for_tiff(tiff_src, offset, analysis_name, vis_dots, back_sub, channels, chromatic, gauss, \

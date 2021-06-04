@@ -40,6 +40,7 @@ def make_distance_between_cells(label_img_src, dist_between_nuclei, post_process
     #Run the distance maker
     #-------------------------------------------------------------
     print("Making Distance Between Cells")
+    print(f'{label_img_src=}')
     subprocess.call(['sh', nuctouchresize_file_path, label_img_src, str(dist_between_nuclei)])
     #-------------------------------------------------------------
     
@@ -102,7 +103,8 @@ def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cy
         #Ignore if you already have the labeled image
         #-------------------------------------------------------------
         if 'Labeled_Images' in tiff_for_segment:
-            labeled_img_path = tiff_for_segment
+            labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
+            copyfile(tiff_for_segment, labeled_img_path)
             labeled_cyto_path = None
         #-------------------------------------------------------------
         
@@ -170,6 +172,8 @@ def get_tiff_for_segment(tiff_dir, position, num_z):
         elif len(tiff.shape) ==2:
             tiff_3d = make_2d_into_3d(tiff, num_z)
             tiff_for_segment = tiff_for_segment.replace('.ome.', '2d_stacked.ome.')
+            #tiff_for_segment = o
+            print(f'{tiff_for_segment=}')
             tf.imwrite(tiff_for_segment, tiff_3d)
         else:
             raise Exception("The Labeled Image has to be 2d or 3d.")
@@ -271,7 +275,8 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     print('7777777777777777777777777777777777777777777')
     label_img = tf.imread(labeled_img_path)
     print(f'{label_img.shape=}')
-    if num_z < 4:
+    if num_z < 4 and 'Labeled_Images' not in tiff_for_segment:
+        print(f'{labeled_img_path=}')
         switch_low_z_to_right_shape(labeled_img_path)
         print('88888888888888888888888888888888888888888')
         label_img = tf.imread(labeled_img_path)
@@ -300,7 +305,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     
 if sys.argv[1] == 'debug_post':
     print('=---------------------------------------')
-    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/'
+    tiff_dir = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel'
     segment_results_path = '/home/nrezaee/temp2'
     position  = 'MMStack_Pos0.ome.tif'
     edge = 0
@@ -319,10 +324,11 @@ if sys.argv[1] == 'debug_post':
     nuclei_channel_num = -1
     cyto_flow_threshold = .3
     cyto_cell_prob_threshold = 1
+    cyto_radius = 10
     save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol, 
                 cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold, 
                 cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold, 
-                debug=debug)
+                cyto_radius = 10, debug=debug)
 
     
     
