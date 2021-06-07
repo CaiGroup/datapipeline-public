@@ -74,7 +74,6 @@ def get_and_sort_hybs(path_to_experiment_dir):
     if len(back_dir) ==1:
         sorted_hyb_dirs.append(back_dir[0])
     #-------------------------------------------------
-    print(f'{sorted_hyb_dirs=}')
     
     return sorted_hyb_dirs
     

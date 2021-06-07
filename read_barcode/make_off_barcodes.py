@@ -103,11 +103,16 @@ def get_off_barcodes(barcode_src, off_barcode_dst):
     df_off.columns = on_barcode.columns
     #-------------------------------------------------------
     
+    #Save off barcode
+    #-------------------------------------------------------
+    df_off.to_csv(off_barcode_dst, index = False)
+    #-------------------------------------------------------
+    
     return df_off
   
 if sys.argv[1] == 'debug_get_off':
-    src = '/groups/CaiLab/personal/nrezaee/raw/test1-big/barcode_key/channel_1.csv'
-    dst = '/groups/CaiLab/personal/nrezaee/raw/test1-big/barcode_key/channel_1_fake.csv'
+    src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_9/barcode_key/channel_2.csv'
+    dst = 'foo/channel_2_fake.csv'
     get_off_barcodes(src, dst)
     print(f'{dst=}')
     

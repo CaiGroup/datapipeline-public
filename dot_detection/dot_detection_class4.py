@@ -474,7 +474,7 @@ class Dot_Detection:
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
-                    time_for_slurm = "4:00:00"
+                    time_for_slurm = "20:00:00"
                 
                 elif self.dot_detection == "biggest jump 3d":
                     

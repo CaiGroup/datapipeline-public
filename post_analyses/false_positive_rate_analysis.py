@@ -99,7 +99,7 @@ def get_false_pos_intensities_hist(genes_csv_src, dest):
     #------------------------------------------------------
     df = pd.read_csv(genes_csv_src)
     #------------------------------------------------------
-    
+
     #Separate Real and Fake ID's
     #------------------------------------------------------
     fake_ids = [ gene for gene in df.gene if 'fake' in gene]
@@ -108,7 +108,7 @@ def get_false_pos_intensities_hist(genes_csv_src, dest):
     df_fake = df[df.gene.isin(fake_ids)]
     df_real = df[df.gene.isin(real_ids)]
     #------------------------------------------------------
-    
+
     #Plot On Off Barcodes Across Intensities
     #------------------------------------------------------
     pop_a = mpatches.Patch(color='b', label='On Barcodes')
@@ -116,9 +116,33 @@ def get_false_pos_intensities_hist(genes_csv_src, dest):
     plt.figure(figsize = (20,10))
     plt.legend(handles=[pop_a,pop_b], prop={'size': 30})
     plt.title('Intensity Analysis Across On/Off Barcodes', fontsize=40)
-    plt.hist([df_real.intensity, df_fake.intensity], stacked = True, \
+    y, x, patches = plt.hist([df_real.intensity, df_fake.intensity], stacked = True, \
              rwidth=0.8, color = ['b', 'orange'])
+    #------------------------------------------------------
+
+
+    #Plot the false positive rate for each bar on the bar chart
+    #------------------------------------------------------
+    for i in range(len(x)-1):
+        
+        #Get false positive rate
+        #------------------------------------------------------
+        df_threshed = df[df.intensity > x[i]]
+        fake_ids = [ gene for gene in df_threshed.gene if 'fake' in gene]
+        df_fake = df_threshed[df_threshed.gene.isin(fake_ids)]
+        false_pos_rate = round(df_fake.shape[0]/df_threshed.shape[0], 3)
+        #------------------------------------------------------
+        
+        #PLot it
+        #------------------------------------------------------
+        plt.text(x[i], y[1][i], str(false_pos_rate), fontsize=25)
+        #------------------------------------------------------
+    #------------------------------------------------------
+    
+    #Save bar chart to destination
+    #------------------------------------------------------
     plt.savefig(dest)
+    print(f'{dest=}')
     #------------------------------------------------------
     
 def save_to_file_z(num_reals, num_fakes, ratio, z, dst):
@@ -252,10 +276,10 @@ def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, on_barcode_
     
 import sys
 if sys.argv[1] == 'debug_false_pos':
-    results_src = '/home/nrezaee/test_cronjob_multi_dot/foo/jonathan_linus_results/pre_seg_diff_1_minseeds_3_filtered.csv'
+    results_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation/Channel_2/gene_locations_assigned_to_cell.csv'
     dst = '/home/nrezaee/temp/false_pos.txt'
-    on_barcode_src = '/groups/CaiLab/personal/nrezaee/raw/arun_1/barcode_key/channel_1.csv'
-    off_barcode_src = '/groups/CaiLab/personal/nrezaee/raw/arun_1/barcode_key/channel_1_fake.csv'
+    on_barcode_src = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5/barcode_key/channel_1.csv'
+    off_barcode_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/BarcodeKey/channel_1_fake.csv'
     get_false_pos_rate_post_seg(results_src, on_barcode_src, off_barcode_src, dst)
     
     

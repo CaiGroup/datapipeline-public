@@ -308,7 +308,7 @@ if sys.argv[1] == 'debug_post':
     tiff_dir = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel'
     segment_results_path = '/home/nrezaee/temp2'
     position  = 'MMStack_Pos0.ome.tif'
-    edge = 0
+    edge = 5
     dist = 0
     bool_cyto_match = False
     area_tol = 1
