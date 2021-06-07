@@ -45,7 +45,7 @@ def get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav):
     channels = list(range(1, int(num_wav) + 1 ))
     for channel in channels:
         
-`       #Set Inputs
+        #Set Inputs
         #----------------------------------------------------------------------------
         ch_ref = df_fid_init.set_index("ch").loc[channel]
         ch_ro = df_points.set_index("ch").loc[channel].set_index("hyb")
