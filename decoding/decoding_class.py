@@ -190,7 +190,7 @@ class Decoding:
         #--------------------------------------------------------------------
         
     def run_non_barcoded_decoding(self):
-        barcode_src = os.path.join(self.data_dir, 'non_barcoded_genes', 'sequential_key.csv')
+        barcode_src = os.path.join(self.data_dir, 'non_barcoded_key', 'sequential_key.csv')
         
         if not os.path.exists(self.barcode_dst):
             os.makedirs(self.barcode_dst)

@@ -5,6 +5,7 @@ import scipy.io as sio
 import numpy as np
 import glob
 import tifffile as tf
+sys.path.insert(0, os.getcwd())
 
 
 #Segmentation Script
@@ -225,7 +226,43 @@ class Segmentation:
         
         return labeled_img
         
-        
+if sys.argv[1] == 'debug_seg_class_indiv':
+    labeled_img_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation/labeled_img_post.tif'
+    
+    labeled_img = tf.imread(labeled_img_src)
+    segmenter = Segmentation(data_dir = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5', 
+                            position = 'MMStack_Pos.ome.tif', 
+                            seg_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation', 
+                            decoded_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Decoded', 
+                            locations_dir ='/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Dot_Locations', 
+                            barcode_dst = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/BarcodeKey', 
+                            barcode_src = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5/barcode_key', 
+                            bool_fake_barcodes = True,
+                            bool_decoding_individual = [1,2], 
+                            num_z_slices = None,
+                            seg_type = 'cellpose', 
+                            seg_data_dir = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5/segmentation', 
+                            dimensions = 3, 
+                            num_zslices = 3, 
+                            labeled_img = labeled_img, 
+                            edge_dist = 0, 
+                            dist_between_nuclei = 0, 
+                            bool_cyto_match= False, 
+                            area_tol = False, 
+                            cyto_channel_num = False, 
+                            get_nuclei_img = True, 
+                            get_cyto_img = False, 
+                            num_wav = 4, 
+                            nuclei_radius = 0, 
+                            flow_threshold = .4, 
+                            cell_prob_threshold = 0,
+                            nuclei_channel_num = -1, 
+                            cyto_flow_threshold = 0, 
+                            cyto_cell_prob_threshold =0, 
+                            cyto_radius =0)
+    print("Created Segmentation Class")
+    
+    segmenter.run_segmentation_individually()
 
  
                 

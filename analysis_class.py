@@ -12,11 +12,14 @@ import shutil
 # sys.path.insert(0, os.getcwd())
 
 print('Current Directory:', os.getcwd())
+
+
 #Import things to be done after all positions
 #-----------------------------------------------------
 from helpers.send_email_notif import send_finished_notif, are_logs_finished
-from helpers.combine_all_pos_locs import combine_locs_csv_s
-from helpers.combine_decoded_genes_all_pos import combine_pos_genes
+from helpers.combine_position_results.combine_all_pos_locs import combine_locs_csv_s
+from helpers.combine_position_results.combine_decoded_genes_all_pos import combine_pos_genes
+from helpers.combine_position_results.combine_count_matrices import get_combined_count_matrix
 from helpers.sync_specific_analysis import send_analysis_to_onedrive
 from helpers.get_correlation_plots import get_correlated_positions
 #-----------------------------------------------------
@@ -788,6 +791,8 @@ class Analysis:
                 decoder.run_decoding_across()
                 timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Across')
                 
+            #Run Decoding non barcoded
+            #--------------------------------------------------------------------------------
             if self.decoding_non_barcoded== True:
                 if self.dot_detection == False:
                     timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
@@ -876,7 +881,7 @@ class Analysis:
             send_finished_notif(self.analysis_dir, self.email)
         #--------------------------------------------------------------------------------
             
-        #Check if all positions are finished
+        #Check if all positions are finished and combine results
         #--------------------------------------------------------------------------------
         if are_logs_finished(self.analysis_dir):
             
@@ -889,8 +894,9 @@ class Analysis:
                 for channel in self.decoding_individual:
                     combine_pos_genes(self.analysis_dir, channel)
                 
-                #Get pearson correlation of positions
-                get_correlated_positions
+                # #Get pearson correlation of positions
+                # get_correlated_positions(self.analysis_dir)
+                    
         #--------------------------------------------------------------------------------
                     
         #Send Analysis to onedrive    

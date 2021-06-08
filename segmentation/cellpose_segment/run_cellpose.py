@@ -44,13 +44,14 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, position, label_im
     #-------------------------------------------
     
     
-    #Get Gene Matrix
+    #Get Gene Cell Matrix (Count Matrix)
     #-------------------------------------------
     df_gene_cell_matrix = cellpose_segment_funcs.get_gene_cell_matrix(df_gene_list_assigned_cell, label_img)
     df_gene_cell_matrix_path = os.path.join(segment_results_path, 'count_matrix.csv')
     print(f'{df_gene_cell_matrix_path=}')
     df_gene_cell_matrix.to_csv(df_gene_cell_matrix_path, index = False)
     #-------------------------------------------
+    
     
     #Plot Genes Assigned to Cell
     #-------------------------------------------
