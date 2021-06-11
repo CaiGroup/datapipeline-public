@@ -116,17 +116,6 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             
             tiff_2d = tiff_3d[z, :, :]
             
-            #Background Subtraction
-            #---------------------------------------------------------------------
-
-            #---------------------------------------------------------------------
-            
-
-            #Normalize tiff 2d
-            #---------------------------------------------------------------------
-            #tiff_2d = cv2.normalize(tiff_2d,  None, 0, 1000, cv2.NORM_MINMAX)
-            #---------------------------------------------------------------------
-            
             #Get dots from 2d image
             #---------------------------------------------------------------------
             dot_analysis = list(find_dots(tiff_2d))

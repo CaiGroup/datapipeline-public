@@ -1,13 +1,17 @@
 import os 
 import numpy as np
 import sys
-sys.path.insert(0, os.getcwd())
-from align_scripts.fiducial_marker_helpers.get_fiducial_dots_in_tiff import get_dots_for_tiff
-from align_scripts.fiducial_marker_helpers.FMAligner import FMAligner
-from align_scripts.fiducial_marker_helpers.colocalize_dots import get_colocs
 import pandas as pd
 from scipy.io import loadmat
 import pandas as pd
+
+sys.path.insert(0, os.getcwd())
+from align_scripts.fiducial_marker_helpers.get_fiducial_dots_in_tiff import get_dots_for_tiff
+from align_scripts.fiducial_marker_helpers.get_fiducial_dots_in_tiff_top import get_dots_for_tiff_top
+from align_scripts.fiducial_marker_helpers.FMAligner import FMAligner
+from align_scripts.fiducial_marker_helpers.colocalize_dots import get_colocs
+from align_scripts.fiducial_marker_helpers.fid_alignment_check import plot_hyb_locs_on_fids
+
 
 
 def get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav):
@@ -22,8 +26,8 @@ def get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav):
     #----------------------------------------------------------------------------
     final_fids_dst_dir = os.path.join(dst_dir, 'final_fids')
     initial_fids_dst_dir = os.path.join(dst_dir, 'initial_fids')
-    df_fid_final = get_dots_for_tiff(fid_final_path, num_wav, final_fids_dst_dir, dot_radius=2)
-    df_fid_init = get_dots_for_tiff(fid_init_path, num_wav, initial_fids_dst_dir, dot_radius=2)
+    df_fid_final = get_dots_for_tiff_top(fid_final_path, num_wav, final_fids_dst_dir, dot_radius=2)
+    df_fid_init = get_dots_for_tiff_top(fid_init_path, num_wav, initial_fids_dst_dir, dot_radius=2)
     #----------------------------------------------------------------------------
     
     #Colocalize Initial and Final
@@ -34,6 +38,13 @@ def get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav):
     
     print(f'{df_fid_final.shape}')
     print(f'{df_fid_init.shape=}')
+    
+    #Plot Hyb Locs on Fids
+    #----------------------------------------------------------------------------
+    hyb_locs_on_fids_dst = os.path.join(dst_dir, 'Hyb_Dots_On_Fid_Dots_Check.png')
+    plot_hyb_locs_on_fids(locs_src, os.path.join(final_fids_dst_dir,'locs.csv'), os.path.join(initial_fids_dst_dir,'locs.csv'), hyb_locs_on_fids_dst)
+    #----------------------------------------------------------------------------
+    
     
     #Read in points
     #----------------------------------------------------------------------------
@@ -69,14 +80,27 @@ def get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav):
 if sys.argv[1] == 'debug_fiducials':
     sys.path.insert(0, os.getcwd())
     data_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-10-19-takei/'
-    pos_dir = '/groups/CaiLab/'
     position = 'MMStack_Pos0.ome.tif'
     locs_src = '/groups/CaiLab/analyses/nrezaee/2020-10-19-takei/takei_fid/MMStack_Pos0/Dot_Locations/locations.csv'
     dst_dir = 'foo/test_fid_alignment2'
-    if not os.path.exists(dst_dir):
-        os.mkdir(dst_dir)
+    
+    os.makedirs(dst_dir, exist_ok = True)
+    
     num_wav = 4
     get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav)
+
+elif sys.argv[1] == 'debug_fiducials_linus':
+    sys.path.insert(0, os.getcwd())
+    data_dir = '/groups/CaiLab/personal/nrezaee/raw/linus_data/'
+    position = 'MMStack_Pos0.ome.tif'
+    locs_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_all_pos/MMStack_Pos1/Dot_Locations/locations.csv'
+    dst_dir = 'foo/linus_fid_align'
+    
+    os.makedirs(dst_dir, exist_ok = True)
+    
+    num_wav = 4
+    get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav)
+
 
 
 

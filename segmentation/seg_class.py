@@ -168,21 +168,24 @@ class Segmentation:
             # Get Segmentation Dirs
             #----------------------------------------------
             segmented_dir = os.path.join(self.seg_dir, 'Channel_'+str(channel_num))
-                                    
-            if not os.path.exists(segmented_dir):
-                os.makedirs(segmented_dir)
+            os.makedirs(segmented_dir, exist_ok=True)
             #----------------------------------------------
             
             #Get Decoded genes path
             #----------------------------------------------
             decoded_genes_glob = os.path.join(self.decoded_dir, 'Channel_'+str(channel_num),'*unfiltered.csv')
-            print(f'{decoded_genes_glob=}')
             decoded_genes_paths = glob.glob(decoded_genes_glob)
-            print(f'{decoded_genes_paths=}')
+            print(f'{decoded_genes_glob=}')
             assert len(decoded_genes_paths) == 1, "There should be exactly one file with *unfiltered.csv"
-            
             decoded_genes_path = decoded_genes_paths[0]
             #----------------------------------------------
+            
+            #Get Barcode key src
+            #----------------------------------------------
+            barcode_key_src = os.path.join(self.barcode_dst, 'channel_' + str(channel_num) + '.csv')
+            print(f'{barcode_key_src=}')
+            #----------------------------------------------
+            
             
             if 'roi' in self.seg_type:
                 
@@ -202,7 +205,7 @@ class Segmentation:
                 
                 print(f'{self.labeled_img.shape=}')
                 
-                run_cellpose.run_me(self.data_dir, segmented_dir, decoded_genes_path, self.position, self.labeled_img)
+                run_cellpose.run_me(self.data_dir, segmented_dir, decoded_genes_path, barcode_key_src, self.position, self.labeled_img)
                 #----------------------------------------------
                 
     
@@ -230,18 +233,18 @@ if sys.argv[1] == 'debug_seg_class_indiv':
     labeled_img_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation/labeled_img_post.tif'
     
     labeled_img = tf.imread(labeled_img_src)
-    segmenter = Segmentation(data_dir = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5', 
+    segmenter = Segmentation(data_dir = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/', 
                             position = 'MMStack_Pos.ome.tif', 
-                            seg_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation', 
-                            decoded_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Decoded', 
-                            locations_dir ='/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Dot_Locations', 
-                            barcode_dst = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/BarcodeKey', 
-                            barcode_src = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5/barcode_key', 
+                            seg_dir = 'foo/seg_test', 
+                            decoded_dir = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Decoded', 
+                            locations_dir ='/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Dot_Locations', 
+                            barcode_dst = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/BarcodeKey', 
+                            barcode_src = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/barcode_key', 
                             bool_fake_barcodes = True,
-                            bool_decoding_individual = [1,2], 
+                            bool_decoding_individual = [1], 
                             num_z_slices = None,
                             seg_type = 'cellpose', 
-                            seg_data_dir = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5/segmentation', 
+                            seg_data_dir = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/segmentation', 
                             dimensions = 3, 
                             num_zslices = 3, 
                             labeled_img = labeled_img, 

@@ -29,6 +29,7 @@ from helpers.get_correlation_plots import get_correlated_positions
 from align_scripts import run_alignment
 from align_scripts import fiducial_alignment
 from align_scripts.dapi_visual_check.dapi_visual_check import get_stacked_dapi_s_align_check
+from align_scripts.helpers.alignment_errors_plot import get_alignment_errors_plot
 #----------------------------
 
 #Align Error Script
@@ -643,13 +644,24 @@ class Analysis:
                     
                     else:
                         
-                        offset, align_errors = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, self.align, self.num_wav, self.start_time)
+                        offset, align_errors_dict = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, self.align, self.num_wav, self.start_time)
                         offsets_path = os.path.join(path, 'offsets.json')
                         print("        Saving to", offsets_path, flush=True)
                         
+                        #Save Alignment Errors
+                        #------------------------------------------------
                         align_errors_path = os.path.join(path, 'align_errors.json')
                         with open(align_errors_path, 'w') as jsonfile:
-                            json.dump(align_errors, jsonfile)
+                            json.dump(align_errors_dict, jsonfile)
+                        #------------------------------------------------
+                        
+                        #Get Align Errors Plot
+                        #------------------------------------------------
+                        align_error_check_dir = os.path.join(self.position_dir, 'Alignment_Checks')
+                        os.makedirs(align_error_check_dir, exist_ok = True)
+                        align_errors_plot_dst = os.path.join(align_error_check_dir, 'Align_Errors_Plot.png')
+                        get_alignment_errors_plot(align_errors_path, align_errors_plot_dst)
+                        #------------------------------------------------
                         
                     #Write Results to Path
                     #-----------------------------------------------------

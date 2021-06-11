@@ -11,6 +11,64 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import tifffile as tf
 import sys
+import os
+
+def include_genes_not_in_count_matrix(count_src, barcode_src):
+    """
+    Get Genes not included in count matrix and add rows of zeros with it
+    """
+    
+    #Load Dataframes
+    #-------------------------------------
+    df_count_matrix = pd.read_csv(count_src)
+    df_barcode = pd.read_csv(barcode_src)
+    #-------------------------------------
+    
+    #Check for off barcodes
+    #-------------------------------------
+    off_barcode_file_name = os.path.basename(barcode_src).split('.csv')[0] + '_fake.csv'
+    off_barcode_src = os.path.join(os.path.dirname(barcode_src), off_barcode_file_name)
+    print(f'{off_barcode_src=}')
+    if os.path.isfile(off_barcode_src):
+        df_off_barcode = pd.read_csv(off_barcode_src)
+        df_barcode = df_barcode.append(df_off_barcode)
+    #-------------------------------------
+    
+    #Get Genes not included
+    #-------------------------------------
+    diff_bars = np.setdiff1d(df_barcode.iloc[:,0], df_count_matrix.gene)
+    #-------------------------------------
+    
+    #Include Genes not in Count matrix
+    #-------------------------------------
+    for diff_bar in diff_bars:
+        
+        #Make new row to include
+        #-------------------------------------
+        new_row_dict = {}    
+        cols = list(df_count_matrix.columns)
+        cols.remove('gene')
+        new_row_dict['gene'] = diff_bar
+        #-------------------------------------
+        
+        print(f'{diff_bar=}')
+        #Make other columns zero
+        #-------------------------------------
+        for col in cols:
+            new_row_dict[col] = 0
+        #-------------------------------------
+        
+        #Add row
+        #-------------------------------------
+        df_count_matrix = df_count_matrix.append(new_row_dict, ignore_index=True)
+        print(f'{df_count_matrix.shape=}')
+        #-------------------------------------
+        
+    #Save new count matrix
+    #-------------------------------------
+    df_count_matrix.to_csv(count_src, index = False)
+    #-------------------------------------
+    
 
 def get_plotted_assigned_genes(assigned_genes_csv_src, dst, label_img):
     
@@ -154,49 +212,69 @@ def get_cell_info(label_img):
 
 
 def add_empty_cells(df_gene_cell, labels):
+    """
+    Adds cells that did not have any genes
+    """
+    
+    #Make the variable that will have all genes
+    #------------------------------------------------------
     df_gene_cell_all = df_gene_cell
-
+    #------------------------------------------------------
+    
+    #Make all the columns
+    #------------------------------------------------------
     for i in labels:
         gene_column = 'cell_'+str(i) + '.0'
 
         if gene_column not in df_gene_cell.columns:
             df_gene_cell_all[gene_column] = 0
+    #------------------------------------------------------
     
-    bool_cols = []
-    for col in df_gene_cell.columns:
-        bool_cols.append(df_gene_cell[col] == df_gene_cell_all[col])
-    
+
+    #Get Cell indices
+    #------------------------------------------------------
     cell_cols = list(df_gene_cell_all.columns)[1:]
     cell_indices = []
     for i in range(len(cell_cols)):
         index = float(cell_cols[i].split('cell_')[1])
         cell_indices.append(index)
+    #------------------------------------------------------
         
+    #Sort the cell indices
+    #------------------------------------------------------
     sorted_indices = sorted(cell_indices)
     sorted_cols = []
     for index in sorted_indices:
         sorted_cols.append('cell_'+str(index))
+    #------------------------------------------------------
         
+    #Move the columns to be sorted cell indices
+    #------------------------------------------------------
     sorted_cols.insert(0, 'gene')
     df_gene_cell_all_sorted = df_gene_cell_all[sorted_cols]
+    #------------------------------------------------------
     
     return df_gene_cell_all_sorted
 
 def get_gene_cell_matrix(df_gene_list, labeled_img):
 
-    # Organize code by gene and count unique cellIDs
-    # ---------------------------------------------------------------------
     # keep all cells > 0
+    # ---------------------------------------------------------------------
     keep = df_gene_list['cellID'] > 0
     df_keep = df_gene_list[keep]
+    # ---------------------------------------------------------------------
 
     # unique gene dict and add to df
+    # ---------------------------------------------------------------------
     dict_keep = {"gene": df_keep.gene.unique()}
     df_gene_cell = pd.DataFrame.from_dict(dict_keep)
+    # ---------------------------------------------------------------------
 
     # get and sort all unique cellIDs
+    # ---------------------------------------------------------------------
     u_cell = df_keep.cellID.unique()
     u_cell = np.sort(u_cell)
+    # ---------------------------------------------------------------------
 
     # Convert to list
     u_cell_list = u_cell.tolist()
@@ -232,5 +310,18 @@ def get_gene_cell_matrix(df_gene_list, labeled_img):
     labels = np.unique(labeled_img)
     df_gene_cell_all = add_empty_cells(df_gene_cell, labels)
     
+    if 'cell_0.0' in df_gene_cell_all.columns:
+        df_gene_cell_all = df_gene_cell_all.drop(columns = ['cell_0.0']) 
+    
     return df_gene_cell_all
+    
+if sys.argv[1] == 'debug_gene_cell_matrix':
+    
+    df_gene_list = pd.read_csv('/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv')
+    barcode_src = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/barcode_key/channel_1.csv'
+    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Segmentation/labeled_img_post.tif'
+    labeled_img = tf.imread(labeled_img_src)
+    df_gene_cell = get_gene_cell_matrix(df_gene_list, labeled_img)
+    print(f'{df_gene_cell.shape=}')
+    df_gene_cell.to_csv('foo/gene_cell.csv', index=False)
 

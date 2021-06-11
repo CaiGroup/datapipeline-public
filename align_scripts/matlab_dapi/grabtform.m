@@ -51,7 +51,7 @@ function [tform, imageCheck] = grabtform(moving, fixed, varargin)
         end
     end
     % set up optional args
-    optargs = {true, 0.0625, 100};
+    optargs = {True, 0.0625, 100};
     optargs(1:numvarargs) = varargin;
     [partialTform, initRadius, maxIterations] = optargs{:};
   

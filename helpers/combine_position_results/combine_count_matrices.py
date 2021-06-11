@@ -38,14 +38,20 @@ def combine_two_count_matrices(df1, count_matrix_src):
         df1.loc[len(df1)] = row_to_add
     #-------------------------------------------------
     
-    #Make sure rows equal each other 
+    #Make sure genes equal each other 
     #-------------------------------------------------
     assert set(df1.gene.unique()) == set(df2.gene.unique()), 'The two count matrices have different genes.'
     #-------------------------------------------------
-    
+
+    # Add position string 
+    #-------------------------------------------------
+    pos_string_to_add = '_pos_'+ count_matrix_src.split('Pos')[1].split('/Segmentation')[0]
+    df2.columns = df2.columns + pos_string_to_add
+    #-------------------------------------------------
+
     #Add horizontally
     #-------------------------------------------------
-    combined_df = pd.concat([df1, df2.drop(columns=['gene'], axis = 1)], axis=1)
+    combined_df = pd.concat([df1, df2.drop(columns=['gene'+ pos_string_to_add], axis = 1)], axis=1)
     #-------------------------------------------------
     
     return combined_df
@@ -80,10 +86,16 @@ def get_combined_count_matrix(analysis_dir, dst):
     #----------------------------------------
     
     
-    #Comebine all count matrices
+    #Make initial count matrix
     #----------------------------------------
     comb_count_matrices = pd.read_csv(all_count_matrices[0])
+    pos_string_to_add = '_pos_'+ all_count_matrices[0].split('Pos')[1].split('/Segmentation')[0]
+    comb_count_matrices.columns = comb_count_matrices.columns + pos_string_to_add
+    comb_count_matrices = comb_count_matrices.rename(columns={"gene" + pos_string_to_add: "gene"})
+    #----------------------------------------
     
+    #Comebine all count matrices
+    #----------------------------------------
     for i in range(1, len(all_count_matrices)):
         print(f'{all_count_matrices[i]=}')
         comb_count_matrices = combine_two_count_matrices(comb_count_matrices, all_count_matrices[i])
@@ -98,7 +110,7 @@ def get_combined_count_matrix(analysis_dir, dst):
 
 if sys.argv[1] == 'debug_comb_count_matrices':
     analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4/jina_pseudos_4_all_pos_all_chs/'
-    dst = 'foo.csv'
+    dst = 'foo/jina_4_combined.csv'
     get_combined_count_matrix(analysis_dir, dst)
 
 

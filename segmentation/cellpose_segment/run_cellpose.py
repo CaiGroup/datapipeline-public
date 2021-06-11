@@ -13,7 +13,7 @@ from segmentation.cellpose_segment.helpers.get_cellpose_labeled_img import get_l
 from segmentation.cellpose_segment.helpers import cellpose_segment_funcs
 from segmentation.cellpose_segment.helpers.reorder_hybs import get_and_sort_hybs
 
-def run_me(tiff_dir, segment_results_path, decoded_genes_src, position, label_img):
+def run_me(tiff_dir, segment_results_path, decoded_genes_src, barcode_key_src, position, label_img):
     
     
     #Get Gene List
@@ -50,6 +50,7 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, position, label_im
     df_gene_cell_matrix_path = os.path.join(segment_results_path, 'count_matrix.csv')
     print(f'{df_gene_cell_matrix_path=}')
     df_gene_cell_matrix.to_csv(df_gene_cell_matrix_path, index = False)
+    cellpose_segment_funcs.include_genes_not_in_count_matrix(df_gene_cell_matrix_path, barcode_key_src)
     #-------------------------------------------
     
     
@@ -62,16 +63,18 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, position, label_im
 
 
 if sys.argv[1] == 'debug_run_cellpose':
-    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei'
-    segmented_dst_dir = '/home/nrezaee/test_cronjob_multi_dot/foo/takei2'
-    os.makedirs(segmented_dst_dir, exist_ok=True)
-    decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv'
-    position = 'MMStack_Pos0.ome.tif'
     
-    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Segmentation/labeled_img_post.tif'
+    tiff_dir = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/'
+    segmented_dst_dir = '/home/nrezaee/test_cronjob_multi_dot/foo/cellpose_test'
+    os.makedirs(segmented_dst_dir, exist_ok=True)
+    decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv'
+    position = 'MMStack_Pos0.ome.tif'
+    barcode_key_src = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/barcode_key/channel_1.csv'
+    
+    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Segmentation/labeled_img_post.tif'
     labeled_img = tifffile.imread(labeled_img_src)
     
-    run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, position, labeled_img)
+    run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)
     
 
 

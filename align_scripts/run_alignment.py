@@ -71,8 +71,8 @@ def get_and_sort_hybs(path_to_experiment_dir):
     
     #Add background to dirs to align
     #-------------------------------------------------
-    if len(back_dir) ==1:
-        sorted_hyb_dirs.append(back_dir[0])
+    # if len(back_dir) ==1:
+    #     sorted_hyb_dirs.append(back_dir[0])
     #-------------------------------------------------
     
     return sorted_hyb_dirs
@@ -178,7 +178,20 @@ def run_alignment(exp_name, personal, position, align_function, num_wav, start_t
             
             #Run Batch script command
             #-------------------------------------------------
-            call_me = ['sbatch', '--output', out_file_path, '--job-name', rand_list[sub_dirs.index(sub_dir)], "--time", "0:20:00","--mem-per-cpu", "9G", "--ntasks", '1', script_name ]
+            
+            #Add extra resources for matlab 3d
+            #-----------------
+            if align_function == 'matlab_dapi':
+                time_for_slurm = '00:20:00'
+                ntasks = str(2)
+                mem_per_cpu = '15G'
+            else:
+                time_for_slurm = '00:10:00'
+                ntasks = str(1)
+                mem_per_cpu = '10G'
+            #-----------------
+            
+            call_me = ['sbatch', '--output', out_file_path, '--job-name', rand_list[sub_dirs.index(sub_dir)], "--time", time_for_slurm, "--mem-per-cpu", mem_per_cpu, "--ntasks", ntasks, script_name ]
             print(f'{" ".join(call_me)=}')
             subprocess.call(call_me)
             #-------------------------------------------------

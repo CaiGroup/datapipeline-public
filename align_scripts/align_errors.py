@@ -5,6 +5,9 @@ import scipy.ndimage
 import json
 import glob
 import sys
+import pandas as pd
+import matplotlib.pyplot as plt
+
 sys.path.insert(0, os.getcwd())
 from load_tiff import tiffy
 from align_scripts.mean_squares_blur import preprocess_align
@@ -12,6 +15,41 @@ from align_scripts.mean_squares_blur import preprocess_align
 
 main_dir = '/groups/CaiLab'
 
+def get_alignment_errors_plot(align_errors_src, dst):
+    
+    #Open align errors
+    #------------------------------------------------
+    with open(align_errors_src) as json_file:
+        data = json.load(json_file)
+    #------------------------------------------------
+        
+    #Get value from each key
+    #------------------------------------------------
+    values = []
+    for key in data.keys():
+        values.append(data[key])
+    #------------------------------------------------
+    
+    #Get each value as float
+    #------------------------------------------------
+    float_values = [float(value.split('by ')[1].split('%')[0]) for value in values[1:]]
+    #------------------------------------------------
+    
+    #Make Plot
+    #------------------------------------------------
+    plt.figure(figsize = (20,10))
+    plt.title('Alignment Errors (Anything Below Zero is bad)', fontsize=30)
+    plt.ylabel('Percentage Improved', fontsize=20)
+    plt.bar(list(data.keys())[1:], float_values)
+    plt.tick_params(axis='x', labelrotation = 90)
+    #------------------------------------------------
+    
+    #Save Plot to dest
+    #------------------------------------------------
+    plt.savefig(dst)
+    #------------------------------------------------
+    
+    
 def crop_center(img,cropx,cropy):
     
     y,x = img.shape

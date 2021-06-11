@@ -1,6 +1,7 @@
 function [tform] = full_wrap_alignment(fixed_src, moving_src, dst, varargin)
 
-
+    fixed_src
+    moving_src
     disp('Importing Images')
     fixed = loadometiff(fixed_src, 0);
     moving = loadometiff(moving_src, 0);

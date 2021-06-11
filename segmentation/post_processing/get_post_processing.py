@@ -91,7 +91,7 @@ def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cy
     #-------------------------------------------------------------
     if bool_cyto_match == True:
         labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
-        label_img = get_labeled_img_cellpose(tiff_for_segment, dst = labeled_img_path, num_wav = num_wav)
+        label_img = get_labeled_img_cellpose(tiff_for_segment, dst = labeled_img_path, num_wav = num_wav, nuclei_channel_num = nuclei_channel_num)
         
         labeled_cyto_path = os.path.join(segment_results_path, 'labeled_cyto_img.tif')
         labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, dst = labeled_cyto_path, cyto_channel = cyto_channel_num, num_wav = num_wav)
@@ -272,13 +272,12 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
         labeled_img_path = label_img_post_processed_dst
     #-------------------------------------------------------------
     
-    print('7777777777777777777777777777777777777777777')
+    print(f'{labeled_img_path=}')
     label_img = tf.imread(labeled_img_path)
     print(f'{label_img.shape=}')
     if num_z < 4 and 'Labeled_Images' not in tiff_for_segment:
         print(f'{labeled_img_path=}')
         switch_low_z_to_right_shape(labeled_img_path)
-        print('88888888888888888888888888888888888888888')
         label_img = tf.imread(labeled_img_path)
         print(f'{label_img.shape=}')
         
@@ -305,7 +304,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     
 if sys.argv[1] == 'debug_post':
     print('=---------------------------------------')
-    tiff_dir = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel'
+    tiff_dir = '/groups/CaiLab/personal/Yodai/raw/2021-02-27-E14-100k-RNAIFfull-rep2'
     segment_results_path = '/home/nrezaee/temp2'
     position  = 'MMStack_Pos0.ome.tif'
     edge = 5
@@ -322,8 +321,8 @@ if sys.argv[1] == 'debug_post':
     cell_prob_threshold= .5
     flow_threshold = .5
     nuclei_channel_num = -1
-    cyto_flow_threshold = .3
-    cyto_cell_prob_threshold = 1
+    cyto_flow_threshold = 0
+    cyto_cell_prob_threshold = 0
     cyto_radius = 10
     save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol, 
                 cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold, 
