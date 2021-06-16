@@ -3,8 +3,9 @@ function [tform] = full_wrap_alignment(fixed_src, moving_src, dst, varargin)
     fixed_src
     moving_src
     disp('Importing Images')
-    fixed = loadometiff(fixed_src, 0);
-    moving = loadometiff(moving_src, 0);
+    get_pos_from_path(fixed_src)
+    fixed = loadometiff(fixed_src, get_pos_from_path(fixed_src));
+    moving = loadometiff(moving_src, get_pos_from_path(fixed_src));
     
     disp('Getting Dapis')
     fixed_dapi = squeeze(fixed(:,end,:,:));

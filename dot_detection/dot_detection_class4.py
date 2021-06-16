@@ -433,7 +433,7 @@ class Dot_Detection:
                     
                     list_cmd = [str(i) for i in list_cmd]
                
-                    time_for_slurm = "0:10:00"
+                    time_for_slurm = "00:11:00"
                
                 elif self.dot_detection == "biggest jump":
                     
@@ -446,7 +446,7 @@ class Dot_Detection:
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
-                    time_for_slurm = "0:10:00"            
+                    time_for_slurm = "0:12:00"            
                         
                 elif self.dot_detection == "matlab 3d":
                     
@@ -460,11 +460,11 @@ class Dot_Detection:
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
-                    time_for_slurm = "0:10:00"
+                    time_for_slurm = "02:00:00"
                     
                 elif self.dot_detection == "adcg 2d":
                     
-
+jhfjhfgkhg
                     list_cmd = ['python', dot_detection_dir+ '/adcg_2d.py', '--offset0', offset[0], '--offset1', offset[1], '--offset2', offset[2], \
                     '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
@@ -536,18 +536,18 @@ class Dot_Detection:
         return df_locs
         
 if sys.argv[1] == 'debug_dot_class':
-                       
+    print('hi')
     experiment_name = 'arun_1'
     personal='nrezaee'
     position = 'MMStack_Pos0.ome.tif'
     locations_dir=None
-    analysis_name = 'test_form2_______strict_6.json'
+    analysis_name = 'test_form2_______strict_6'
     visualize_dots = True
     normalization = False
     background_subtraction = False
     decoding_individual = True
     chrom = False
-    dot_detection = 'biggest jump 3d'
+    dot_detection = 'matlab 3d'
     gauss = False
     strict = 10
     dim = 3
@@ -564,7 +564,7 @@ if sys.argv[1] == 'debug_dot_class':
     min_weight_adcg = 1000
     final_loss_adcg = 1000
     
-    dot_detection = Dot_Detection = (experiment_name, personal, position, locations_dir, \
+    dot_detection = Dot_Detection(experiment_name, personal, position, locations_dir, \
                   analysis_name, visualize_dots, normalization, \
                   background_subtraction, decoding_individual, chrom, \
                   dot_detection, gauss, strict, dim, \
@@ -577,6 +577,7 @@ if sys.argv[1] == 'debug_dot_class':
                    min_weight_adcg, 
                    final_loss_adcg)
                    
+    dot_detection.run_dot_detection()
     print(f'{dot_detection=}')
                    
     

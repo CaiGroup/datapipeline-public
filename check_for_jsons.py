@@ -29,6 +29,9 @@ def Diff(li1, li2):
     return (list(list(set(li1)-set(li2)) + list(set(li2)-set(li1))))
     
 def get_specific_positions(spec_positions, positions):
+    
+    print(f'{spec_positions=}')
+    print(f'{positions=}')
     """
     Inputs:
         spec_postions: list of numbers
@@ -37,7 +40,8 @@ def get_specific_positions(spec_positions, positions):
         list of MMStack_Pos{n}.ome.tif's in spec_positions
     """
     
-    
+    spec_positions = spec_positions.replace(' ', '').split(',')
+    print(f'{spec_positions=}')
     #Split positions to get position numbers
     positions_split = [re.split('Pos|,|.ome.tif', position) 
                        for position in positions]
@@ -56,8 +60,7 @@ def get_specific_positions(spec_positions, positions):
     
     return result_positions
     
-
-
+    
 def check_if_all_hybs_are_present(path_to_experiment_dir):
     """
     Runs a check to see if all hybs are in an experiment

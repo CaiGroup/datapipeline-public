@@ -28,7 +28,8 @@ function [tform, imageCheck] = grabtform(moving, fixed, varargin)
 % Email: nicogpt@caltech.edu
 % Date: 2/26/2019
 % Modified: 3/10/2020
-
+    
+    varargin
 
     %% Set up optional Parameters for z-slice index
     argsLimit = 3;
@@ -51,7 +52,7 @@ function [tform, imageCheck] = grabtform(moving, fixed, varargin)
         end
     end
     % set up optional args
-    optargs = {True, 0.0625, 100};
+    optargs = {true, 0.0625, 100};
     optargs(1:numvarargs) = varargin;
     [partialTform, initRadius, maxIterations] = optargs{:};
   

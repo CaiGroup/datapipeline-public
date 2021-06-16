@@ -78,7 +78,9 @@ def get_and_sort_hybs(path_to_experiment_dir):
     return sorted_hyb_dirs
     
 def get_fixed_and_movings(exp_name, personal, position, main_dir):
-    
+    """
+    Get fixed and moving images from details of experiment
+    """
     #Get Fixed File Path and Sub Dirs
     #-------------------------------------------------
     exp_dir = os.path.join(main_dir, 'personal', personal, 'raw', exp_name)
@@ -170,7 +172,8 @@ def run_alignment(exp_name, personal, position, align_function, num_wav, start_t
             #Write command to bash script to run in parallel
             #-------------------------------------------------
             script_name = os.path.join(rand_dir, 'align.sh')
-            out_file_path = script_name = os.path.join(rand_dir, 'slurm_align.out')
+            print(f'{script_name=}')
+            out_file_path = os.path.join(rand_dir, 'slurm_align.out')
             with open(script_name , 'w') as f:
                 f.write('#!/bin/bash \n')
                 f.write(cmd)
@@ -183,14 +186,15 @@ def run_alignment(exp_name, personal, position, align_function, num_wav, start_t
             #-----------------
             if align_function == 'matlab_dapi':
                 time_for_slurm = '00:20:00'
-                ntasks = str(2)
+                ntasks = str(5)
                 mem_per_cpu = '15G'
             else:
                 time_for_slurm = '00:10:00'
                 ntasks = str(1)
                 mem_per_cpu = '10G'
             #-----------------
-            
+            print('-----------------------------------------------')
+            print(f'{script_name=}')
             call_me = ['sbatch', '--output', out_file_path, '--job-name', rand_list[sub_dirs.index(sub_dir)], "--time", time_for_slurm, "--mem-per-cpu", mem_per_cpu, "--ntasks", ntasks, script_name ]
             print(f'{" ".join(call_me)=}')
             subprocess.call(call_me)
@@ -221,9 +225,9 @@ def run_alignment(exp_name, personal, position, align_function, num_wav, start_t
  
         #Delete Temp Directories
         #-------------------------------------------------
-        for rand in rand_list:
-            rand_dir = os.path.join(temp_dir, rand)
-            shutil.rmtree(rand_dir)
+        # for rand in rand_list:
+        #     rand_dir = os.path.join(temp_dir, rand)
+        #     shutil.rmtree(rand_dir)
         #-------------------------------------------------
         
         return offsets, align_errors

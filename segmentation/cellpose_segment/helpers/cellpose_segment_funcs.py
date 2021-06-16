@@ -12,7 +12,27 @@ import matplotlib.pyplot as plt
 import tifffile as tf
 import sys
 import os
+import imageio as io
+import imutils
 
+def rotate_img(img_src, angle=-90):
+    
+    #Read and rotate image
+    #---------------------------------------
+    img = io.imread(img_src)
+    rotated_img = imutils.rotate(img, angle=angle)
+    
+    #Check to see image
+    #---------------------------------------
+    plt.figure(figsize=(20,20))
+    plt.imshow(rotated_img)
+    #---------------------------------------
+    
+    #Save image
+    #---------------------------------------
+    io.imwrite(img_src, rotated_img)
+    #---------------------------------------
+    
 def include_genes_not_in_count_matrix(count_src, barcode_src):
     """
     Get Genes not included in count matrix and add rows of zeros with it
@@ -36,7 +56,7 @@ def include_genes_not_in_count_matrix(count_src, barcode_src):
     
     #Get Genes not included
     #-------------------------------------
-    diff_bars = np.setdiff1d(df_barcode.iloc[:,0], df_count_matrix.gene)
+    diff_bars = np.setdiff1d(df_barcode.iloc[:,0].apply(str), df_count_matrix.gene.apply(str))
     #-------------------------------------
     
     #Include Genes not in Count matrix
@@ -101,6 +121,11 @@ def get_plotted_assigned_genes(assigned_genes_csv_src, dst, label_img):
     #-------------------------------------------------
     print('File Path of Genes on Cells:', dst)
     plt.savefig(dst)
+    #-------------------------------------------------
+    
+    #Rotate saved image
+    #-------------------------------------------------
+    rotate_img(dst)
     #-------------------------------------------------
     
 if sys.argv[1] == 'debug_plotted_assigned_genes':
@@ -307,11 +332,18 @@ def get_gene_cell_matrix(df_gene_list, labeled_img):
         for cell_id, group in df_cell:
             df_gene_cell.iloc[i, cell_index[cell_id]] += group.shape[0]
     # ---------------------------------------------------------------------
+    
+    #Add Cells that do not have genes
+    # ---------------------------------------------------------------------
     labels = np.unique(labeled_img)
     df_gene_cell_all = add_empty_cells(df_gene_cell, labels)
+    # ---------------------------------------------------------------------
     
+    #Check if cell 0 is in cell columns
+    # ---------------------------------------------------------------------
     if 'cell_0.0' in df_gene_cell_all.columns:
         df_gene_cell_all = df_gene_cell_all.drop(columns = ['cell_0.0']) 
+    # ---------------------------------------------------------------------
     
     return df_gene_cell_all
     
@@ -324,4 +356,14 @@ if sys.argv[1] == 'debug_gene_cell_matrix':
     df_gene_cell = get_gene_cell_matrix(df_gene_list, labeled_img)
     print(f'{df_gene_cell.shape=}')
     df_gene_cell.to_csv('foo/gene_cell.csv', index=False)
+
+elif sys.argv[1] == 'debug_gene_cell_matrix_non_barcoded':
+    
+    df_gene_list = pd.read_csv('foo/cellpose_test_non_barcoded/gene_locations_assigned_to_cell.csv')
+    barcode_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/BarcodeKey/sequential_key.csv'
+    labeled_img_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Segmentation/labeled_img_post.tif'
+    labeled_img = tf.imread(labeled_img_src)
+    df_gene_cell = get_gene_cell_matrix(df_gene_list, labeled_img)
+    print(f'{df_gene_cell.shape=}')
+    df_gene_cell.to_csv('foo/gene_cell_non_barcoded.csv', index=False)
 

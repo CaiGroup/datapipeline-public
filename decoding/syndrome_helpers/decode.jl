@@ -24,7 +24,7 @@ z_thresh = 2
 cb_name = ARGS[2]
 cb = readdlm(cb_name, UInt8)
 
-ndrops=0
+ndrops=1
 
 pnts.dot_ID = Array(1:nrow(pnts))
 ndots = nrow(pnts)

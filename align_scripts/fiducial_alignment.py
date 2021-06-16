@@ -92,8 +92,8 @@ if sys.argv[1] == 'debug_fiducials':
 elif sys.argv[1] == 'debug_fiducials_linus':
     sys.path.insert(0, os.getcwd())
     data_dir = '/groups/CaiLab/personal/nrezaee/raw/linus_data/'
-    position = 'MMStack_Pos0.ome.tif'
-    locs_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_all_pos/MMStack_Pos1/Dot_Locations/locations.csv'
+    position = 'MMStack_Pos1.ome.tif'
+    locs_src = '/groups/CaiLab/analyses/nrezaee/linus_data/adcg/MMStack_Pos1/Dot_Locations/locations.csv'
     dst_dir = 'foo/linus_fid_align'
     
     os.makedirs(dst_dir, exist_ok = True)

@@ -40,7 +40,7 @@ from align_errors import align_errors
 #Dot Detection Script
 #----------------------------
 print('Current Directory:', os.getcwd())
-from dot_detection.dot_detection_class4 import Dot_Detection
+from dot_detection.dot_detection_class5 import Dot_Detection
 #----------------------------
 
 #Barcode Script

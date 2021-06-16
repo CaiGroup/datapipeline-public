@@ -63,9 +63,14 @@ function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins,
 
     tiff_src
     tiff= loadometiff(tiff_src, get_pos_from_path(tiff_src));
+    size(tiff)
     mat_channel = channel +1
     image = squeeze(tiff(:,mat_channel,:,:));
+    
+    size(image)
+    
     image = permute(image, [3 2 1]);
+    size(image)
     
     %image = illum(image);
     

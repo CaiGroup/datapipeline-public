@@ -37,6 +37,11 @@ args = parser.parse_args()
 #Runs analysis by setting parameters for Analysis Class
 #=========================================================================
 def run_analysis(json_name, position):
+    """
+    Run a json file with a specific position
+    
+    This file makes an Analysis Object from the analysis_class.py file
+    """
     
     
     #Get Json Path

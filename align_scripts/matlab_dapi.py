@@ -31,7 +31,7 @@ def matlab_dapi(fixed_image_src, moving_image_src, num_wav, rand_dir):
     bfmatlab_dir = os.path.join(matlab_dapi_dir, 'bfmatlab')
     #-------------------------------------------------------------------
     
-    
+    print(f'{os.getcwd()=}')
     #Create Matlab Command and Call it
     #-------------------------------------------------------------------
     cmd = """  matlab -r "addpath('{0}');addpath('{1}');full_wrap_alignment('{2}', '{3}', '{4}'); quit"; """ 
@@ -89,8 +89,20 @@ if 'debug' not in sys.argv[1]:
 
 elif sys.argv[1] == 'debug_matlab_dapi':
     
-    fixed_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_2/MMStack_Pos0.ome.tif'
-    moving_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_4/MMStack_Pos0.ome.tif'
+    fixed_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_2/MMStack_Pos6.ome.tif'
+    moving_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_37/MMStack_Pos6.ome.tif'
+    
+    rand_dir = 'foo/matlab_dapi'
+    os.makedirs(rand_dir, exist_ok=True)
+    num_wav = 4
+    start_time = None
+    
+    matlab_dapi(fixed_src, moving_src, num_wav, rand_dir)
+    
+elif sys.argv[1] == 'debug_matlab_dapi_jina':
+    
+    fixed_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4/HybCycle_4/MMStack_Pos6.ome.tif'
+    moving_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4/HybCycle_5/MMStack_Pos6.ome.tif'
     
     rand_dir = 'foo/matlab_dapi'
     os.makedirs(rand_dir, exist_ok=True)

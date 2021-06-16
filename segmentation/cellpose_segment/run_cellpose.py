@@ -76,6 +76,20 @@ if sys.argv[1] == 'debug_run_cellpose':
     
     run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)
     
+if sys.argv[1] == 'debug_run_cellpose_non_barcoded':
+    
+    tiff_dir = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013'
+    segmented_dst_dir = '/home/nrezaee/test_cronjob_multi_dot/foo/cellpose_test_non_barcoded'
+    os.makedirs(segmented_dst_dir, exist_ok=True)
+    decoded_genes_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Decoded/sequential_decoding_results.csv'
+    position = 'MMStack_Pos1.ome.tif'
+    barcode_key_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/BarcodeKey/sequential_key.csv'
+    
+    labeled_img_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Segmentation/labeled_img_post.tif'
+    labeled_img = tifffile.imread(labeled_img_src)
+    
+    run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)
+    
 
 
 

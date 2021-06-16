@@ -29,7 +29,7 @@ from decoding import decoding_non_barcoded
 from decoding import syndrome_decoding
 #----------------------------
 
-#Analysis Class to set and run parameters for analyses
+#Decoding Class to set and run parameters for decoding
 #=====================================================================================
 class Decoding:
     def __init__(self, data_dir, position, decoded_dir, locations_dir, position_dir, barcode_dst, barcode_src, \
@@ -60,19 +60,7 @@ class Decoding:
         self.synd_decoding = synd_decoding
         self.lampfish_pixel = lampfish_pixel
         self.start_time = start_time
-         
-    def labeled_img_from_tiff_dir(self):
-        glob_me = os.path.join(self.data_dir, '*')
-        
-        hybs = get_and_sort_hybs(glob_me)
-        
-        assert len(hybs) >= 1
-        
-        tiff_for_seg = os.path.join(hybs[0], self.position)
-        print(f'{tiff_for_seg=}')
-        labeled_img = get_labeled_img_cellpose(tiff_for_seg)
-    
-        return labeled_img
+
             
     def combine_decode_z_s(self, decode_channel_dir):
         
@@ -190,13 +178,18 @@ class Decoding:
         #--------------------------------------------------------------------
         
     def run_non_barcoded_decoding(self):
-        barcode_src = os.path.join(self.data_dir, 'non_barcoded_key', 'sequential_key.csv')
         
-        if not os.path.exists(self.barcode_dst):
-            os.makedirs(self.barcode_dst)
-            
+        #Show location of non barcode key
+        #--------------------------------------------------------------------
+        barcode_src = os.path.join(self.data_dir, 'non_barcoded_key', 'sequential_key.csv')
+        #--------------------------------------------------------------------
+        
+        #Copy non barcode key
+        #--------------------------------------------------------------------
+        os.makedirs(self.barcode_dst, exist_ok = True)
         barcode_file_path = os.path.join(self.barcode_dst, 'sequential_key.csv')
         shutil.copyfile(barcode_src, barcode_file_path)
+        #--------------------------------------------------------------------
         
         #Set Directory for locations
         #--------------------------------------------------------------------
@@ -209,24 +202,22 @@ class Decoding:
             os.makedirs(self.decoded_dir)
         #--------------------------------------------------------------------
         
+        #Run Sequential Decoding
+        #--------------------------------------------------------------------
         print("Running Sequential Decoding (smFISH)")
-        
         pos_num = int(self.position.split('.ome.tif')[0].split('Pos')[1])
         decoding_non_barcoded.run_decoding_non_barcoded(barcode_src, locations_path, pos_num, self.decoded_dir)
-        
+        #--------------------------------------------------------------------
         
     def run_decoding_across_2d(self):
+        
         
         #Set directories for barcodes 
         #--------------------------------------------------------------------
         print("Reading Barcodes", flush=True)
         
         barcode_src = os.path.join(self.barcode_src, 'barcode.csv')
-        
-                                  
-        if not os.path.exists(self.barcode_dst):
-            os.makedirs(self.barcode_dst)
-            
+        os.makedirs(self.barcode_dst, exist_ok = True)
         barcode_file_path = os.path.join(self.barcode_dst, 'barcode.mat')
         #--------------------------------------------------------------------
         
@@ -247,15 +238,7 @@ class Decoding:
         if not os.path.exists(self.decoded_dir):
             os.makedirs(self.decoded_dir)
         #--------------------------------------------------------------------
-        
-        #Get Labeled Img
-        #--------------------------------------------------------------------
-        # if self.seg != False:
 
-        #     if self.seg == "roi":
-        #         labeled_img = self.labeled_img_from_tiff_dir()
-                    
-        #--------------------------------------------------------------------
         
         for z in range(self.num_zslices):
         
@@ -271,18 +254,13 @@ class Decoding:
             
             #Set directories for decoding
             #--------------------------------------------------------------------
-            if not os.path.exists(self.decoded_dir):
-                os.makedirs(self.decoded_dir)
+            os.makedirs(self.decoded_dir, exist_ok = True)
                 
             decoding_dst_for_channel = self.decoded_dir
-
-            
             z_dir = 'Z_Slice_' +str(z)
-            
             decoding_dst_z = os.path.join(self.decoded_dir, z_dir)
                                   
-            if not os.path.exists(decoding_dst_z):
-                os.makedirs(decoding_dst_z)
+            os.makedirs(decoding_dst_z, exist_ok = True)
             #--------------------------------------------------------------------
             
             #Run Decoding Across Channels
@@ -341,21 +319,14 @@ class Decoding:
                 
                 #Set directories for decoding
                 #--------------------------------------------------------------------
-                if not os.path.exists(self.decoded_dir):
-                    os.makedirs(self.decoded_dir)
-                    
+                os.makedirs(self.decoded_dir, exist_ok = True)
                 decoding_dst_for_channel = os.path.join(self.decoded_dir, "Channel_"+str(channel))
-                                      
-                if not os.path.exists(decoding_dst_for_channel):
-                    os.makedirs(decoding_dst_for_channel)
+                os.makedirs(decoding_dst_for_channel, exist_ok = True)
                     
                 
                 z_dir = 'Z_Slice_' +str(z)
-                
                 decoding_dst_for_channel_z = os.path.join(decoding_dst_for_channel, z_dir)
-                                      
-                if not os.path.exists(decoding_dst_for_channel_z):
-                    os.makedirs(decoding_dst_for_channel_z)
+                os.makedirs(decoding_dst_for_channel_z, exist_ok = True)
                 #--------------------------------------------------------------------
             
                 if self.seg == False:
@@ -385,16 +356,10 @@ class Decoding:
             #Set Directories for reading barcode key
             #--------------------------------------------------------------------
             barcode_file_name = 'channel_' + str(channel) + '.csv'
-            
             barcode_src = os.path.join(self.barcode_src, barcode_file_name)
             
-            
-     
-            if not os.path.exists(self.barcode_dst):
-                os.makedirs(self.barcode_dst)
-                
+            os.makedirs(self.barcode_dst, exist_ok = True)
             barcode_file_mat = barcode_file_name.replace('.csv', '.mat')
-                
             barcode_dst = os.path.join(self.barcode_dst, barcode_file_mat)
             #--------------------------------------------------------------------
         
@@ -412,13 +377,11 @@ class Decoding:
             
             #Set directories for decoding
             #--------------------------------------------------------------------
-            if not os.path.exists(self.decoded_dir):
-                os.makedirs(self.decoded_dir)
+            os.makedirs(self.decoded_dir, exist_ok = True)
                 
             decoding_dst_for_channel = os.path.join(self.decoded_dir, "Channel_"+str(channel))
                                   
-            if not os.path.exists(decoding_dst_for_channel):
-                os.makedirs(decoding_dst_for_channel)
+            os.makedirs(decoding_dst_for_channel, exist_ok = True)
             #--------------------------------------------------------------------
             
             if self.seg == False:
@@ -462,8 +425,7 @@ class Decoding:
         
         barcode_src = os.path.join(self.barcode_src, 'barcode.csv')
                                   
-        if not os.path.exists(self.barcode_dst):
-            os.makedirs(self.barcode_dst)
+        os.makedirs(self.barcode_dst, exist_ok = True)
             
         barcode_dst = os.path.join(self.barcode_dst, 'barcode.mat')
         #--------------------------------------------------------------------
@@ -477,8 +439,7 @@ class Decoding:
         
         #Set Directory for Decoding
         #--------------------------------------------------------------------
-        if not os.path.exists(self.decoded_dir):
-            os.makedirs(self.decoded_dir)
+        os.makedirs(self.decoded_dir, exist_ok = True)
         #--------------------------------------------------------------------
         
         #Run Decoding Across Channels
@@ -512,8 +473,7 @@ class Decoding:
         
         barcode_src = os.path.join(self.barcode_src, 'barcode.csv')
                                   
-        if not os.path.exists(self.barcode_dst):
-            os.makedirs(self.barcode_dst)
+        os.makedirs(self.barcode_dst, exist_ok = True)
             
         barcode_dst = os.path.join(self.barcode_dst, 'barcode.mat')
         #--------------------------------------------------------------------
@@ -524,13 +484,9 @@ class Decoding:
         read_barcode.read_barcode(barcode_src, barcode_dst, self.fake_barcodes)
         #--------------------------------------------------------------------
         
-
-        
         #Set Directory for Decoding
         #--------------------------------------------------------------------
- 
-        if not os.path.exists(self.decoded_dir):
-            os.makedirs(self.decoded_dir)
+        os.makedirs(self.decoded_dir, exist_ok = True)
         #--------------------------------------------------------------------
         
         #Run Decoding Across Channels
@@ -562,12 +518,10 @@ class Decoding:
             
             #Set directories for decoding
             #--------------------------------------------------------------------
-            if not os.path.exists(self.decoded_dir):
-                os.makedirs(self.decoded_dir)
+            os.makedirs(self.decoded_dir, exist_ok = True)
                 
             decoding_dst_for_channel = os.path.join(self.decoded_dir, "Channel_"+str(channel))
-            if not os.path.exists(decoding_dst_for_channel):
-                os.makedirs(decoding_dst_for_channel)
+            os.makedirs(decoding_dst_for_channel, exist_ok = True)
             #--------------------------------------------------------------------
             
             #Run Syndrome Decoding
