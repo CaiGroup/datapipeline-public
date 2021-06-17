@@ -7,6 +7,7 @@ def get_barcode_info(barcode_src):
     #Get Info on how Barcode key is structured
     #-------------------------------------------------------------------
     print("Reading Barcode Key")
+    print(f'{barcode_src=}')
     barcodes = loadmat(barcode_src)["barcodekey"]
     num_of_rounds = barcodes[0][0][0].shape[1]
     channels_per_round = np.max(barcodes[0][0][0][:200])
@@ -15,6 +16,8 @@ def get_barcode_info(barcode_src):
     
     #Make assertion to double check
     #-------------------------------------------------------------------
+    print(f'{total_number_of_channels=}')
+    print(f'{num_of_rounds=}')
     assert total_number_of_channels % num_of_rounds == 0
     #-------------------------------------------------------------------
     
@@ -69,8 +72,10 @@ def decoding(barcode_src ,locations_src, dest, allowed_diff, min_seeds, channel_
     #-------------------------------------------------------------------
     os.system(cmd)
     #-------------------------------------------------------------------
-    
-    return None
+    if min_seeds =='number_of_rounds - 1':
+        min_seeds = num_of_rounds - 1
+        
+    return os.path.join(dest, 'pre_seg_diff_' + str(allowed_diff) + '_minseeds_' + str(min_seeds) + '_unfiltered.csv')
     
 import sys
 if sys.argv[1] == 'debug_no_parallel':

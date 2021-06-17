@@ -9,6 +9,7 @@ import random
 import string
 import glob
 import tifffile as tf
+import tempfile
 
 print(1)
 sys.path.insert(0, os.getcwd())
@@ -171,8 +172,17 @@ def get_tiff_for_segment(tiff_dir, position, num_z):
             pass
         elif len(tiff.shape) ==2:
             tiff_3d = make_2d_into_3d(tiff, num_z)
-            tiff_for_segment = tiff_for_segment.replace('.ome.', '2d_stacked.ome.')
-            #tiff_for_segment = o
+            # tiff_for_segment = tiff_for_segment.replace('.ome.', '2d_stacked.ome.')
+            
+            #Make temp_dir and save
+            #-------------------------------------------------------------
+            temp_dir = os.path.join('/tmp', ''.join(random.choices(string.ascii_uppercase +string.digits, k = 10)))
+            os.makedirs(temp_dir)
+            temp_dir_labeled_img = os.path.join(temp_dir, 'Labeled_Images')
+            os.makedirs(temp_dir_labeled_img)
+            tiff_for_segment = os.path.join(temp_dir_labeled_img, os.path.basename(tiff_for_segment))
+            #-------------------------------------------------------------
+            
             print(f'{tiff_for_segment=}')
             tf.imwrite(tiff_for_segment, tiff_3d)
         else:

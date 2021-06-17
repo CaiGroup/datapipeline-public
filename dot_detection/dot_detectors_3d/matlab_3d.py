@@ -57,7 +57,7 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
 
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
-                      bool_radial_center, strictness, z_slices, nbins, threshold, num_wav, rand_dir):
+                      bool_radial_center, strictness, z_slices, nbins, threshold, num_wav, bool_stack_z_dots, rand_dir):
     
     #Getting Background Src
     #--------------------------------------------------------------------
@@ -153,15 +153,25 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         dot_analysis[0] = shift_locations(dot_analysis[0], np.array(offset), tiff_src, bool_chromatic)
         #---------------------------------------------------------------------
         
+        #Add channel dataframe to tiff dataframe
+        #----------------------------------------------------------
         df_ch = add_hyb_and_ch_to_df(dot_analysis, tiff_src, channel)
         df_tiff = df_tiff.append(df_ch)
         print(f'{df_tiff.shape=}')
+        #----------------------------------------------------------
         
+    #Stack z dots
+    #----------------------------------------------------------
+    if bool_stack_z_dots:
+        df_tiff.z = 1 
+    #----------------------------------------------------------
+    
+    #Save to file
+    #----------------------------------------------------------
     csv_path = rand_dir +'/locs.csv'
     print(f'{csv_path=}')
-    df_tiff.z = df_tiff.z = 1 
     df_tiff.to_csv(csv_path, index=False)
-
+    #----------------------------------------------------------
 
      
     
@@ -189,6 +199,7 @@ if sys.argv[1] != 'debug_matlab_3d':
     parser.add_argument("--num_wav")
     parser.add_argument("--nbins")
     parser.add_argument("--threshold")
+    parser.add_argument("--stack_z_s")
     
     
     args, unknown = parser.parse_known_args()
@@ -219,7 +230,7 @@ if sys.argv[1] != 'debug_matlab_3d':
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
                           args.back_subtract, channels, args.chromatic, str2bool(args.gaussian), \
                           str2bool(args.radial_center),int(args.strictness), args.z_slices, int(float(args.nbins)), \
-                          int(args.threshold), args.num_wav, args.rand)
+                          int(args.threshold), args.num_wav, str2bool(args.stack_z_s), args.rand)
         
 else:
     print('Debugging')
@@ -238,9 +249,10 @@ else:
     threshold= 300
     num_wav = 4
     rand_dir = '/home/nrezaee/temp'
+    bool_stack_z_dots = True
     get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, back_sub, channels, \
                     chromatic, gaussian, rad_center, strictness, z_slices, nbins, \
-                    threshold, num_wav, rand_dir)
+                    threshold, num_wav, bool_stack_z_dots, rand_dir)
                     
                     
                     

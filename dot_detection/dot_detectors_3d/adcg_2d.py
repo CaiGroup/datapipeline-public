@@ -107,7 +107,7 @@ def get_adcg_dots(tiff_2d, min_weight, final_loss):
     
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool_normalization, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, num_wav, \
-                      z_slices, rand_dir, min_weight, final_loss):
+                      z_slices, rand_dir, min_weight, final_loss, bool_stack_z_dots):
     
     
     #Getting Background Src
@@ -224,6 +224,13 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
             df_tiff['y'] = df_tiff['y'] + offset[0]
         #-------------------------------------------------------------------
         
+        
+    #Stack z dots
+    #----------------------------------------------------------
+    if bool_stack_z_dots:
+        df_tiff.z = 1 
+    #----------------------------------------------------------
+        
     #Save to path
     #-------------------------------------------------------------------
     csv_path = os.path.join(rand_dir, 'locs.csv')
@@ -254,6 +261,7 @@ if sys.argv[1] != 'debug_adcg':
     parser.add_argument("--num_wav")
     parser.add_argument("--min_weight_adcg")
     parser.add_argument("--final_loss_adcg")
+    parser.add_argument("--stack_z_dots")
     
     
     
@@ -275,7 +283,7 @@ if sys.argv[1] != 'debug_adcg':
     print(f'{args.z_slices=}')
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), args.norm, \
                           args.back_subtract, channels, args.chromatic, args.num_wav, args.z_slices, 
-                          args.rand, args.min_weight_adcg, args.final_loss_adcg)
+                          args.rand, args.min_weight_adcg, args.final_loss_adcg, str2bool(args.stack_z_dots))
                           
 else:                        
     print('Debugging')

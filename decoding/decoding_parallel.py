@@ -162,7 +162,7 @@ def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_se
 
         cell_dirs.append('cell_' +str(i))
         temp_dir = os.path.join(dest, 'cell_' + str(i)) 
-        os.mkdir(temp_dir)
+        os.makedirs(temp_dir, exist_ok = True)
         locations_cell_path = os.path.join(temp_dir, 'locations_for_cell.csv')
         
         save_points_int_to_csv(locations_for_cell[:,0], locations_for_cell[:,1], locations_cell_path)
@@ -190,7 +190,7 @@ def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_se
     print(f'{dest_filt=}')
     get_combined_csv(dest, cell_dirs, dest_unfilt, dest_filt)
     
-    return rand_list
+    return dest_unfilt
     
 
 if sys.argv[1] == 'debug_parallel':

@@ -499,6 +499,13 @@ def run_analysis(json_name, position):
             analysis.set_cyto_radius_arg(data['cyto radius'])
     #----------------------------------------------------------
     
+    #Stack z slices
+    #----------------------------------------------------------
+    if 'stack z slices in dot detection' in data.keys():
+        if data['stack z slices in dot detection'] != 'none':
+            analysis.set_stack_z_slices_in_dot_detection_true()
+    #----------------------------------------------------------
+    
     #Writ
     #----------------------------------------------------------
     analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)

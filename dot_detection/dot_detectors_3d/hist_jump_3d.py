@@ -21,25 +21,37 @@ from dot_detection.preprocessing.preprocess import preprocess_img, get_preproces
 warnings.filterwarnings("ignore")
 
 def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
-
+    """
+    Add channel dataframe of dots to tiff dataframe of dots
+        add channel and hyb columns in process
+    """
+    
+    #Get hybs and channel columns
+    #----------------------------------------------------------
     channel_array = np.full((len(dots_in_channel[1])), channel + 1)
-    
     hyb = int(tiff_src.split('HybCycle_')[1].split('/MMStack')[0])
-    
     hyb_array = np.full((len(dots_in_channel[1])), hyb)
-
+    #----------------------------------------------------------
+    
+    #Add Hyb and channel column
+    #----------------------------------------------------------
     df = pd.DataFrame(data = dots_in_channel[0], columns=['x', 'y', 'z'])
     df['ch'] = channel_array
     df['hyb'] = hyb_array
     df['int'] = dots_in_channel[1]
+    #----------------------------------------------------------
+    
+    #Reorganize columns
+    #----------------------------------------------------------
     df = df.reindex(columns=['hyb', 'ch', 'x','y','z','int'])
-
+    #----------------------------------------------------------
+    
     return df
 
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
                       strictness, bool_radial_center, z_slices, num_wav, rand_dir, num_z, nbins, dot_radius, threshold, \
-                      radius_step, num_radii):
+                      radius_step, num_radii, bool_stack_z_dots):
     
     #Getting Background Src
     #--------------------------------------------------------------------
@@ -158,19 +170,27 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         print(f'{df_tiff.shape=}')
         #---------------------------------------------------------------------
         
-    tf.imwrite('foo.tif', tiff)
+    #Stack z dots
+    #----------------------------------------------------------
+    if bool_stack_z_dots:
+        df_tiff.z = 1 
+    #----------------------------------------------------------
     
+    #Save to csv file
+    #----------------------------------------------------------
     csv_path = rand_dir +'/locs.csv'
     print(f'{csv_path=}')
     df_tiff.to_csv(csv_path, index=False)
+    #----------------------------------------------------------
 
 
 if sys.argv[1] != 'debug_hist_3d':    
     def str2bool(v):
       return v.lower() == "true"
     
+    #Set Args
+    #----------------------------------------------------------
     import argparse
-    
     parser = argparse.ArgumentParser()
     parser.add_argument("--tiff_src")
     parser.add_argument("--offset0")
@@ -193,34 +213,42 @@ if sys.argv[1] != 'debug_hist_3d':
     parser.add_argument("--threshold")
     parser.add_argument("--num_radii")
     parser.add_argument("--radius_step")
-    
-    
+    parser.add_argument("--stack_z_s")
     args, unknown = parser.parse_known_args()
     
-    #print(f'{args.offset=}')
-    
     print(f'{args=}')
+    #----------------------------------------------------------
     
+    #Get offset from args
+    #----------------------------------------------------------
     if args.offset2 == 'None':
         offset = [float(args.offset0), float(args.offset1)]
     else:    
         offset = [float(args.offset0), float(args.offset1), float(args.offset2)]
+    #----------------------------------------------------------
     
-    
+    #Get Channels from args
+    #----------------------------------------------------------
     if args.channels[0] == 'all':
         channels = 'all'
     else:
         channels = [int(i.replace('[', '').replace(']','').replace(',','')) for i in args.channels]
-        
+    #----------------------------------------------------------
+    
+    #Get z_slices from args
+    #----------------------------------------------------------
     if args.z_slices != 'all':
         args.z_slices = int(args.z_slices)
-
+    #----------------------------------------------------------
     
+    #Run dot detection on tiff
+    #----------------------------------------------------------
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
                           str2bool(args.back_subtract), channels, args.chromatic, str2bool(args.gaussian), int(args.strictness), \
                           str2bool(args.radial_center), args.z_slices, args.num_wav, args.rand, args.num_z, args.nbins, float(args.dot_radius), \
-                          float(args.threshold), float(args.radius_step), int(float((args.num_radii))))
-
+                          float(args.threshold), float(args.radius_step), int(float((args.num_radii))), str2bool(args.stack_z_s))
+    #----------------------------------------------------------
+    
 else:
     
     print('Debugging')

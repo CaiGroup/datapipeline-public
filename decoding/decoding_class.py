@@ -4,7 +4,7 @@ import sys
 import numpy as np
 import glob
 import pandas as pd
-import tifffile
+import tifffile as tf
 import shutil
 
 sys.path.insert(0, os.getcwd())
@@ -27,6 +27,11 @@ from decoding import previous_points_decoding as previous_points_decoding
 from decoding import previous_locations_decoding as previous_locations_decoding
 from decoding import decoding_non_barcoded
 from decoding import syndrome_decoding
+#----------------------------
+
+#Decoding Check scripts
+#----------------------------
+from decoding.percentage_of_dots_used_check.percentage_of_dots_used import get_percentage_of_dots_used
 #----------------------------
 
 #Decoding Class to set and run parameters for decoding
@@ -387,7 +392,7 @@ class Decoding:
             if self.seg == False:
                 #Run decoding for individual channel
                 #--------------------------------------------------------------------
-                decoding_non_parallel.decoding(barcode_dst, locations_path, decoding_dst_for_channel, self.allowed_diff, self.min_seeds, self.decoding_individual.index(channel), \
+                decoded_genes_path = decoding_non_parallel.decoding(barcode_dst, locations_path, decoding_dst_for_channel, self.allowed_diff, self.min_seeds, self.decoding_individual.index(channel), \
                                   len(self.decoding_individual))
                 #--------------------------------------------------------------------
             else:
@@ -395,10 +400,18 @@ class Decoding:
                 #Run Decoding Across Channels
                 #--------------------------------------------------------------------
                 print('Shape in Decoding Class: ' +  str(self.labeled_img.shape))
-                decoding_parallel.decoding(barcode_dst, locations_path, self.labeled_img, decoding_dst_for_channel, self.allowed_diff, self.min_seeds, \
+                decoded_genes_path = decoding_parallel.decoding(barcode_dst, locations_path, self.labeled_img, decoding_dst_for_channel, self.allowed_diff, self.min_seeds, \
                     self.decoding_individual.index(channel), len(self.decoding_individual), decode_only_cells = self.decode_only_cells)
                 
             print("Finished Decoding Across Channels")
+            #--------------------------------------------------------------------
+            
+            #Get percentage of Dots used
+            #--------------------------------------------------------------------
+            get_percentage_of_dots_used(locs_src = locations_path,
+                                        decoded_genes_src = decoded_genes_path,
+                                        channel = channel,
+                                        dst_dir = decoding_dst_for_channel)
             #--------------------------------------------------------------------
             
     def run_decoding_with_previous_dots(self):
@@ -586,10 +599,66 @@ if sys.argv[1] == 'debug_decoding_class_synd':
                         decode_only_cells = True, 
                         labeled_img = None, 
                         num_wav = 4, 
-                        synd_decoding = True)
+                        synd_decoding = False)
     print('Made Decoding Class')
     
     decoder.run_synd_decoding_individual()
+    
+if sys.argv[1] == 'debug_decoding_class_indiv_takei':
+    
+    labeled_img = tf.imread('/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Segmentation/labeled_img_post.tif')
+    decoder = Decoding(data_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei', 
+                        position = 'MMStack_Pos0.ome.tif', 
+                        decoded_dir = 'foo/test_decoding_class', 
+                        locations_dir = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Dot_Locations/', 
+                        position_dir = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/', 
+                        barcode_dst = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/BarcodeKey/', 
+                        barcode_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/barcode_key', 
+                        bool_decoding_with_previous_dots = False, 
+                        bool_decoding_with_previous_locations = False, 
+                        bool_fake_barcodes = True, 
+                        bool_decoding_individual = [1], 
+                        min_seeds = None, 
+                        allowed_diff = None, 
+                        dimensions = 3, 
+                        num_zslices = None, 
+                        segmentation = None, 
+                        decode_only_cells = True, 
+                        labeled_img = labeled_img, 
+                        num_wav = 4, 
+                        synd_decoding = False,
+                        lampfish_pixel = False, 
+                        start_time = 0)
+    print('Made Decoding Class')
+    
+    decoder.run_decoding_individual()
+    
+if sys.argv[1] == 'debug_decoding_class_indiv_1_ch':
+    decoder = Decoding(data_dir = '/groups/CaiLab/personal/nrezaee/raw/test1-indiv', 
+                        position = 'MMStack_Pos0.ome.tif', 
+                        decoded_dir = 'foo/test_decoding_class', 
+                        locations_dir = '/groups/CaiLab/analyses/nrezaee/test1-indiv/3d_indiv/MMStack_Pos0/Dot_Locations/', 
+                        position_dir = '/groups/CaiLab/analyses/nrezaee/test1-indiv/3d_indiv/MMStack_Pos0/', 
+                        barcode_dst = '/groups/CaiLab/analyses/nrezaee/test1-indiv/3d_indiv/BarcodeKey/', 
+                        barcode_src = '/groups/CaiLab/personal/nrezaee/raw/test1-indiv/barcode_key', 
+                        bool_decoding_with_previous_dots = False, 
+                        bool_decoding_with_previous_locations = False, 
+                        bool_fake_barcodes = True, 
+                        bool_decoding_individual = [1], 
+                        min_seeds = None, 
+                        allowed_diff = None, 
+                        dimensions = 3, 
+                        num_zslices = None, 
+                        segmentation = False, 
+                        decode_only_cells = True, 
+                        labeled_img = None, 
+                        num_wav = 4, 
+                        synd_decoding = False,
+                        lampfish_pixel = False, 
+                        start_time = 0)
+    print('Made Decoding Class')
+    
+    decoder.run_decoding_individual()
 
 elif sys.argv[1] == 'debug_decoding_class_lampfish_linus':
     decoder = Decoding(data_dir = '/groups/CaiLab/personal/Linus/raw/5ratiometric_test', 
@@ -597,8 +666,8 @@ elif sys.argv[1] == 'debug_decoding_class_lampfish_linus':
                         decoded_dir = 'foo/test_decoding_class/lampfish', 
                         locations_dir = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos/MMStack_Pos0/Dot_Locations/', 
                         position_dir = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos/MMStack_Pos0/', 
-                        barcode_dst = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/BarcodeKey/', 
-                        barcode_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/barcode_key', 
+                        barcode_dst = '/groups/CaiLab/analyses/nrezaee/test1-indiv/3d_indiv_ch2/BarcodeKey/BarcodeKey/', 
+                        barcode_src = '/groups/CaiLab/personal/nrezaee/raw/test1-indiv/barcode_key', 
                         bool_decoding_with_previous_dots = False, 
                         bool_decoding_with_previous_locations = False, 
                         bool_fake_barcodes = False, 

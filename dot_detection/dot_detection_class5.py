@@ -46,7 +46,7 @@ class Dot_Detection:
                    strictness_dot_detection, dimensions, radial_center, num_zslices, 
                    nbins, threshold, num_wav, z_slices, 
                    dot_radius, radius_step, num_radii, debug_dot_detection,
-                   min_weight_adcg, final_loss_adcg):
+                   min_weight_adcg, final_loss_adcg, stack_z_dots):
 
         self.experiment_name = experiment_name
         self.personal = personal
@@ -75,7 +75,7 @@ class Dot_Detection:
         self.debug_dot_detection = debug_dot_detection
         self.min_weight_adcg = min_weight_adcg
         self.final_loss_adcg = final_loss_adcg
-        
+        self.stack_z_dots = stack_z_dots
         
         #Set Directories
         #--------------------------------------------------------------

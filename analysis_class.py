@@ -40,7 +40,7 @@ from align_errors import align_errors
 #Dot Detection Script
 #----------------------------
 print('Current Directory:', os.getcwd())
-from dot_detection.dot_detection_class5 import Dot_Detection
+from dot_detection.dot_detection_class6 import Dot_Detection
 #----------------------------
 
 #Barcode Script
@@ -165,6 +165,7 @@ class Analysis:
         self.max_cd_iters = 10
         self.nuclei_channel_num = -1
         self.cyto_radius = 0
+        self.stack_z_dots = False
         #--------------------------------------------------------------
         
         
@@ -468,6 +469,11 @@ class Analysis:
         self.cyto_radius = float(cyto_radius)
         
         print("    Set Cyto Radius to", str(self.cyto_radius))
+        
+    def set_stack_z_slices_in_dot_detection_true(self):
+        self.stack_z_dots = True
+        
+        print("    Set Stack Z Slices in Dot Detection to True")
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -492,7 +498,7 @@ class Analysis:
                                                self.strictness_dot_detection, self.dimensions, self.radial_center, self.num_zslices, 
                                                self.nbins, self.threshold, self.num_wav, self.num_z, 
                                                self.dot_radius, self.radius_step, self.num_radii, self.debug_dot_detection,
-                                               self.min_weight_adcg, self.final_loss_adcg)
+                                               self.min_weight_adcg, self.final_loss_adcg, self.stack_z_dots)
                                               
                                                
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')

@@ -28,17 +28,6 @@ def get_stacked_dapi_s_align_check(offset_path, dst, num_wav=4, num_dapi_stacked
     #--------------------------------------------------------
     
     
-    #Get random hyb dirs to test for offsets
-    #--------------------------------------------------------
-    if len(all_hyb_dirs) >= num_dapi_stacked:
-        rand_hyb_dirs = random.sample(all_hyb_dirs, num_dapi_stacked)
-    else:
-        rand_hyb_dirs = random.sample(all_hyb_dirs, len(all_hyb_dirs))
-        
-    print(f'{rand_hyb_dirs=}')
-    #--------------------------------------------------------
-    
-    
     #Read in offsets
     #--------------------------------------------------------
     with open(offset_path) as json_file:
@@ -50,7 +39,7 @@ def get_stacked_dapi_s_align_check(offset_path, dst, num_wav=4, num_dapi_stacked
     #Loop through random hyb_dirs to get offset
     #--------------------------------------------------------
     stacked_dapi_s = []
-    for hyb_dir in rand_hyb_dirs:
+    for hyb_dir in all_hyb_dirs:
         
         #Read in offset
         #--------------------------------------------------------
