@@ -71,8 +71,8 @@ def get_and_sort_hybs(path_to_experiment_dir):
     
     #Add background to dirs to align
     #-------------------------------------------------
-    # if len(back_dir) ==1:
-    #     sorted_hyb_dirs.append(back_dir[0])
+    if len(back_dir) ==1:
+        sorted_hyb_dirs.append(back_dir[0])
     #-------------------------------------------------
     
     return sorted_hyb_dirs

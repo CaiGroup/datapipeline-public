@@ -5,6 +5,7 @@ import warnings
 import sys
 import pandas as pd
 import scipy 
+import cv2
 
 sys.path.append(os.getcwd())
 
@@ -101,8 +102,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             print(f'{channel=}')
             
             back_3d = get_shifted_background(background[:, channel], tiff_src, analysis_name)
-            tiff_3d = tiff_3d.astype(np.int32) - back_3d.astype(np.int32)*.99
-            tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
+            tiff_3d = cv2.subtract(tiff_3d, back_3d)
             get_back_sub_check(tiff_src, analysis_name, tiff_3d)
         #---------------------------------------------------------------------
         

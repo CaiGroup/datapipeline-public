@@ -4,6 +4,7 @@ import glob
 import numpy as np
 import warnings
 import pandas as pd
+import cv2
 
 import sys
 
@@ -14,7 +15,7 @@ from dot_detection.helpers.visualize_dots import get_visuals_3d
 from dot_detection.reorder_hybs import get_and_sort_hybs
 from dot_detection.helpers.shift_locations import shift_locations
 from dot_detection.helpers.background_subtraction import apply_background_subtraction
-from dot_detection.helpers.background_subtraction import get_background
+from dot_detection.helpers.background_subtraction import get_background, get_back_sub_check, get_shifted_background
 from dot_detection.helpers.add_z import add_z_col
 
 from dot_detection.helpers.threshold import apply_thresh
@@ -65,6 +66,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             background_src = get_background(tiff_src)
             print(f'{background_src=}')
             background = tiffy.load(background_src, num_wav)
+            print(f'{background.shape=}')
     #--------------------------------------------------------------------
     
     
@@ -105,8 +107,8 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             # tiff_3d = run_back_sub(background, tiff_3d, channel, offset)
             print(f'{background.shape=}')
             print(f'{channel=}')
-            tiff_3d = tiff_3d.astype(np.int32) - background[:, channel].astype(np.int32)*.95
-            tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
+            back_3d = get_shifted_background(background[:, channel], tiff_src, analysis_name)
+            tiff_3d = cv2.subtract(tiff_3d, back_3d)
             get_back_sub_check(tiff_src, analysis_name, tiff_3d)
         #---------------------------------------------------------------------
         

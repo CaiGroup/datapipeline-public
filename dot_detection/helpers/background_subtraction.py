@@ -81,7 +81,6 @@ def get_shifted_background(back_3d, tiff_src, analysis_name):
     #Get offsets_src
     #-------------------------------------------------------------
     splitted_tiff_src = (tiff_src).split(os.sep)
-    
     personal = splitted_tiff_src[4]
     exp_name = splitted_tiff_src[6]
     hyb = splitted_tiff_src[7]
@@ -89,7 +88,6 @@ def get_shifted_background(back_3d, tiff_src, analysis_name):
     pos = splitted_tiff_src[-1].split('.ome')[0]
     
     offsets_src = os.path.join('/groups/CaiLab/analyses', personal, exp_name, analysis_name, pos, 'offsets.json')
-    
     print(f'{offsets_src=}')
     #-------------------------------------------------------------
     
@@ -118,20 +116,20 @@ def get_shifted_background(back_3d, tiff_src, analysis_name):
     #-------------------------------------------------------------
     print("Shifting Background")
     print(f'{back_3d.shape=}')
-    back_minus_hyb_offset =  back_offset - hyb_offset
-    print(f'{back_minus_hyb_offset=}')
+    hyb_minus_back_offset =  hyb_offset - back_offset
+    print(f'{hyb_minus_back_offset=}')
     
     if len(back_offset) == 3:
-        shifted_back = shift(back_3d, back_minus_hyb_offset)
+        shifted_back = shift(back_3d, hyb_minus_back_offset)
     elif len(back_offset) == 2:
-        shifted_back = shift_each_2d_in_3d(back_3d, back_minus_hyb_offset)
+        shifted_back = shift_each_2d_in_3d(back_3d, hyb_minus_back_offset)
     #-------------------------------------------------------------
     
     return shifted_back
 
 if sys.argv[1] == 'debug_shift_background':
-    tiff_src = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5/final_background/MMStack_Pos8.ome.tif'
-    analysis_name = 'test'
+    tiff_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_10/MMStack_Pos0.ome.tif'
+    analysis_name = 'anthony_test_1'
     tiff = tf.imread(tiff_src)
     back_tiff = tiff[:,0]
     shifted_back = get_shifted_background(back_tiff, tiff_src, analysis_name)
