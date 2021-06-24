@@ -8,6 +8,8 @@ import tifffile as tf
 import numpy as np
 from scipy.ndimage import shift
 import imageio as io
+sys.path.insert(0, os.getcwd())
+from load_tiff import tiffy
 
 def apply_background_subtraction(background, tiff_2d, z, channel):
     background_2d = background[z, channel,:,:]
@@ -24,7 +26,7 @@ def get_background(tiff_src):
     
     return background_src
 
-def get_back_sub_check(tiff_src, analysis_name, back_img_3d):
+def get_back_sub_check(tiff_src, analysis_name, back_img_3d, channel):
     
     """
     Creates a check for background subtraction
@@ -46,7 +48,7 @@ def get_back_sub_check(tiff_src, analysis_name, back_img_3d):
     pos_analysis_dir = os.path.join(all_analyses_dir, personal, exp_name, analysis_name, pos)
     back_sub_dir = os.path.join(pos_analysis_dir, 'Back_Sub_Check')
     os.makedirs(back_sub_dir, exist_ok= True)
-    back_sub_dst = os.path.join(back_sub_dir, hyb + '.png')
+    back_sub_dst = os.path.join(back_sub_dir, hyb + '_channel_' + str(channel) +'.png')
     print(f'{back_sub_dst=}')
     #------------------------------------------------
 
@@ -60,10 +62,10 @@ def get_back_sub_check(tiff_src, analysis_name, back_img_3d):
 if sys.argv[1] == 'debug_back_sub_check':
     tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_1/MMStack_Pos0.ome.tif'
     analysis_name = 'linus_decoding'
-
+    channel = 0
     back_img_3d = tf.imread(tiff_src)[:, 0]
     
-    get_back_sub_check(tiff_src, analysis_name, back_img_3d)
+    get_back_sub_check(tiff_src, analysis_name, back_img_3d, channel)
     
     
 def shift_each_2d_in_3d(back_3d, offset):
@@ -134,6 +136,144 @@ if sys.argv[1] == 'debug_shift_background':
     back_tiff = tiff[:,0]
     shifted_back = get_shifted_background(back_tiff, tiff_src, analysis_name)
     print(f'{shifted_back.shape=}')
+    
+
+def get_background_mask_2d(back_img_2d):
+    
+    #Blur Image
+    #---------------------------------------------------
+    img_blur = cv2.blur(back_img_2d, (10,10) ,cv2.BORDER_DEFAULT)
+    #---------------------------------------------------
+    
+    #Log Image
+    #---------------------------------------------------
+    log_img_blur = np.log(img_blur)
+    #---------------------------------------------------
+    
+    #Normalize Image
+    #---------------------------------------------------
+    norm_img_between_0_and_1 = log_img_blur/log_img_blur.max()
+    norm_img = norm_img_between_0_and_1*255
+    norm_img = norm_img.astype(np.uint8)
+    #---------------------------------------------------
+    
+    #Threshold Image
+    #---------------------------------------------------
+    adaptive_image_thresh = cv2.adaptiveThreshold(norm_img,255,cv2.ADAPTIVE_THRESH_MEAN_C,\
+            cv2.THRESH_BINARY_INV,201,-10)
+    #---------------------------------------------------
+    
+    #Change 255 to 1
+    #---------------------------------------------------
+    adaptive_image_thresh = np.where(adaptive_image_thresh == 255, 1, adaptive_image_thresh)
+    #---------------------------------------------------
+    
+    return adaptive_image_thresh
+
+def get_background_mask(back_tiff_3d):
+    
+    #Initalize result variable
+    #---------------------------------------------------
+    back_tiff_mask = np.zeros(back_tiff_3d.shape)
+    #---------------------------------------------------
+    
+    #Loop through 3d background and get masks
+    #---------------------------------------------------
+    for z_i in range(back_tiff_3d.shape[0]):
+        back_tiff_mask[z_i] = get_background_mask_2d(back_tiff_3d[z_i])
+    #---------------------------------------------------
+    
+    return back_tiff_mask
+
+def remove_blobs_with_masks_3d(back_tiff_ch, tiff_ch, tiff_src, analysis_name, channel):
+    """
+    Takes in a 3d Background and a 3d tiff 
+    Then finds the blobs and removes them from the tiff
+    """
+    
+    #Get back subtracted tiff
+    #---------------------------------------------------
+    back_tiff_ch_mask = get_background_mask(back_tiff_ch)
+    #---------------------------------------------------
+    
+    #Remove blobs
+    #---------------------------------------------------
+    tiff_ch_blobs_removed = back_tiff_ch_mask*tiff_ch
+    #---------------------------------------------------
+    
+    #Split Tiff src
+    #------------------------------------------------
+    all_analyses_dir = '/groups/CaiLab/analyses'
+    
+    splitted_tiff_src = tiff_src.split(os.sep)
+    personal = splitted_tiff_src[4]
+    exp_name = splitted_tiff_src[6]
+    hyb = splitted_tiff_src[-2]
+    pos = tiff_src.split(os.sep)[-1].split('.ome')[0]
+    #------------------------------------------------
+    
+    #Get destination for back sub check
+    #------------------------------------------------
+    pos_analysis_dir = os.path.join(all_analyses_dir, personal, exp_name, analysis_name, pos)
+    blob_removal_dir = os.path.join(pos_analysis_dir, 'Back_Blob_Removal_Check')
+    os.makedirs(blob_removal_dir, exist_ok= True)
+    blob_removal_dst = os.path.join(blob_removal_dir, hyb + '_channel_'+ str(channel) +'.png')
+    print(f'{blob_removal_dst=}')
+    #------------------------------------------------
+    
+    #Save tiff_ch_blobs_removed
+    #------------------------------------------------
+    tiff_ch_blobs_removed_middle_z = tiff_ch_blobs_removed[tiff_ch_blobs_removed.shape[0]//2]
+    logged_tiff_ch_blobs_removed_middle_z = np.log(tiff_ch_blobs_removed_middle_z)
+    logged_tiff_ch_blobs_removed_middle_z[logged_tiff_ch_blobs_removed_middle_z == -np.inf] = 0 
+    io.imwrite(blob_removal_dst, logged_tiff_ch_blobs_removed_middle_z)
+    #------------------------------------------------
+    
+    #Save Blobbed image
+    #------------------------------------------------
+    blob_mask_dst = os.path.join(blob_removal_dir, 'blob_mask_channel_' + str(channel) + '.png')
+    print(f'{blob_mask_dst=}')
+    back_tiff_ch_mask_middle_z = back_tiff_ch_mask[back_tiff_ch_mask.shape[0]//2]
+    if not os.path.exists(blob_mask_dst):
+        io.imwrite(blob_mask_dst, back_tiff_ch_mask_middle_z)
+    #------------------------------------------------
+    
+    
+    return tiff_ch_blobs_removed
+
+if sys.argv[1] == 'debug_remove_back_blobs':
+    analysis_name = 'anthony_test_1'
+    tiff_src = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013/HybCycle_10/MMStack_Pos12.ome.tif'
+    back_tiff = tiffy.load('/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013/final_background/MMStack_Pos12.ome.tif')
+    tiff = tiffy.load(tiff_src)
+    print(f'{back_tiff.shape=}')
+    ch = 1
+    back_tiff_ch = back_tiff[:, ch]
+    tiff_ch = tiff[:, ch]
+    remove_blobs_with_masks_3d(back_tiff_ch, tiff_ch, tiff_src, analysis_name, ch)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
 
     

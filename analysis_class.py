@@ -22,6 +22,8 @@ from helpers.combine_position_results.combine_decoded_genes_all_pos import combi
 from helpers.combine_position_results.combine_count_matrices import get_combined_count_matrix
 from helpers.sync_specific_analysis import send_analysis_to_onedrive
 from helpers.get_correlation_plots import get_correlated_positions
+from helpers.combine_position_results.get_false_pos_metrics import show_norm_false_pos_metrics
+from helpers.combine_position_results.all_pos_count_matrix_analytics import get_genes_per_cell_for_all_pos_plot
 #-----------------------------------------------------
 
 #Alignment Scripts
@@ -40,7 +42,7 @@ from align_errors import align_errors
 #Dot Detection Script
 #----------------------------
 print('Current Directory:', os.getcwd())
-from dot_detection.dot_detection_class6 import Dot_Detection
+from dot_detection.dot_detection_class7 import Dot_Detection
 #----------------------------
 
 #Barcode Script
@@ -82,6 +84,11 @@ from timer import timer_tools
 import timer
 #----------------------------
 
+#Import Analysis Warnings
+#----------------------------
+from analysis_warnings.all_warnings import get_all_warnings
+#----------------------------
+
 
 
 
@@ -93,6 +100,7 @@ main_dir = '/groups/CaiLab'
 #=====================================================================================
 class Analysis:
     def __init__(self, experiment_name, analysis_name, personal, position, email):
+        
         #Set Basic Information
         #--------------------------------------------------------------
         self.experiment_name = experiment_name
@@ -166,6 +174,7 @@ class Analysis:
         self.nuclei_channel_num = -1
         self.cyto_radius = 0
         self.stack_z_dots = False
+        self.background_blob_removal = False
         #--------------------------------------------------------------
         
         
@@ -181,6 +190,7 @@ class Analysis:
         self.hamming_dir = os.path.join(self.position_dir, 'Hamming_Analysis')
         self.false_pos_dir = os.path.join(self.position_dir, 'False_Positive_Rate_Analysis')
         self.logging_plot_dst = os.path.join(self.position_dir, 'Time_Analysis_Plot.png')
+        self.all_positions_dir = os.path.join(self.analysis_dir, 'All_Positions')
         
         self.data_dir = os.path.join(main_dir, 'personal', self.personal, 'raw', self.experiment_name)
         self.barcode_key_src = os.path.join(self.data_dir, 'barcode_key')
@@ -474,6 +484,11 @@ class Analysis:
         self.stack_z_dots = True
         
         print("    Set Stack Z Slices in Dot Detection to True")
+        
+    def set_background_blob_removal_true(self):
+        self.background_blob_removal = True
+        
+        print("    Set Background Blob Removal to True")
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -498,9 +513,8 @@ class Analysis:
                                                self.strictness_dot_detection, self.dimensions, self.radial_center, self.num_zslices, 
                                                self.nbins, self.threshold, self.num_wav, self.num_z, 
                                                self.dot_radius, self.radius_step, self.num_radii, self.debug_dot_detection,
-                                               self.min_weight_adcg, self.final_loss_adcg, self.stack_z_dots)
+                                               self.min_weight_adcg, self.final_loss_adcg, self.stack_z_dots, self.background_blob_removal)
                                               
-                                               
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 
         
@@ -571,6 +585,44 @@ class Analysis:
             
         chromatic_abberation.run.run_beads(beads_src, t_form_dest)
         
+    def run_algorithms_for_all_pos(self):
+    
+        #Get Warnings file
+        #--------------------------------------------------------------------------------
+        warnings_dst = os.path.join(self.analysis_dir, 'Warnings.txt')
+        get_all_warnings(warnings_dst, self.analysis_dir)
+        #--------------------------------------------------------------------------------
+        
+        #Combine all dots
+        #--------------------------------------------------------------------------------
+        if self.dot_detection != False:
+            combine_locs_csv_s(self.analysis_dir)
+        
+        #Combine all decoded genes
+        #--------------------------------------------------------------------------------
+        if not self.decoding_individual == 'all':
+            for channel in self.decoding_individual:
+                combine_pos_genes(self.analysis_dir, channel)
+        #--------------------------------------------------------------------------------
+        
+        #Combine Count Matrices
+        #--------------------------------------------------------------------------------
+        if self.decoding_individual != 'all' and self.segmentation != False:
+            print('Did Indiv Decoding and Segmentation')
+            
+            combined_count_matrices_dst = os.path.join(self.all_positions_dir, 'Segmentation', 'count_matrix_all_pos.csv')
+            get_combined_count_matrix(self.analysis_dir, combined_count_matrices_dst)
+            
+            all_false_pos_dst = os.path.join(self.all_positions_dir, 'False_Positive_Rate_Analysis')
+            show_norm_false_pos_metrics(self.analysis_dir, all_false_pos_dst)
+            
+            genes_per_cell_plot_dst = os.path.join(self.all_positions_dir, 'Segmentation', 'Genes_per_cell_all_pos.png')
+            get_genes_per_cell_for_all_pos_plot(self.analysis_dir, genes_per_cell_plot_dst)
+        #--------------------------------------------------------------------------------
+        
+        
+        send_analysis_to_onedrive(self.analysis_dir)
+            
     #Runs the Parameters and functions
     #--------------------------------------------------------------------------------
     def write_results(self, path):
@@ -902,26 +954,33 @@ class Analysis:
         #Check if all positions are finished and combine results
         #--------------------------------------------------------------------------------
         if are_logs_finished(self.analysis_dir):
-            
-            #Combine all dots
-            if self.dot_detection != False:
-                combine_locs_csv_s(self.analysis_dir)
-            
-            #Combine all decoded genes
-            if not self.decoding_individual == 'all':
-                for channel in self.decoding_individual:
-                    combine_pos_genes(self.analysis_dir, channel)
-                
+            self.run_algorithms_for_all_pos()
+
                 # #Get pearson correlation of positions
                 # get_correlated_positions(self.analysis_dir)
-                    
         #--------------------------------------------------------------------------------
                     
         #Send Analysis to onedrive    
-        send_analysis_to_onedrive(self.analysis_dir)
+
 
     #--------------------------------------------------------------------------------
     #End of running the parameters
             
         
+if sys.argv[1] == 'debug_analysis_class_all_pos':
+    
+    analysis = Analysis(experiment_name = 'jina_1_pseudos_4_corrected',
+                        analysis_name = 'jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot_strict_1', 
+                        personal ='nrezaee', 
+                        position = 'MMStack_Pos0.ome.tif', 
+                        email = None)
+    
+    analysis.set_segmentation_arg("cellpose")
+    analysis.set_decoding_individual([1,2])
+    
+    analysis.run_algorithms_for_all_pos()
+    
+    
+    
+    
         

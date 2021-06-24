@@ -65,7 +65,7 @@ def preprocess_img(img_3d):
     nonzero_img_3d = np.where(blur_img_3d < 0, 0, blur_img_3d)
     return nonzero_img_3d
     
-def get_preprocess_check(tiff_src, analysis_name, preprocess_3d):
+def get_preprocess_check(tiff_src, analysis_name, preprocess_3d, channel):
     
     """
     Creates a check for background subtraction
@@ -87,15 +87,13 @@ def get_preprocess_check(tiff_src, analysis_name, preprocess_3d):
     pos_analysis_dir = os.path.join(all_analyses_dir, personal, exp_name, analysis_name, pos)
     preprocess_dir = os.path.join(pos_analysis_dir, 'PreProcess_Check')
     os.makedirs(preprocess_dir, exist_ok= True)
-    preprocess_dst = os.path.join(preprocess_dir, hyb + '.png')
+    preprocess_dst = os.path.join(preprocess_dir, hyb + '_channel_' + str(channel) + '.png')
     print(f'{preprocess_dst=}')
     #------------------------------------------------
 
     #Get and save middle z of back_sub
     #------------------------------------------------
     middle_z = preprocess_3d.shape[0]//2
-    print(f'{preprocess_3d[middle_z]=}')
-    print(f'{preprocess_3d[middle_z].astype(np.uint8)=}')
     io.imwrite(preprocess_dst, preprocess_3d[middle_z].astype(np.uint8))
     print('Saved PreProcess Check')
     #------------------------------------------------

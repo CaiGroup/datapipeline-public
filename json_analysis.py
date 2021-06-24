@@ -506,6 +506,13 @@ def run_analysis(json_name, position):
             analysis.set_stack_z_slices_in_dot_detection_true()
     #----------------------------------------------------------
     
+    #Background Blob Removal
+    #----------------------------------------------------------
+    if 'background blob removal' in data.keys():
+        if data['background blob removal'] != 'none':
+            analysis.set_background_blob_removal_true()
+    #----------------------------------------------------------
+    
     #Writ
     #----------------------------------------------------------
     analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)

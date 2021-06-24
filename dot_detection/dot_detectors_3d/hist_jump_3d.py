@@ -12,7 +12,7 @@ sys.path.append(os.getcwd())
 from load_tiff import tiffy
 from dot_detection.helpers.visualize_dots import get_visuals_3d
 from dot_detection.helpers.shift_locations import shift_locations
-from dot_detection.helpers.background_subtraction import get_background, get_back_sub_check, get_shifted_background
+from dot_detection.helpers.background_subtraction import get_background, get_back_sub_check, get_shifted_background, remove_blobs_with_masks_3d
 from dot_detection.dot_detectors_3d.hist_jump_helpers.jump_helpers import hist_jump_threshed_3d
 from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
 from dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
@@ -52,15 +52,15 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
                       strictness, bool_radial_center, z_slices, num_wav, rand_dir, num_z, nbins, dot_radius, threshold, \
-                      radius_step, num_radii, bool_stack_z_dots):
+                      radius_step, num_radii, bool_stack_z_dots, bool_blob_removal):
     
     #Getting Background Src
     #--------------------------------------------------------------------
-    if bool_background_subtraction == True:
-            background_src = get_background(tiff_src)
-            print(f'{background_src=}')
-            background = tiffy.load(background_src, num_wav)
-            print(f'{background.shape=}')
+    if bool_background_subtraction == True or bool_blob_removal == True:
+        background_src = get_background(tiff_src)
+        print(f'{background_src=}')
+        background = tiffy.load(background_src, num_wav)
+        print(f'{background.shape=}')
     #--------------------------------------------------------------------
     
     #Reading Tiff File
@@ -83,7 +83,6 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
     #Loops through channels for Dot Detection
     #---------------------------------------------------------------------
     if channels_to_detect_dots=='all':
-        
         channels = range(tiff.shape[1]-1)
     else:
         channels = [int(channel)-1 for channel in channels_to_detect_dots]
@@ -103,13 +102,19 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             
             back_3d = get_shifted_background(background[:, channel], tiff_src, analysis_name)
             tiff_3d = cv2.subtract(tiff_3d, back_3d)
-            get_back_sub_check(tiff_src, analysis_name, tiff_3d)
+            get_back_sub_check(tiff_src, analysis_name, tiff_3d, channel)
+        #---------------------------------------------------------------------
+        
+        #Background Blob Removal
+        #---------------------------------------------------------------------
+        if bool_blob_removal == True:
+            tiff_3d = remove_blobs_with_masks_3d(background[:, channel], tiff_3d, tiff_src, analysis_name, channel)
         #---------------------------------------------------------------------
         
         #Run Preprocessing
         #---------------------------------------------------------------------
         tiff_3d = preprocess_img(tiff_3d)
-        get_preprocess_check(tiff_src, analysis_name, tiff_3d)
+        get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel)
         #---------------------------------------------------------------------
         
         
@@ -214,6 +219,7 @@ if sys.argv[1] != 'debug_hist_3d':
     parser.add_argument("--num_radii")
     parser.add_argument("--radius_step")
     parser.add_argument("--stack_z_s")
+    parser.add_argument("--back_blob_removal")
     args, unknown = parser.parse_known_args()
     
     print(f'{args=}')
@@ -246,33 +252,35 @@ if sys.argv[1] != 'debug_hist_3d':
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
                           str2bool(args.back_subtract), channels, args.chromatic, str2bool(args.gaussian), int(args.strictness), \
                           str2bool(args.radial_center), args.z_slices, args.num_wav, args.rand, args.num_z, args.nbins, float(args.dot_radius), \
-                          float(args.threshold), float(args.radius_step), int(float((args.num_radii))), str2bool(args.stack_z_s))
+                          float(args.threshold), float(args.radius_step), int(float((args.num_radii))), str2bool(args.stack_z_s),
+                          str2bool(args.back_blob_removal))
     #----------------------------------------------------------
     
 else:
     
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5/HybCycle_10/MMStack_Pos8.ome.tif'
-    offset = [0,0,0]
-    channels = 'all'
-    analysis_name = 'test'
-    rand_dir = '/home/nrezaee/temp'
-    vis_dots = True
-    back_sub = True
-    chromatic = False
-    gauss = False
-    rad = False
-    strictness = 5
-    z_slices = 'all'
-    num_wav = 4
-    num_z = 'None'
-    nbins = 100
-    dot_radius = 1
-    threshold = .01
-    num_radii = 2
-    radius_step = 1
-    get_dots_for_tiff(tiff_src, offset, analysis_name, vis_dots, back_sub, channels, chromatic, gauss, \
-        strictness, rad, z_slices, num_wav, rand_dir, num_z, nbins, dot_radius, threshold, radius_step, num_radii)
+
+    get_dots_for_tiff(tiff_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_12/MMStack_Pos12.ome.tif', 
+                        offset = [0,0,0], 
+                        analysis_name = 'anthony_test_1', 
+                        bool_visualize_dots = False, 
+                        bool_background_subtraction = False, 
+                        channels_to_detect_dots = [1], 
+                        bool_chromatic = False, 
+                        bool_gaussian_fitting= False, 
+                        strictness = 5 , 
+                        bool_radial_center = False, 
+                        z_slices = 'all', 
+                        num_wav = 4, 
+                        rand_dir = '/home/nrezaee/temp', 
+                        num_z = 'None', 
+                        nbins = 100, 
+                        dot_radius = 1, 
+                        threshold = .0001, 
+                        radius_step = 1 , 
+                        num_radii = 2,
+                        bool_stack_z_dots = True,
+                        bool_blob_removal = True)
     
     
     

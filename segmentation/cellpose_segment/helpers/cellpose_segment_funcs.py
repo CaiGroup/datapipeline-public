@@ -104,13 +104,15 @@ def get_plotted_assigned_genes(assigned_genes_csv_src, dst, label_img):
     #-------------------------------------------------
     df_genes = pd.read_csv(assigned_genes_csv_src)
     cellIDs = list(df_genes.cellID.unique())
-    #cellIDs.remove(0)
+    if 0 in cellIDs:
+        cellIDs.remove(0)
     
     #-------------------------------------------------
 
     #Plot each cellID
     #-------------------------------------------------
     for cell in cellIDs:
+        
         df_genes_cell = df_genes[df_genes.cellID == cell]
         plt.xlim((0,2048))
         plt.ylim((0,2048))
@@ -129,9 +131,9 @@ def get_plotted_assigned_genes(assigned_genes_csv_src, dst, label_img):
     #-------------------------------------------------
     
 if sys.argv[1] == 'debug_plotted_assigned_genes':
-    genes_csv = '/groups/CaiLab/analyses/alinares/2021_0512_mouse_hydrogel/anthony_test_1/MMStack_Pos6/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv'
+    genes_csv = 'foo/cellpose_test_non_barcoded/gene_locations_assigned_to_cell.csv'
     dst = 'foo/assigned.png'
-    labeled_img_src = '/groups/CaiLab/analyses/alinares/2021_0512_mouse_hydrogel/anthony_test_1/MMStack_Pos6/Segmentation/labeled_img_post.tif'
+    labeled_img_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Segmentation/labeled_img_post.tif'
     labeled_img = tf.imread(labeled_img_src)
     get_plotted_assigned_genes(genes_csv, dst, labeled_img)
 
@@ -282,6 +284,13 @@ def add_empty_cells(df_gene_cell, labels):
     return df_gene_cell_all_sorted
 
 def get_gene_cell_matrix(df_gene_list, labeled_img):
+    """
+    Inputs:
+        df_gene_list - pandas dataframe (gene,x,y,z)
+        labeled_img 
+    Outputs:
+        count_matrix
+    """
 
     # keep all cells > 0
     # ---------------------------------------------------------------------

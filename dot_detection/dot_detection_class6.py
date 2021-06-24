@@ -46,7 +46,8 @@ class Dot_Detection:
                    strictness_dot_detection, dimensions, radial_center, num_zslices, 
                    nbins, threshold, num_wav, z_slices, 
                    dot_radius, radius_step, num_radii, debug_dot_detection,
-                   min_weight_adcg, final_loss_adcg, stack_z_dots):
+                   min_weight_adcg, final_loss_adcg, stack_z_dots, background_blob_removal):
+                    
         self.experiment_name = experiment_name
         self.personal = personal
         self.position = position 
@@ -75,6 +76,7 @@ class Dot_Detection:
         self.min_weight_adcg = min_weight_adcg
         self.final_loss_adcg = final_loss_adcg
         self.stack_z_dots = stack_z_dots
+        self.background_blob_removal = background_blob_removal
         
         #Set Directories
         #--------------------------------------------------------------
@@ -443,7 +445,8 @@ class Dot_Detection:
                     '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
                             '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
-                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,'--z_slices', z_slice]
+                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,'--z_slices', z_slice,
+                            '--back_blob_removal', self.background_blob_removal]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
@@ -457,7 +460,7 @@ class Dot_Detection:
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
                             '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
                             '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,'--z_slices', z_slice, '--nbins',  \
-                            self.nbins, '--threshold', self.threshold, '--stack_z_s', self.stack_z_dots]
+                            self.nbins, '--threshold', self.threshold, '--stack_z_s', self.stack_z_dots, '--back_blob_removal', self.background_blob_removal]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
@@ -487,7 +490,7 @@ class Dot_Detection:
                             '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav',  \
                             self.num_wav, '--z_slices', z_slice, '--num_z', self.num_z, '--nbins', self.nbins, '--dot_radius', self.dot_radius, \
                             '--threshold', self.threshold, '--radius_step', self.radius_step, '--num_radii', self.num_radii,
-                            '--stack_z_s', self.stack_z_dots]
+                            '--stack_z_s', self.stack_z_dots, '--back_blob_removal', self.background_blob_removal]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     

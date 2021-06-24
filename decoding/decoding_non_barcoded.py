@@ -3,7 +3,7 @@ import numpy as np
 import sys
 import os
 
-def locations_to_gene(df_codes, df_locs, position):
+def locations_to_gene(df_codes, df_locs):
     
     genes_to_locs = []
     
@@ -20,7 +20,9 @@ def locations_to_gene(df_codes, df_locs, position):
             if len(gene) > 0:
                 df_locs.loc[(df_locs.hyb == hyb) & \
                             (df_locs.ch ==ch), 'gene'] = gene.iloc[0,0]
-                
+    
+    df_locs = df_locs.dropna()
+    
     return df_locs
 
 def run_decoding_non_barcoded(sequential_csv, locations_csv, position, dst_dir):
@@ -34,21 +36,31 @@ def run_decoding_non_barcoded(sequential_csv, locations_csv, position, dst_dir):
     #Get Genes from dots
     #--------------------------------------------------
     df_locs["gene"] = np.nan
-    df_decoded = locations_to_gene(df_codes, df_locs, position)
+    df_decoded = locations_to_gene(df_codes, df_locs)
     #--------------------------------------------------
     
     #Save Decoded Genes
     #--------------------------------------------------
     df_decoded.to_csv(os.path.join(dst_dir, 'sequential_decoding_results.csv'), index= False)
+    print(f'{dst_dir=}')
     #--------------------------------------------------
     
     return df_decoded
     
 if sys.argv[1] == 'debug_smfish_decoding':
-    df_decoded =run_decoding_non_barcoded(sequential_csv = '/groups/CaiLab/personal/nrezaee/raw/test1-big/non_barcoded_genes/sequential_key.csv',
+    dst_dir = 'foo/smfish_test'
+    os.makedirs(dst_dir, exist_ok=True)
+    df_decoded =run_decoding_non_barcoded(sequential_csv = '/groups/CaiLab/personal/nrezaee/raw/test1-big/non_barcoded_key/sequential_key.csv',
                                  locations_csv = '/groups/CaiLab/analyses/nrezaee/test1-big/non_barcoded/MMStack_Pos0/Dot_Locations/locations.csv',
                                  position = 0,
-                                 dst_dir = 'foo')
+                                 dst_dir = dst_dir)
                                  
-    print(f'{df_decoded.gene.head()=}')
-                                                                                    
+if sys.argv[1] == 'debug_smfish_decoding_anthony':
+    dst_dir = 'foo/smfish_test_anthony'
+    os.makedirs(dst_dir, exist_ok=True)
+    df_decoded =run_decoding_non_barcoded(sequential_csv = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013/non_barcoded_key/sequential_key.csv',
+                                 locations_csv = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Dot_Locations/locations.csv',
+                                 position = 0,
+                                 dst_dir = dst_dir)
+                                 
+                                       

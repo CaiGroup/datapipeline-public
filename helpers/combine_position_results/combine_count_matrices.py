@@ -10,14 +10,7 @@ def combine_two_count_matrices(df1, count_matrix_src):
     """
     
     df2 = pd.read_csv(count_matrix_src)
-    
-    print(f'{df1.shape=}')
-    print(f'{df2.shape=}')
-        
-    print(f'{df1.gene=}')
-    df1.gene.unique()
-    df2.gene.unique()
-    
+
     #Get Differences in Count Matrices
     #-------------------------------------------------
     not_in_df2 = np.setdiff1d(df1.gene.unique(), df2.gene.unique() )
@@ -57,24 +50,24 @@ def combine_two_count_matrices(df1, count_matrix_src):
     return combined_df
 
 
-
-def get_combined_count_matrix(analysis_dir, dst):
-    """
-    Combine all count matrices for all
-    """
-    
-    assert os.path.exists(analysis_dir), 'The analysis directory does not exist.'
+def get_all_dirs_with_count_matrices(analysis_dir):
     
     #Get All Dirs with count Matrices
     #----------------------------------------
+    #For Individual decoding
     glob_me_for_channels = os.path.join(analysis_dir, 'MMStack_Pos*', 'Segmentation','Channel_*')
     print(f'{glob_me_for_channels=}')
     all_seg_dirs = glob.glob(glob_me_for_channels)
     
+    #For Across Decoding
     if len(all_seg_dirs) == 0:
         all_seg_dirs = glob.glob(os.path.join(analysis_dir, 'MMStack_Pos*', 'Segmentation','*'))
     #----------------------------------------
+
+    return all_seg_dirs
     
+    
+def add_count_matrix_to_end_of_path(all_seg_dirs):
     
     #Get All count_matrices
     #----------------------------------------
@@ -85,6 +78,9 @@ def get_combined_count_matrix(analysis_dir, dst):
         assert os.path.isfile(count_matrix), 'One of the count matrices is missing.'
     #----------------------------------------
     
+    return all_count_matrices
+    
+def get_initial_count_matrix(all_count_matrices):
     
     #Make initial count matrix
     #----------------------------------------
@@ -94,10 +90,28 @@ def get_combined_count_matrix(analysis_dir, dst):
     comb_count_matrices = comb_count_matrices.rename(columns={"gene" + pos_string_to_add: "gene"})
     #----------------------------------------
     
+    return comb_count_matrices
+    
+def get_combined_count_matrix(analysis_dir, dst):
+    """
+    Combine all count matrices for all positions
+    """
+    
+    os.makedirs(os.path.dirname(dst), exist_ok = True)
+    
+    assert os.path.exists(analysis_dir), 'The analysis directory does not exist.'
+    
+    all_seg_dirs = get_all_dirs_with_count_matrices(analysis_dir)
+    
+    all_count_matrices = add_count_matrix_to_end_of_path(all_seg_dirs)
+    print(f'{all_count_matrices=}')
+    
+    
+    comb_count_matrices = get_initial_count_matrix(all_count_matrices)
+    
     #Comebine all count matrices
     #----------------------------------------
     for i in range(1, len(all_count_matrices)):
-        print(f'{all_count_matrices[i]=}')
         comb_count_matrices = combine_two_count_matrices(comb_count_matrices, all_count_matrices[i])
         print(f'{i=}')
         print(f'{comb_count_matrices.shape=}')

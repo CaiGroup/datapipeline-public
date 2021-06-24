@@ -15,7 +15,7 @@ from dot_detection.helpers.visualize_dots import get_visuals_3d
 from dot_detection.reorder_hybs import get_and_sort_hybs
 from dot_detection.helpers.shift_locations import shift_locations
 from dot_detection.helpers.background_subtraction import apply_background_subtraction
-from dot_detection.helpers.background_subtraction import get_background, get_back_sub_check, get_shifted_background
+from dot_detection.helpers.background_subtraction import get_background, get_back_sub_check, get_shifted_background, remove_blobs_with_masks_3d
 from dot_detection.helpers.add_z import add_z_col
 
 from dot_detection.helpers.threshold import apply_thresh
@@ -58,11 +58,12 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
 
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
-                      bool_radial_center, strictness, z_slices, nbins, threshold, num_wav, bool_stack_z_dots, rand_dir):
+                      bool_radial_center, strictness, z_slices, nbins, threshold, num_wav, bool_stack_z_dots, 
+                      bool_blob_removal, rand_dir):
     
     #Getting Background Src
     #--------------------------------------------------------------------
-    if bool_background_subtraction == True:
+    if bool_background_subtraction == True or bool_blob_removal == True:
             background_src = get_background(tiff_src)
             print(f'{background_src=}')
             background = tiffy.load(background_src, num_wav)
@@ -90,7 +91,6 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
     #Loops through channels for Dot Detection
     #---------------------------------------------------------------------
     if channels_to_detect_dots=='all':
-        
         channels = range(tiff.shape[1]-1)
     else:
         channels = [int(channel)-1 for channel in channels_to_detect_dots]
@@ -109,7 +109,14 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
             print(f'{channel=}')
             back_3d = get_shifted_background(background[:, channel], tiff_src, analysis_name)
             tiff_3d = cv2.subtract(tiff_3d, back_3d)
-            get_back_sub_check(tiff_src, analysis_name, tiff_3d)
+            get_back_sub_check(tiff_src, analysis_name, tiff_3d, channel)
+        #---------------------------------------------------------------------
+        
+        
+        #Background Blob Removal
+        #---------------------------------------------------------------------
+        if bool_blob_removal == True:
+            tiff_3d = remove_blobs_with_masks_3d(background[:, channel], tiff_3d, tiff_src, analysis_name, channel)
         #---------------------------------------------------------------------
         
         print((channel+1), end = " ", flush =True)
@@ -202,7 +209,7 @@ if sys.argv[1] != 'debug_matlab_3d':
     parser.add_argument("--nbins")
     parser.add_argument("--threshold")
     parser.add_argument("--stack_z_s")
-    
+    parser.add_argument("--back_blob_removal")
     
     args, unknown = parser.parse_known_args()
     
@@ -232,7 +239,7 @@ if sys.argv[1] != 'debug_matlab_3d':
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
                           args.back_subtract, channels, args.chromatic, str2bool(args.gaussian), \
                           str2bool(args.radial_center),int(args.strictness), args.z_slices, int(float(args.nbins)), \
-                          int(args.threshold), args.num_wav, str2bool(args.stack_z_s), args.rand)
+                          int(args.threshold), args.num_wav, str2bool(args.stack_z_s), str2bool(args.back_blob_removal), args.rand)
         
 else:
     print('Debugging')
@@ -252,9 +259,10 @@ else:
     num_wav = 4
     rand_dir = '/home/nrezaee/temp'
     bool_stack_z_dots = True
+    bool_blob_removal = True
     get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, back_sub, channels, \
                     chromatic, gaussian, rad_center, strictness, z_slices, nbins, \
-                    threshold, num_wav, bool_stack_z_dots, rand_dir)
+                    threshold, num_wav, bool_stack_z_dots, bool_blob_removal, rand_dir)
                     
                     
                     

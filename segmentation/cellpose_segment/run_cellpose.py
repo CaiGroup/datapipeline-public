@@ -12,6 +12,8 @@ sys.path.insert(0, os.getcwd())
 from segmentation.cellpose_segment.helpers.get_cellpose_labeled_img import get_labeled_img_cellpose
 from segmentation.cellpose_segment.helpers import cellpose_segment_funcs
 from segmentation.cellpose_segment.helpers.reorder_hybs import get_and_sort_hybs
+from segmentation.cellpose_segment.helpers import count_matrix_analytics
+from clustering.initial_clustering import basic_clustering
 
 def run_me(tiff_dir, segment_results_path, decoded_genes_src, barcode_key_src, position, label_img):
     
@@ -61,7 +63,24 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, barcode_key_src, p
     cellpose_segment_funcs.get_plotted_assigned_genes(df_gene_list_assigned_cell_path, plot_dst, label_img)
     #-------------------------------------------
 
-
+    #Run Clustering
+    #-------------------------------------------
+    #basic_clustering(df_gene_cell_matrix_path, df_cell_info_path, position, segment_results_path)
+    #-------------------------------------------
+    
+    #Get Count Matrix Analytics
+    #-------------------------------------------
+    png_dst = os.path.join(segment_results_path, "Number_Of_Barcodes_Per_Cell_Plot.png")
+    count_matrix_analytics.save_plot_of_number_of_barcodes_per_cell(df_gene_cell_matrix_path, png_dst)
+    print(f'{png_dst=}')
+    
+    txt_dst = os.path.join(segment_results_path, "Number_Of_Barcodes_Per_Cell.txt")
+    count_matrix_analytics.write_number_of_genes_per_cell_to_file(df_gene_cell_matrix_path, txt_dst)
+    print(f'{txt_dst=}')
+    #-------------------------------------------
+    
+    
+    
 if sys.argv[1] == 'debug_run_cellpose':
     
     tiff_dir = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/'

@@ -75,7 +75,7 @@ function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins,
     %image = illum(image);
     
     % set defaults for optional inputs
-    optargs = {'introns', false, '', 1};
+    optargs = {'log', false, '', 1};
     optargs(1:numvarargs) = varargin;
     
     % Default Value of ref image is 1
