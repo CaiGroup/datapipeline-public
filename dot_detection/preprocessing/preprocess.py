@@ -20,7 +20,7 @@ def blur_back_subtract(tiff_2d, num_tiles):
     
     return tiff_2d
 
-def blur_back_subtract_3d(img_3d, num_tiles=10):
+def blur_back_subtract_3d(img_3d, num_tiles=1):
     """
     Blur the 3d img and then subtract it from itself
     """
@@ -40,7 +40,7 @@ def tophat_2d(img_2d):
     """
     Run tophat processing on a 2d img
     """
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(20,20))
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(5000,5000))
     tophat_img = cv2.morphologyEx(img_2d, cv2.MORPH_TOPHAT, kernel)
     return tophat_img
 
@@ -59,10 +59,10 @@ def preprocess_img(img_3d):
     Run Preprocessing on a 3d img
     """
 
-    blur_img_3d = blur_back_subtract_3d(img_3d)
-    print(f'{blur_img_3d.shape=}')
-    #tophat_img_3d = tophat_3d(blur_img_3d)
-    nonzero_img_3d = np.where(blur_img_3d < 0, 0, blur_img_3d)
+    #img_3d = blur_back_subtract_3d(img_3d)
+    print(f'{img_3d.shape=}')
+    img_3d = tophat_3d(img_3d)
+    nonzero_img_3d = np.where(img_3d < 0, 0, img_3d)
     return nonzero_img_3d
     
 def get_preprocess_check(tiff_src, analysis_name, preprocess_3d, channel):
@@ -94,7 +94,7 @@ def get_preprocess_check(tiff_src, analysis_name, preprocess_3d, channel):
     #Get and save middle z of back_sub
     #------------------------------------------------
     middle_z = preprocess_3d.shape[0]//2
-    io.imwrite(preprocess_dst, preprocess_3d[middle_z].astype(np.uint8))
+    io.imwrite(preprocess_dst, np.log(preprocess_3d[middle_z]).astype(np.uint8))
     print('Saved PreProcess Check')
     #------------------------------------------------
     

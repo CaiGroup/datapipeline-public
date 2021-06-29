@@ -24,6 +24,9 @@ from helpers.sync_specific_analysis import send_analysis_to_onedrive
 from helpers.get_correlation_plots import get_correlated_positions
 from helpers.combine_position_results.get_false_pos_metrics import show_norm_false_pos_metrics
 from helpers.combine_position_results.all_pos_count_matrix_analytics import get_genes_per_cell_for_all_pos_plot
+from helpers.combine_position_results.on_off_barcode_plot_all_pos import get_on_off_barcode_plot_all_pos
+from post_analyses.gene_to_gene_corr_matrix import get_gene_to_gene_correlations
+from helpers.combine_position_results.combine_percentage_of_dots_used import comb_percentage_of_dots_used_and_get_plot
 #-----------------------------------------------------
 
 #Alignment Scripts
@@ -605,19 +608,47 @@ class Analysis:
                 combine_pos_genes(self.analysis_dir, channel)
         #--------------------------------------------------------------------------------
         
-        #Combine Count Matrices
+        #If Individual decoding and segmentation
         #--------------------------------------------------------------------------------
         if self.decoding_individual != 'all' and self.segmentation != False:
             print('Did Indiv Decoding and Segmentation')
             
+            #Get Percentage of dots used for all positions
+            #--------------------------------------------------------------------------------
+            comb_percent_of_dots_dst = os.path.join(self.all_positions_dir, 'Percentage_of_Dots_Used', 'percentage_of_dots_used_plot.png')
+            comb_percentage_of_dots_used_and_get_plot(self.analysis_dir, comb_percent_of_dots_dst)
+            #--------------------------------------------------------------------------------            
+            
+            #Combine count matrices
+            #--------------------------------------------------------------------------------
             combined_count_matrices_dst = os.path.join(self.all_positions_dir, 'Segmentation', 'count_matrix_all_pos.csv')
             get_combined_count_matrix(self.analysis_dir, combined_count_matrices_dst)
+            #--------------------------------------------------------------------------------
             
+            #Get Gene to Gene correlation Matrix
+            #--------------------------------------------------------------------------------
+            gene_corr_dst_dir = os.path.join(self.all_positions_dir, 'Gene_Correlations')
+            get_gene_to_gene_correlations(combined_count_matrices_dst, gene_corr_dst_dir) 
+            #--------------------------------------------------------------------------------            
+            
+            #Get False Positive Metrics
+            #--------------------------------------------------------------------------------
             all_false_pos_dst = os.path.join(self.all_positions_dir, 'False_Positive_Rate_Analysis')
             show_norm_false_pos_metrics(self.analysis_dir, all_false_pos_dst)
+            #--------------------------------------------------------------------------------
             
+            #Get Genes per cell plot
+            #--------------------------------------------------------------------------------
             genes_per_cell_plot_dst = os.path.join(self.all_positions_dir, 'Segmentation', 'Genes_per_cell_all_pos.png')
             get_genes_per_cell_for_all_pos_plot(self.analysis_dir, genes_per_cell_plot_dst)
+            #--------------------------------------------------------------------------------
+            
+            #Get On/off barcode plot for all positions
+            #--------------------------------------------------------------------------------
+            on_off_barcode_plot_all_pos_dst = os.path.join(self.all_positions_dir, 'On_Off_Barcode_Plot', 'on_off_barcode_plot_all_pos.png')
+            get_on_off_barcode_plot_all_pos(combined_count_matrices_dst, on_off_barcode_plot_all_pos_dst)
+            #--------------------------------------------------------------------------------
+
         #--------------------------------------------------------------------------------
         
         

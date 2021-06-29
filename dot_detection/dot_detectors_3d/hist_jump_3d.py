@@ -17,6 +17,8 @@ from dot_detection.dot_detectors_3d.hist_jump_helpers.jump_helpers import hist_j
 from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
 from dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
 from dot_detection.preprocessing.preprocess import preprocess_img, get_preprocess_check
+from dot_detection.preprocessing.get_before_dot_detection_plots import side_by_side_preprocess_checks
+
 
 
 warnings.filterwarnings("ignore")
@@ -92,6 +94,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
         dots_in_channel = None
         
+        raw_tiff_3d = tiff[:, channel]
         tiff_3d = tiff[:, channel,:,:]
 
         #Background Subtraction
@@ -187,8 +190,12 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
     print(f'{csv_path=}')
     df_tiff.to_csv(csv_path, index=False)
     #----------------------------------------------------------
-
-
+    
+    #Get side by side checks
+    #----------------------------------------------------------
+    side_by_side_preprocess_checks(tiff_src, analysis_name, tiff)
+    #----------------------------------------------------------
+    
 if sys.argv[1] != 'debug_hist_3d':    
     def str2bool(v):
       return v.lower() == "true"

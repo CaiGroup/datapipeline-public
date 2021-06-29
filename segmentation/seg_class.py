@@ -14,6 +14,8 @@ from segmentation.roi_segment import run_roi
 from segmentation.cellpose_segment import run_cellpose
 from segmentation.post_processing.get_post_processing import save_labeled_img
 from segmentation.visualization.visual_seg import get_label_img_visuals
+from segmentation.cellpose_segment.helpers.combine_count_matrices import get_count_matrix_for_pos
+from post_analyses.gene_to_gene_corr_matrix import get_gene_to_gene_correlations
 #----------------------------
 
 
@@ -214,8 +216,18 @@ class Segmentation:
                 
                 run_cellpose.run_me(self.data_dir, segmented_dir, decoded_genes_path, barcode_key_src, self.position, self.labeled_img)
                 #----------------------------------------------
-                
-    
+        
+        #Get count matrix for positions
+        #----------------------------------------------
+        pos_count_matrix_dst = os.path.join(self.seg_dir, 'count_matrix_all_channels.csv')
+        get_count_matrix_for_pos(self.seg_dir, pos_count_matrix_dst)
+        #----------------------------------------------
+        
+        #Get Gene Correlation matrix for position
+        #----------------------------------------------
+        get_gene_to_gene_correlations(pos_count_matrix_dst, self.seg_dir)
+        #----------------------------------------------
+        
     def retrieve_labeled_img(self):
         
         # Get Segmentation Dirs

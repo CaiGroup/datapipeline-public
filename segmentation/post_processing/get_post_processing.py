@@ -285,6 +285,8 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     print(f'{labeled_img_path=}')
     label_img = tf.imread(labeled_img_path)
     print(f'{label_img.shape=}')
+    
+    
     if num_z < 4 and 'Labeled_Images' not in tiff_for_segment:
         print(f'{labeled_img_path=}')
         switch_low_z_to_right_shape(labeled_img_path)
@@ -314,7 +316,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     
 if sys.argv[1] == 'debug_post':
     print('=---------------------------------------')
-    tiff_dir = '/groups/CaiLab/personal/Yodai/raw/2021-02-27-E14-100k-RNAIFfull-rep2'
+    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei'
     segment_results_path = '/home/nrezaee/temp2'
     position  = 'MMStack_Pos0.ome.tif'
     edge = 5

@@ -101,8 +101,20 @@ elif sys.argv[1] == 'debug_matlab_dapi':
     
 elif sys.argv[1] == 'debug_matlab_dapi_jina':
     
-    fixed_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4/HybCycle_4/MMStack_Pos6.ome.tif'
-    moving_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4/HybCycle_5/MMStack_Pos6.ome.tif'
+    fixed_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_4/MMStack_Pos6.ome.tif'
+    moving_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_5/MMStack_Pos6.ome.tif'
+    
+    rand_dir = 'foo/matlab_dapi'
+    os.makedirs(rand_dir, exist_ok=True)
+    num_wav = 4
+    start_time = None
+    
+    matlab_dapi(fixed_src, moving_src, num_wav, rand_dir)
+
+elif sys.argv[1] == 'debug_matlab_dapi_1z':
+    
+    fixed_src = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_pool1/HybCycle_9/MMStack_Pos33.ome.tif'
+    moving_src = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_pool1/final_background/MMStack_Pos33.ome.tif'
     
     rand_dir = 'foo/matlab_dapi'
     os.makedirs(rand_dir, exist_ok=True)

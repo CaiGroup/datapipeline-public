@@ -10,6 +10,7 @@ from scipy.ndimage import shift
 import imageio as io
 sys.path.insert(0, os.getcwd())
 from load_tiff import tiffy
+from matplotlib import cm
 
 def apply_background_subtraction(background, tiff_2d, z, channel):
     background_2d = background[z, channel,:,:]
@@ -55,7 +56,11 @@ def get_back_sub_check(tiff_src, analysis_name, back_img_3d, channel):
     #Get and save middle z of back_sub
     #------------------------------------------------
     middle_z = back_img_3d.shape[0]//2
-    io.imwrite(back_sub_dst, back_img_3d[middle_z].astype(np.uint8))
+    
+    logged_img = np.log(back_img_3d[middle_z].astype(np.uint8))
+    
+    logged_img = np.where(logged_img == -np.inf, 0, logged_img)
+    io.imwrite(back_sub_dst, logged_img)
     print('Saved Back Sub Check')
     #------------------------------------------------
     

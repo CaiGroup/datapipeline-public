@@ -135,6 +135,7 @@ def get_3d_from_2d(src, num_z):
     #Stack 2d into 3d
     #---------------------------------------------------------------------------
     tiff_2d = tf.imread(src)
+    print(f'{tiff_2d.shape=}')
     tiff_3d = []
     for z in range(num_z):
         tiff_3d.append(tiff_2d)
@@ -145,12 +146,22 @@ def get_3d_from_2d(src, num_z):
     #---------------------------------------------------------------------------
     #tiff_3d = np.swapaxes(tiff_3d, 0, 2)
     print(f'{tiff_3d.shape=}')
+    print('In get 3d from 2d')
     tf.imwrite(src, tiff_3d)
     #---------------------------------------------------------------------------
     
 def switch_low_z_to_right_shape(labeled_src):
     label_img = tf.imread(labeled_src)
-    
+    if len(label_img.shape) == 2:
+        new_label_img = []
+        new_label_img.append(label_img)
+        new_label_img.append(label_img)
+        
+        new_label_img = np.array(new_label_img)
+        tf.imwrite(labeled_src, new_label_img)
+        return new_label_img
+        
+        
     label_img = np.swapaxes(label_img, 0, 2)
     label_img = np.swapaxes(label_img, 1, 2)
     
@@ -158,12 +169,13 @@ def switch_low_z_to_right_shape(labeled_src):
     return label_img
     
     
-def get_labeled_img_cellpose(tiff_path, num_wav, nuclei_channel_num, dst=None, nuclei_radius=0, flow_threshold =.4, cell_prob_threshold=0):
+def get_labeled_img_cellpose(tiff_path, num_wav, nuclei_channel_num, dst=None, nuclei_radius=0, flow_threshold =.4, cell_prob_threshold=0, num_z = None):
 
     #Getting Tiff
     #----------------------------------------------
     print('Reading TIff')
-    tiff = tiffy.load(tiff_path, num_wav)
+    tiff = tiffy.load(tiff_path, num_wav, num_z)
+    print(f'{tiff.shape=}')
     file_name = os.path.basename(tiff_path)
     dir_name = os.path.dirname(tiff_path)
     #----------------------------------------------
@@ -221,11 +233,12 @@ def get_labeled_img_cellpose(tiff_path, num_wav, nuclei_channel_num, dst=None, n
     return labeled_img
 
 if sys.argv[1] == 'debug_cellpose':
-    labeled_img = get_labeled_img_cellpose(tiff_path = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_1/MMStack_Pos0.ome.tif', 
+    labeled_img = get_labeled_img_cellpose(tiff_path = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_pool1/HybCycle_13/MMStack_Pos0.ome.tif', 
                                             num_wav = 4,
                                             dst = '/home/nrezaee/temp/labeled_img_thresh_3.tif', 
                                             nuclei_radius=20, 
-                                            nuclei_channel_num= -1)
+                                            nuclei_channel_num= -1, 
+                                            num_z = 1)
     print(f'{labeled_img.shape=}')
     
     

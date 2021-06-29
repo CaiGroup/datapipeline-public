@@ -5,6 +5,7 @@ import numpy as np
 import warnings
 import pandas as pd
 import cv2
+from scipy.io import savemat
 
 import sys
 
@@ -25,18 +26,8 @@ from dot_detection.helpers.remove_extra_dots import take_out_extra_dots
 from dot_detection.dot_detectors_3d.matlab_dot_detection.matlab_dot_detector import get_matlab_detected_dots
 from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
 from dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
-
-def run_back_sub(background, tiff_3d, channel, offset):
-    print(4, flush=True)    
-    background2d = scipy.ndimage.interpolation.shift(background[:,channel,:,:], np.negative(offset))[0,:,:]
-    
-    background3d = np.full((tiff_3d.shape[0], background2d.shape[0], background2d.shape[0]), background2d)
-
-    tiff_3d = cv2.subtract(tiff_3d, background3d)
-    tiff_3d[tiff_3d < 0] = 0
-
-    
-    return tiff_3d
+from dot_detection.preprocessing.get_before_dot_detection_plots import side_by_side_preprocess_checks
+from dot_detection.preprocessing.preprocess import preprocess_img, get_preprocess_check
 
 warnings.filterwarnings("ignore")
 
@@ -55,6 +46,13 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
     df = df.reindex(columns=['hyb', 'ch', 'x','y','z','int'])
 
     return df
+    
+def blur_3d(img_3d):
+    
+    for i in range(len(img_3d)):
+        img_3d[i] = cv2.blur(img_3d[i], (2,2))
+    
+    return img_3d
 
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
@@ -104,7 +102,6 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         #Background Subtraction
         #---------------------------------------------------------------------
         if bool_background_subtraction == True:
-            # tiff_3d = run_back_sub(background, tiff_3d, channel, offset)
             print(f'{background.shape=}')
             print(f'{channel=}')
             back_3d = get_shifted_background(background[:, channel], tiff_src, analysis_name)
@@ -122,13 +119,26 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         print((channel+1), end = " ", flush =True)
         
 
+        #Run Preprocessing
+        #---------------------------------------------------------------------
+        tiff_3d = preprocess_img(tiff_3d)
+        get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel)
+        #---------------------------------------------------------------------
+        
+        
+        #Save tiff 3d mat
+        #---------------------------------------------------------------------
+        tiff_3d_mat_dst = os.path.join(rand_dir, 'tiff_3d.mat')
+        
+        savemat(tiff_3d_mat_dst, {'tiff_ch': tiff_3d})
+        #---------------------------------------------------------------------
+
         
         #Threshold on Biggest Jump for matlab 3d
         #---------------------------------------------------------------------
-        #strictness = 5
         print(f'{strictness=}')
         print(f'{tiff_3d.shape=}')
-        dot_analysis = get_matlab_detected_dots(tiff_src, channel, strictness, nbins, threshold)
+        dot_analysis = get_matlab_detected_dots(tiff_3d_mat_dst, channel, strictness, nbins, threshold)
         
         #print(f'{len(dot_analysis[1])=}')
 
@@ -182,7 +192,10 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
     df_tiff.to_csv(csv_path, index=False)
     #----------------------------------------------------------
 
-     
+    #Get side by side checks
+    #----------------------------------------------------------
+    side_by_side_preprocess_checks(tiff_src, analysis_name, tiff)
+    #----------------------------------------------------------
     
 if sys.argv[1] != 'debug_matlab_3d':
     def str2bool(v):
@@ -242,26 +255,28 @@ if sys.argv[1] != 'debug_matlab_3d':
                           int(args.threshold), args.num_wav, str2bool(args.stack_z_s), str2bool(args.back_blob_removal), args.rand)
         
 else:
+    
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_1/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_4/MMStack_Pos3.ome.tif'
     offset = [0,0]
     channels = [1]
-    analysis_name = 'takei_align'
-    visualize_dots = True
+    analysis_name = 'jina_pseudos_4_corrected_pos3_strict_0_tophat_back_sub'
+    visualize_dots = False
     back_sub = False
     chromatic = False
     gaussian = False
     rad_center = False
-    strictness = 5
+    strictness = 2
     z_slices = None
     nbins= 100
     threshold= 300
     num_wav = 4
-    rand_dir = '/home/nrezaee/temp'
-    bool_stack_z_dots = True
-    bool_blob_removal = True
-    get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, back_sub, channels, \
-                    chromatic, gaussian, rad_center, strictness, z_slices, nbins, \
+    rand_dir = 'foo/matlab_3d'
+    os.makedirs(rand_dir, exist_ok= True)
+    bool_stack_z_dots = False
+    bool_blob_removal = False
+    get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, back_sub, channels, 
+                    chromatic, gaussian, rad_center, strictness, z_slices, nbins, 
                     threshold, num_wav, bool_stack_z_dots, bool_blob_removal, rand_dir)
                     
                     

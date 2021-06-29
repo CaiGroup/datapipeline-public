@@ -1,4 +1,4 @@
-function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins, strictness, dest, varargin)
+function [dots, thresh_ints] = biggest_jump(tiff_ch_mat_src, channel, threshold, nbins, strictness, dest, varargin)
 % Process the image and check the threshold. Find dots using a
 % laplacian filter. Code is usually used for detecting dots for exons as
 % they are not as bright as introns. For 'exons', threshold values are
@@ -60,20 +60,42 @@ function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins,
                 'detectdots var saveFigPath requires type string');
         end
     end
-
-    tiff_src
-    tiff= loadometiff(tiff_src, get_pos_from_path(tiff_src));
-    size(tiff)
-    mat_channel = channel +1
-    image = squeeze(tiff(:,mat_channel,:,:));
     
+    %Get tiff channel
+    %------------------------------------------------------------
+    % tiff_src
+    % tiff= loadometiff(tiff_src, get_pos_from_path(tiff_src));
+    % size(tiff)
+    % mat_channel = channel +1
+    % image = squeeze(tiff(:,mat_channel,:,:));
+    % size(image)
+    % %------------------------------------------------------------
+    
+    % %Resize tiff image
+    % %------------------------------------------------------------
+    % image = permute(image, [3 2 1]);
+    % size(image)
+    %------------------------------------------------------------
+    
+    tiff_ch_struct = load(tiff_ch_mat_src);
+    image = tiff_ch_struct.tiff_ch;
     size(image)
-    
-    image = permute(image, [3 2 1]);
+    image = permute(image, [2 3 1]);
     size(image)
+    disp('element')
+    image(34,10,2)
+    save('foo/image_old.mat', 'image')
     
+    
+    %Preprocess Image
+    %------------------------------------------------------------
     %image = illum(image);
+    %image = imgaussfilt3(image);
+    %disp('After Gaussian blur')
+    %------------------------------------------------------------
     
+    %Initialize Variables
+    %------------------------------------------------------------
     % set defaults for optional inputs
     optargs = {'log', false, '', 1};
     optargs(1:numvarargs) = varargin;
@@ -83,6 +105,7 @@ function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins,
     
     % Initialize Variables
     threshold = threshold * multiplier;
+    %------------------------------------------------------------
 
 
         switch typeDetectDots
@@ -166,7 +189,8 @@ function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins,
                 error 'detectdots var typedetectdots invalid argument';
         end
 
-        %% Remove border dots
+        %Remove border dots
+        %-------------------------------------------------------------
         bordSize = 1;
         bord = ones(size(dotsLogical));
         bord(1:bordSize,:,:) = 0;
@@ -175,8 +199,10 @@ function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins,
         bord(:,end-bordSize:end,:) = 0;
         bord(:,1:bordSize,:) = 0;
         dotsLogical = dotsLogical.*logical(bord);
-
-        %% Debug flag to visualize image and dots
+        %-------------------------------------------------------------
+        
+        %Debug flag to visualize image and dots
+        %-------------------------------------------------------------
         if debug
             f = figure();
             % View image with dots: can use logFish or fish image
@@ -189,8 +215,10 @@ function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins,
             savefig(f, saveFigPath);
             close all;
         end
-
-        %% Get x, y, z coordinates of dots
+        %-------------------------------------------------------------
+        
+        %Get x, y, z coordinates of dots
+        %-------------------------------------------------------------
         [y,x,z] = ind2sub(size(dotsLogical), find(dotsLogical == 1));
         dots = [x y z]; % structure is location or channels
 
@@ -206,10 +234,12 @@ function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins,
         end
         dots(removeDots,:) = [];
         intensity(removeDots) = [];
+        %-------------------------------------------------------------
         
         disp('size dots')
         size(dots)
         
+        %Get Biggest Jump Thresh
         %--------------------------------------------
         hist = histogram(intensity,nbins,'Normalization','cdf');
 
@@ -226,12 +256,16 @@ function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins,
         biggest_jump_thresh = threshs(thresh_index + strictness);
         %---------------------------------------------
 
+
+        %Get intensities to threshold
         %---------------------------------------------
         thresh_ints_bools = intensity > biggest_jump_thresh;
 
         thresh_ints = intensity(thresh_ints_bools);
         %---------------------------------------------
 
+        
+        %Remove Dots based off intensities
         %---------------------------------------------
         thresh_ints_ind = find(thresh_ints_bools);
         size_dots = size(dots);
@@ -240,6 +274,7 @@ function [dots, thresh_ints] = biggest_jump(tiff_src, channel, threshold, nbins,
         remove_inds = setdiff(all_indices,thresh_ints_ind);
         dots(remove_inds, :) = [];
         %---------------------------------------------
+        
         save(dest, 'dots', 'thresh_ints')
 
 
