@@ -12,6 +12,7 @@ __pycache__/
 *.npy
 run_test.sh
 run_test.py
+foo/
 *.log
 foo.*
 *.png

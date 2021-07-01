@@ -533,6 +533,13 @@ def run_analysis(json_name, position):
         if data['blur preprocessing'] != 'none':
             analysis.set_blur_preprocessing_true()
     #----------------------------------------------------------
+
+    #Blur Preprocessing
+    #----------------------------------------------------------
+    if 'blur preprocessing' in data.keys():
+        if data['blur preprocessing'] != 'none':
+            analysis.set_blur_preprocessing_true()
+    #----------------------------------------------------------
     
     #Writ
     #----------------------------------------------------------

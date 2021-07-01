@@ -1,2 +1,0 @@
-Mean Normalized False Positive Rate: 25.27% 
-Variance of Normalized False Positive Rate: 4.34

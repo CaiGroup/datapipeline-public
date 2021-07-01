@@ -14,6 +14,7 @@ import cv2
 import pickle
 import matplotlib.pyplot as plt
 import pandas as pd
+import tifffile as tf
 
 import sys
 sys.path.insert(0, os.getcwd())
@@ -134,8 +135,7 @@ def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_se
     print(f'{barcode_src=}')
     print(f'{locations_src=}')
     print(f'{labeled_img.shape=}')
-    import tifffile as tf
-    tf.imwrite('parallel.tif', labeled_img)
+    
     print(f'{channel_index=}')
     print(f'{number_of_individual_channels_for_decoding=}')
     

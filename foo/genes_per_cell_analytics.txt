@@ -1,4 +1,0 @@
-Mean Genes Per Cell: 147.5 
-Variance of Genes Per Cell: 3874.41
-25th Percentile of Genes Per Cell: 100.26 
-75th Percentile of Genes Per Cell: 185.98 

@@ -1,4 +1,0 @@
-Mean Percentage Of Dots Used: 9.8% 
-Variance of Percentage Of Dots Used: 15.14
-25th Percentile of Percentage Of Dots Used: 6.79% 
-75th Percentile of Percentage Of Dots Used: 12.19% 
