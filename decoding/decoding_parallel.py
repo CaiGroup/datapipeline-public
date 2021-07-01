@@ -145,15 +145,19 @@ def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_se
     plotted_img_dest = os.path.join(dest, 'Plotted_Cell_Spot_Locations.png')
     seg_dict = get_segmentation_dict_dots(locations_src, labeled_img, plotted_img_dest)
     
-    if decode_only_cells == True:
-        del seg_dict[0]
-    
 
     rand_list = get_random_list(len(seg_dict.keys()))
     
     cell_dirs = []
     
-    for i in range(len(seg_dict.keys())):
+    if decode_only_cells == True:
+        start_cell = 1
+    else:
+        start_cell = 0
+        
+    last_cell = len(seg_dict.keys())
+    
+    for i in range(start_cell, last_cell):
 
         print("Saving locations")
         #Get and Save Location in Dict Key

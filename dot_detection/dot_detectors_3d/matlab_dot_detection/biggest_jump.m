@@ -84,7 +84,6 @@ function [dots, thresh_ints] = biggest_jump(tiff_ch_mat_src, channel, threshold,
     size(image)
     disp('element')
     image(34,10,2)
-    save('foo/image_old.mat', 'image')
     
     
     %Preprocess Image
