@@ -513,6 +513,27 @@ def run_analysis(json_name, position):
             analysis.set_background_blob_removal_true()
     #----------------------------------------------------------
     
+    #Tophat Preprocessing
+    #----------------------------------------------------------
+    if 'tophat preprocessing' in data.keys():
+        if data['tophat preprocessing'] != 'none':
+            analysis.set_tophat_true()
+    #----------------------------------------------------------
+    
+    #Rolling ball background subtraction
+    #----------------------------------------------------------
+    if 'rolling ball preprocessing' in data.keys():
+        if data['rolling ball preprocessing'] != 'none':
+            analysis.set_rolling_ball_true()
+    #----------------------------------------------------------
+
+    #Blur Preprocessing
+    #----------------------------------------------------------
+    if 'blur preprocessing' in data.keys():
+        if data['blur preprocessing'] != 'none':
+            analysis.set_blur_preprocessing_true()
+    #----------------------------------------------------------
+    
     #Writ
     #----------------------------------------------------------
     analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)

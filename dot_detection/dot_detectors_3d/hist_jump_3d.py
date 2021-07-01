@@ -53,8 +53,8 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
 
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
-                      strictness, bool_radial_center, z_slices, num_wav, rand_dir, num_z, nbins, dot_radius, threshold, \
-                      radius_step, num_radii, bool_stack_z_dots, bool_blob_removal):
+                      strictness, bool_radial_center, z_slices, num_wav, num_z, nbins, dot_radius, threshold, \
+                      radius_step, num_radii, bool_stack_z_dots, bool_blob_removal, bool_rolling_ball, bool_tophat, rand_dir):
     
     #Getting Background Src
     #--------------------------------------------------------------------
@@ -96,6 +96,11 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
         raw_tiff_3d = tiff[:, channel]
         tiff_3d = tiff[:, channel,:,:]
+        
+        #Save Raw image to png file
+        #---------------------------------------------------------------------
+        get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel, 'Raw_Image')
+        #---------------------------------------------------------------------
 
         #Background Subtraction
         #---------------------------------------------------------------------
@@ -117,7 +122,7 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         #Run Preprocessing
         #---------------------------------------------------------------------
         tiff_3d = preprocess_img(tiff_3d)
-        get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel)
+        get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel, 'PreProcessing_Check')
         #---------------------------------------------------------------------
         
         
@@ -193,10 +198,10 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
     
     #Get side by side checks
     #----------------------------------------------------------
-    side_by_side_preprocess_checks(tiff_src, analysis_name, tiff)
+    side_by_side_preprocess_checks(tiff_src, analysis_name)
     #----------------------------------------------------------
     
-if sys.argv[1] != 'debug_hist_3d':    
+if 'debug' not in sys.argv[1]:    
     def str2bool(v):
       return v.lower() == "true"
     
@@ -227,6 +232,9 @@ if sys.argv[1] != 'debug_hist_3d':
     parser.add_argument("--radius_step")
     parser.add_argument("--stack_z_s")
     parser.add_argument("--back_blob_removal")
+    parser.add_argument("--tophat")
+    parser.add_argument("--rolling_ball")
+    
     args, unknown = parser.parse_known_args()
     
     print(f'{args=}')
@@ -258,12 +266,13 @@ if sys.argv[1] != 'debug_hist_3d':
     #----------------------------------------------------------
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
                           str2bool(args.back_subtract), channels, args.chromatic, str2bool(args.gaussian), int(args.strictness), \
-                          str2bool(args.radial_center), args.z_slices, args.num_wav, args.rand, args.num_z, args.nbins, float(args.dot_radius), \
+                          str2bool(args.radial_center), args.z_slices, args.num_wav, args.num_z, args.nbins, float(args.dot_radius), \
                           float(args.threshold), float(args.radius_step), int(float((args.num_radii))), str2bool(args.stack_z_s),
-                          str2bool(args.back_blob_removal))
+                          str2bool(args.back_blob_removal), str2bool(args.rolling_ball), str2bool(args.tophat), args.rand)
     #----------------------------------------------------------
     
-else:
+    
+elif sys.argv[1] == 'debug_biggest_jump_3d':
     
     print('Debugging')
 
@@ -279,7 +288,6 @@ else:
                         bool_radial_center = False, 
                         z_slices = 'all', 
                         num_wav = 4, 
-                        rand_dir = '/home/nrezaee/temp', 
                         num_z = 'None', 
                         nbins = 100, 
                         dot_radius = 1, 
@@ -287,7 +295,10 @@ else:
                         radius_step = 1 , 
                         num_radii = 2,
                         bool_stack_z_dots = True,
-                        bool_blob_removal = True)
+                        bool_blob_removal = True,
+                        bool_rolling_ball = False,
+                        bool_tophat = False,
+                        rand_dir = '/home/nrezaee/temp')
     
     
     

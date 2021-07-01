@@ -67,7 +67,7 @@ def get_gene_to_gene_correlations(count_matrix_src, dst_dir):
     #--------------------------------------------------
 
 if sys.argv[1] == 'debug_corr_matrix_plot':
-    count_matrix_src = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot_strict_1/All_Positions/Segmentation/count_matrix_all_pos.csv'
+    count_matrix_src = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_strict_2_tophat_again/All_Positions/Segmentation/count_matrix_all_pos.csv'
     dst_dir = 'foo/corr_matrix'
     os.makedirs(dst_dir, exist_ok = True)
     get_gene_to_gene_correlations(count_matrix_src, dst_dir)

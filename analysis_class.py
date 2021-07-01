@@ -45,7 +45,7 @@ from align_errors import align_errors
 #Dot Detection Script
 #----------------------------
 print('Current Directory:', os.getcwd())
-from dot_detection.dot_detection_class7 import Dot_Detection
+from dot_detection.dot_detection_class8 import Dot_Detection
 #----------------------------
 
 #Barcode Script
@@ -178,6 +178,12 @@ class Analysis:
         self.cyto_radius = 0
         self.stack_z_dots = False
         self.background_blob_removal = False
+        self.tophat = False
+        self.rolling_ball = False
+        self.blur_dot_detection = False
+        self.blur_kernel_size = 5
+        self.blur_back_kernel_size = 1000
+        self.tophat_kernel_size = 200
         #--------------------------------------------------------------
         
         
@@ -492,6 +498,36 @@ class Analysis:
         self.background_blob_removal = True
         
         print("    Set Background Blob Removal to True")
+        
+    def set_tophat_true(self):
+        self.tophat = True
+        
+        print("    Set Tophat to True")
+        
+    def set_rolling_ball_true(self):
+        self.rolling_ball = True
+        
+        print("    Set Rolling Ball to True")
+        
+    def set_blur_preprocessing_true(self):
+        self.blur_dot_detection = True
+        
+        print("    Set Blur Dot Detection to True")
+        
+    def set_blur_preprocessing_kernel_size_arg(self, blur_kernel_size):
+        self.blur_kernel_size = float(blur_kernel_size)
+        
+        print("    Set Blur Kernel Size to", str(self.blur_kernel_size))
+        
+    def set_blur_back_sub_kernel_size_arg(self, back_sub_blur_kernel_size):
+        self.blur_back_kernel_size = float(blur_back_kernel_size)
+        
+        print("    Set Back Blur Kernel Size to", str(self.blur_kernel_size))
+        
+    def set_tophat_kernel_size_arg(self, tophat_kernel_size):
+        self.tophat_kernel_size = float(tophat_kernel_size)
+        
+        print("    Set Tophat Kernel Size to", str(self.blur_kernel_size))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -516,7 +552,9 @@ class Analysis:
                                                self.strictness_dot_detection, self.dimensions, self.radial_center, self.num_zslices, 
                                                self.nbins, self.threshold, self.num_wav, self.num_z, 
                                                self.dot_radius, self.radius_step, self.num_radii, self.debug_dot_detection,
-                                               self.min_weight_adcg, self.final_loss_adcg, self.stack_z_dots, self.background_blob_removal)
+                                               self.min_weight_adcg, self.final_loss_adcg, self.stack_z_dots, self.background_blob_removal,
+                                               self.tophat, self.rolling_ball, self.blur_dot_detection, self.blur_kernel_size, 
+                                               self.blur_back_kernel_size, self.tophat_kernel_size)
                                               
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 

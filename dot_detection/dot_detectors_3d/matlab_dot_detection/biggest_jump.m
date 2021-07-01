@@ -241,8 +241,14 @@ function [dots, thresh_ints] = biggest_jump(tiff_ch_mat_src, channel, threshold,
         
         %Get Biggest Jump Thresh
         %--------------------------------------------
+        f = figure;
         hist = histogram(intensity,nbins,'Normalization','cdf');
-
+        
+        [filepath,name,ext] = fileparts(dest)
+        
+        dst_histogram = fullfile(filepath, 'hist.png')
+        saveas(f, dst_histogram)
+        
         hist_heights = hist.Values;
 
         diffs = diff(hist_heights);
@@ -252,7 +258,15 @@ function [dots, thresh_ints] = biggest_jump(tiff_ch_mat_src, channel, threshold,
 
         index = thresh_index + strictness;
         
-
+        disp('thresh index')
+        thresh_index
+        
+        disp('strictness')
+        strictness
+        
+        disp('threshs')
+        threshs;
+        
         biggest_jump_thresh = threshs(thresh_index + strictness);
         %---------------------------------------------
 

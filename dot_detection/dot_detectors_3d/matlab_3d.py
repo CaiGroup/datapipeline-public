@@ -6,7 +6,7 @@ import warnings
 import pandas as pd
 import cv2
 from scipy.io import savemat
-
+import tifffile as tf
 import sys
 
 sys.path.insert(0, os.getcwd())
@@ -27,7 +27,7 @@ from dot_detection.dot_detectors_3d.matlab_dot_detection.matlab_dot_detector imp
 from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
 from dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
 from dot_detection.preprocessing.get_before_dot_detection_plots import side_by_side_preprocess_checks
-from dot_detection.preprocessing.preprocess import preprocess_img, get_preprocess_check
+from dot_detection.preprocessing.preprocess import preprocess_img, get_preprocess_check, tophat_3d, blur_back_subtract_3d, blur_3d
 
 warnings.filterwarnings("ignore")
 
@@ -47,25 +47,19 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
 
     return df
     
-def blur_3d(img_3d):
-    
-    for i in range(len(img_3d)):
-        img_3d[i] = cv2.blur(img_3d[i], (2,2))
-    
-    return img_3d
 
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
                       bool_radial_center, strictness, z_slices, nbins, threshold, num_wav, bool_stack_z_dots, 
-                      bool_blob_removal, rand_dir):
+                      bool_blob_removal, bool_rolling_ball, bool_tophat, bool_blur, rand_dir):
     
     #Getting Background Src
     #--------------------------------------------------------------------
     if bool_background_subtraction == True or bool_blob_removal == True:
-            background_src = get_background(tiff_src)
-            print(f'{background_src=}')
-            background = tiffy.load(background_src, num_wav)
-            print(f'{background.shape=}')
+        background_src = get_background(tiff_src)
+        print(f'{background_src=}')
+        background = tiffy.load(background_src, num_wav)
+        print(f'{background.shape=}')
     #--------------------------------------------------------------------
     
     
@@ -99,6 +93,11 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         dots_in_channel = None
         tiff_3d = tiff[:, channel,:,:]
         
+        #Save Raw image to png file
+        #---------------------------------------------------------------------
+        get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel, 'Raw_Image')
+        #---------------------------------------------------------------------
+        
         #Background Subtraction
         #---------------------------------------------------------------------
         if bool_background_subtraction == True:
@@ -118,13 +117,26 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
         print((channel+1), end = " ", flush =True)
         
-
-        #Run Preprocessing
+        #Blur 3d
         #---------------------------------------------------------------------
-        tiff_3d = preprocess_img(tiff_3d)
-        get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel)
+        if bool_blur == True:
+            tiff_3d = blur_3d(tiff_3d)
+            get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel, 'Blur_Check')
         #---------------------------------------------------------------------
         
+        #Run Rolling Ball
+        #---------------------------------------------------------------------
+        if bool_rolling_ball == True:
+            tiff_3d = blur_back_subtract_3d(tiff_3d)
+            get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel, 'Rolling_Ball_Check')
+        #---------------------------------------------------------------------
+
+        #Run Tophat
+        #---------------------------------------------------------------------
+        if bool_tophat == True:
+            tiff_3d = tophat_3d(tiff_3d)
+            get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel, 'Tophat_Check')
+        #---------------------------------------------------------------------
         
         #Save tiff 3d mat
         #---------------------------------------------------------------------
@@ -136,8 +148,6 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
         
         #Threshold on Biggest Jump for matlab 3d
         #---------------------------------------------------------------------
-        print(f'{strictness=}')
-        print(f'{tiff_3d.shape=}')
         dot_analysis = get_matlab_detected_dots(tiff_3d_mat_dst, channel, strictness, nbins, threshold)
         
         #print(f'{len(dot_analysis[1])=}')
@@ -194,10 +204,10 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
 
     #Get side by side checks
     #----------------------------------------------------------
-    side_by_side_preprocess_checks(tiff_src, analysis_name, tiff)
+    side_by_side_preprocess_checks(tiff_src, analysis_name)
     #----------------------------------------------------------
     
-if sys.argv[1] != 'debug_matlab_3d':
+if 'debug' not in sys.argv[1]:
     def str2bool(v):
       return v.lower() == "true"
     
@@ -223,6 +233,9 @@ if sys.argv[1] != 'debug_matlab_3d':
     parser.add_argument("--threshold")
     parser.add_argument("--stack_z_s")
     parser.add_argument("--back_blob_removal")
+    parser.add_argument("--rolling_ball")
+    parser.add_argument("--tophat")
+    parser.add_argument("--blur")
     
     args, unknown = parser.parse_known_args()
     
@@ -244,17 +257,14 @@ if sys.argv[1] != 'debug_matlab_3d':
     if args.z_slices != 'all':
         args.z_slices = int(args.z_slices)
     
-    print(f'{args.gaussian=}')
-    print(f'{str2bool(args.gaussian)=}')
-    print(f'{args.radial_center=}')
-    print(f'{str2bool(args.radial_center)=}')
     
     get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
                           args.back_subtract, channels, args.chromatic, str2bool(args.gaussian), \
                           str2bool(args.radial_center),int(args.strictness), args.z_slices, int(float(args.nbins)), \
-                          int(args.threshold), args.num_wav, str2bool(args.stack_z_s), str2bool(args.back_blob_removal), args.rand)
+                          int(float(args.threshold)), args.num_wav, str2bool(args.stack_z_s), str2bool(args.back_blob_removal), 
+                          str2bool(args.rolling_ball), str2bool(args.tophat), str2bool(args.blur), args.rand)
         
-else:
+elif sys.argv[1] == 'debug_matlab_3d':
     
     print('Debugging')
     tiff_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_4/MMStack_Pos3.ome.tif'
@@ -266,7 +276,36 @@ else:
     chromatic = False
     gaussian = False
     rad_center = False
-    strictness = 2
+    strictness = 1
+    z_slices = None
+    nbins= 100
+    threshold= 50.0
+    num_wav = 4
+    rand_dir = 'foo/matlab_3d_old_load'
+    os.makedirs(rand_dir, exist_ok= True)
+    bool_stack_z_dots = False
+    bool_blob_removal = False
+    tophat = True
+    rolling_ball = True
+    blur = True
+    get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, back_sub, channels, 
+                    chromatic, gaussian, rad_center, strictness, z_slices, nbins, 
+                    threshold, num_wav, bool_stack_z_dots, bool_blob_removal, rolling_ball, 
+                    tophat, blur, rand_dir)
+                    
+elif sys.argv[1] == 'debug_matlab_3d_takei':
+    
+    print('Debugging')
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_4/MMStack_Pos0.ome.tif'
+    offset = [0,0]
+    channels = [1]
+    analysis_name = 'takei_align'
+    visualize_dots = False
+    back_sub = False
+    chromatic = False
+    gaussian = False
+    rad_center = False
+    strictness = 0
     z_slices = None
     nbins= 100
     threshold= 300
@@ -275,11 +314,12 @@ else:
     os.makedirs(rand_dir, exist_ok= True)
     bool_stack_z_dots = False
     bool_blob_removal = False
+    tophat = False
+    rolling_ball = False
     get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, back_sub, channels, 
                     chromatic, gaussian, rad_center, strictness, z_slices, nbins, 
-                    threshold, num_wav, bool_stack_z_dots, bool_blob_removal, rand_dir)
-                    
-                    
+                    threshold, num_wav, bool_stack_z_dots, bool_blob_removal, rolling_ball, tophat, 
+                    rand_dir)
                     
                     
                     

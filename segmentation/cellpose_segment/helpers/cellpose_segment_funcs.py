@@ -345,6 +345,7 @@ def get_gene_cell_matrix(df_gene_list, labeled_img):
     #Add Cells that do not have genes
     # ---------------------------------------------------------------------
     labels = np.unique(labeled_img)
+    print(f'{len(labels)=}')
     df_gene_cell_all = add_empty_cells(df_gene_cell, labels)
     # ---------------------------------------------------------------------
     
@@ -358,9 +359,8 @@ def get_gene_cell_matrix(df_gene_list, labeled_img):
     
 if sys.argv[1] == 'debug_gene_cell_matrix':
     
-    df_gene_list = pd.read_csv('/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv')
-    barcode_src = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/barcode_key/channel_1.csv'
-    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Segmentation/labeled_img_post.tif'
+    df_gene_list = pd.read_csv('/groups/CaiLab/analyses/real_arun/06212021_Automation_Testes_NoHydrogel/Testes_Strictness8/MMStack_Pos1/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv')
+    labeled_img_src = '/groups/CaiLab/analyses/real_arun/06212021_Automation_Testes_NoHydrogel/Testes_Strictness8/MMStack_Pos1/Segmentation/labeled_img_post.tif'
     labeled_img = tf.imread(labeled_img_src)
     df_gene_cell = get_gene_cell_matrix(df_gene_list, labeled_img)
     print(f'{df_gene_cell.shape=}')

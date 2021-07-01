@@ -1,7 +1,10 @@
+import os
 import pandas as pd 
+import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
-def get_z_slices_check_img(self, df,dst_dir):
+def get_z_slices_check_img(df, dst_dir):
     
     #Get the number of dots in each z
     #------------------------------------------------------
@@ -19,7 +22,7 @@ def get_z_slices_check_img(self, df,dst_dir):
     plt.savefig(os.path.join(dst_dir, 'Dots_Across_Z_Slices.png'))
     #------------------------------------------------------
 
-def get_heatmap_of_xy(self, df, dst_dir):
+def get_heatmap_of_xy(df, dst_dir):
     
     #Get size and tiles across
     #------------------------------------------------------
@@ -62,7 +65,7 @@ def get_heatmap_of_xy(self, df, dst_dir):
     plt.savefig(os.path.join(dst_dir, 'Map_of_XY_Locations.png'))
     #------------------------------------------------------
     
-def get_location_checks(self, locations_csv_src):
+def get_location_checks_xyz(locations_csv_src):
     
     #Make dst dir
     #------------------------------------------------------
@@ -74,8 +77,8 @@ def get_location_checks(self, locations_csv_src):
     #Read dataframe and get checks
     #------------------------------------------------------
     df = pd.read_csv(locations_csv_src)
-    self.get_z_slices_check_img(df,dst_dir)
-    self.get_heatmap_of_xy(df, dst_dir)
+    get_z_slices_check_img(df,dst_dir)
+    get_heatmap_of_xy(df, dst_dir)
     #------------------------------------------------------
     
     

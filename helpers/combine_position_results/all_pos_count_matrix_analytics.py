@@ -3,6 +3,7 @@ import glob
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
+import numpy as np
 
 def get_number_of_genes_per_cell(count_matrix_src):
     
@@ -64,6 +65,31 @@ def get_all_count_matrix_src_s(analysis_dir):
     
     return count_matrix_src_s
     
+def get_genes_per_cell_analytics(genes_per_cell_dict, genes_per_cell_analytics_dst):
+    
+    #Get Genes Per Cell List
+    #---------------------------------------------------------
+    genes_per_cell_s = list(genes_per_cell_dict.values())
+    #---------------------------------------------------------
+    
+    #Get Analytics
+    #---------------------------------------------------------
+    mean_genes_per_cell = np.mean(genes_per_cell_s)
+    var_genes_per_cell = np.var(genes_per_cell_s)
+    percentile_25_genes_per_cell = np.percentile(genes_per_cell_s, 25)
+    percentile_75_genes_per_cell = np.percentile(genes_per_cell_s, 75)
+    #---------------------------------------------------------
+
+    #Write to file 
+    #---------------------------------------------------------
+    file1 = open(genes_per_cell_analytics_dst, "w")
+    file1.write("Mean Genes Per Cell: " + str(round(mean_genes_per_cell,2)) + ' \n')
+    file1.write("Variance of Genes Per Cell: " + str(round(var_genes_per_cell, 2)) + '\n')
+    file1.write("25th Percentile of Genes Per Cell: " + str(round(percentile_25_genes_per_cell, 2)) + ' \n')
+    file1.write("75th Percentile of Genes Per Cell: " + str(round(percentile_75_genes_per_cell, 2)) + ' \n')
+    file1.close() 
+    #---------------------------------------------------------
+    
 def get_genes_per_cell_for_all_pos_plot(analysis_dir, dst):
     
     os.makedirs(os.path.dirname(dst), exist_ok = True)
@@ -76,7 +102,15 @@ def get_genes_per_cell_for_all_pos_plot(analysis_dir, dst):
     #Get count matrix dict
     #---------------------------------------------------------
     all_pos_genes_per_cell = get_number_of_genes_per_cell_dict(count_matrix_src_s)
+    print(f'{all_pos_genes_per_cell=}')
     #---------------------------------------------------------
+    
+    #Get Genes per cell analytics 
+    #---------------------------------------------------------
+    genes_per_cell_analytics_dst = os.path.join(os.path.dirname(dst), 'genes_per_cell_analytics.txt')
+    get_genes_per_cell_analytics(all_pos_genes_per_cell, genes_per_cell_analytics_dst)
+    #---------------------------------------------------------
+    
     
     #Get plot from gener per cell dict
     #---------------------------------------------------------
@@ -86,7 +120,7 @@ def get_genes_per_cell_for_all_pos_plot(analysis_dir, dst):
  
 if sys.argv[1] == 'debug_jina_pseudos_4_strict_0':
     analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot'
-    dst = 'jina_pseudos_4_strict_0.png'
+    dst = 'foo/jina_pseudos_4_strict_0.png'
     
     get_genes_per_cell_for_all_pos_plot(analysis_dir, dst)
     

@@ -83,14 +83,14 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, barcode_key_src, p
     
 if sys.argv[1] == 'debug_run_cellpose':
     
-    tiff_dir = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/'
+    tiff_dir = '/central/groups/CaiLab/personal/real_arun/raw/06212021_Automation_Testes_NoHydrogel/'
     segmented_dst_dir = '/home/nrezaee/test_cronjob_multi_dot/foo/cellpose_test'
     os.makedirs(segmented_dst_dir, exist_ok=True)
-    decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv'
+    decoded_genes_src = '/groups/CaiLab/analyses/real_arun/06212021_Automation_Testes_NoHydrogel/Testes_Strictness8/MMStack_Pos1/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv'
     position = 'MMStack_Pos0.ome.tif'
-    barcode_key_src = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/barcode_key/channel_1.csv'
+    barcode_key_src = '/central/groups/CaiLab/personal/real_arun/raw/06212021_Automation_Testes_NoHydrogel/barcode_key/channel_1.csv'
     
-    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Segmentation/labeled_img_post.tif'
+    labeled_img_src = '/groups/CaiLab/analyses/real_arun/06212021_Automation_Testes_NoHydrogel/Testes_Strictness8/MMStack_Pos1/Segmentation/labeled_img_post.tif'
     labeled_img = tifffile.imread(labeled_img_src)
     
     run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)

@@ -2,6 +2,7 @@ import os
 import sys
 import glob
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def get_percent_used(percent_src):
@@ -68,10 +69,35 @@ def get_percent_of_dots_used_plot(percent_used_dict, dst):
     plt.tight_layout()
     plt.savefig(dst)
     #------------------------------------------------     
+
+def get_percent_analytics(percent_dict, percent_analytics_dst):
     
+    #Get percents
+    #---------------------------------------------------------
+    percents = list(percent_dict.values())
+    #---------------------------------------------------------
+    
+    #Get Analytics
+    #---------------------------------------------------------
+    mean_percent = np.mean(percents)
+    var_percent = np.var(percents)
+    percentile_25_percent = np.percentile(percents, 25)
+    percentile_75_percent = np.percentile(percents, 75)
+    #---------------------------------------------------------
+
+    #Write to file 
+    #---------------------------------------------------------
+    file1 = open(percent_analytics_dst,"w")
+    file1.write("Mean Percentage Of Dots Used: " + str(round(mean_percent,2)) + '% \n')
+    file1.write("Variance of Percentage Of Dots Used: " + str(round(var_percent, 2)) + '\n')
+    file1.write("25th Percentile of Percentage Of Dots Used: " + str(round(percentile_25_percent, 2)) + '% \n')
+    file1.write("75th Percentile of Percentage Of Dots Used: " + str(round(percentile_75_percent, 2)) + '% \n')
+    file1.close() 
+    #---------------------------------------------------------
     
 def comb_percentage_of_dots_used_and_get_plot(analysis_dir, dst):
     
+    print(f'{dst=}')
     os.makedirs(os.path.dirname(dst), exist_ok = True)
     
     #Get all percentage of dot srcs
@@ -84,6 +110,12 @@ def comb_percentage_of_dots_used_and_get_plot(analysis_dir, dst):
     percent_used_dict = get_percent_of_dots_dict(percent_of_dots_srcs)
     #------------------------------------------------     
     
+    #Get Analytics of Percent of Dots Used
+    #------------------------------------------------
+    percent_analytics_dst = os.path.join(os.path.dirname(dst), 'percentage_of_dots_used_analytics.txt')
+    get_percent_analytics(percent_used_dict, percent_analytics_dst)
+    #------------------------------------------------
+    
     #Get plot of percent of dots used
     #------------------------------------------------     
     get_percent_of_dots_used_plot(percent_used_dict, dst)
@@ -91,7 +123,7 @@ def comb_percentage_of_dots_used_and_get_plot(analysis_dir, dst):
 
 if sys.argv[1] == 'debug_get_percent_of_dots':
     analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot'
-    dst = 'foo.png'
+    dst = 'foo/foo.png'
 
     comb_percentage_of_dots_used_and_get_plot(analysis_dir, dst)
 

@@ -1,1 +1,1 @@
-Number of Genes Per Cell: 37.8
+Number of Genes Per Cell: 15.36

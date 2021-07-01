@@ -1,6 +1,6 @@
 import tempfile
 import os
-from scipy.io import loadmat
+from scipy.io import loadmat, savemat
 import numpy as np
 import sys
 import pickle
@@ -31,12 +31,30 @@ def matlab_dapi(fixed_image_src, moving_image_src, num_wav, rand_dir):
     bfmatlab_dir = os.path.join(matlab_dapi_dir, 'bfmatlab')
     #-------------------------------------------------------------------
     
+    #Open tiff files and get DAPI Channel
+    #-------------------------------------------------------------------
+    fixed_tiff = tiffy.load(fixed_image_src)
+    moving_tiff = tiffy.load(moving_image_src)
+    print(f'{fixed_tiff.shape=}')
+    print(f'{moving_tiff.shape=}')
+    
+    
+    fixed_dapi = fixed_tiff[:, -1]
+    moving_dapi = moving_tiff[:, -1]
+    #-------------------------------------------------------------------
+    
+    #Save dapi's to mat file
+    #-------------------------------------------------------------------
+    mat_dst = os.path.join(temp_dir.name, 'dapi_s.mat')
+    savemat(mat_dst, {'fixed_dapi': fixed_dapi, 'moving_dapi': moving_dapi})
+    #-------------------------------------------------------------------
+    
     print(f'{os.getcwd()=}')
     #Create Matlab Command and Call it
     #-------------------------------------------------------------------
-    cmd = """  matlab -r "addpath('{0}');addpath('{1}');full_wrap_alignment('{2}', '{3}', '{4}'); quit"; """ 
+    cmd = """  matlab -r "addpath('{0}');addpath('{1}');full_wrap_alignment('{2}', '{3}'); quit"; """ 
     
-    cmd = cmd.format(matlab_dapi_dir, bfmatlab_dir, fixed_image_src, moving_image_src, dest)
+    cmd = cmd.format(matlab_dapi_dir, bfmatlab_dir, mat_dst, dest)
     
     os.system(cmd)
     #-------------------------------------------------------------------
@@ -89,8 +107,8 @@ if 'debug' not in sys.argv[1]:
 
 elif sys.argv[1] == 'debug_matlab_dapi':
     
-    fixed_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_2/MMStack_Pos6.ome.tif'
-    moving_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_37/MMStack_Pos6.ome.tif'
+    fixed_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_2/MMStack_Pos0.ome.tif'
+    moving_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_37/MMStack_Pos0.ome.tif'
     
     rand_dir = 'foo/matlab_dapi'
     os.makedirs(rand_dir, exist_ok=True)

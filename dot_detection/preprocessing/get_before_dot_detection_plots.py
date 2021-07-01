@@ -45,7 +45,7 @@ def see_what_dirs_exist(dirs_with_checks):
     return dirs_with_checks
 
 
-def side_by_side_preprocess_checks(tiff_src, analysis_name, tiff):
+def side_by_side_preprocess_checks(tiff_src, analysis_name):
 
     #Get Analysis pos dir
     #-----------------------------------------------------
@@ -55,9 +55,13 @@ def side_by_side_preprocess_checks(tiff_src, analysis_name, tiff):
     #List possible directories
     #-----------------------------------------------------
     back_sub_check_dir = os.path.join(analysis_pos_dir, 'Back_Sub_Check')
-    preprocess_check = os.path.join(analysis_pos_dir, 'PreProcess_Check')
     back_blob_removal_check = os.path.join(analysis_pos_dir, 'Back_Blob_Removal_Check')
-    dirs_with_checks = [back_sub_check_dir, preprocess_check, back_blob_removal_check]
+    tophat_check = os.path.join(analysis_pos_dir, 'Tophat_Check')
+    blur_check = os.path.join(analysis_pos_dir, 'Blur_Check')
+    rolling_ball_check = os.path.join(analysis_pos_dir, 'Rolling_Ball_Check')
+    raw_image = os.path.join(analysis_pos_dir, 'Raw_Image')
+    
+    dirs_with_checks = [raw_image, back_sub_check_dir, blur_check, back_blob_removal_check, tophat_check, rolling_ball_check]
     #-----------------------------------------------------
     
     dirs_with_checks = see_what_dirs_exist(dirs_with_checks)
@@ -80,7 +84,7 @@ def side_by_side_preprocess_checks(tiff_src, analysis_name, tiff):
     
         #Declare Matplolib figure
         #-----------------------------------------------------
-        fig, axs = plt.subplots(1, len(dirs_with_checks) + 1, figsize=(20,20))
+        fig, axs = plt.subplots(1, len(dirs_with_checks), figsize=(20,20))
         #-----------------------------------------------------
         
         #Loop through each HybCycle and Channel
@@ -88,11 +92,7 @@ def side_by_side_preprocess_checks(tiff_src, analysis_name, tiff):
         for png_file_name in png_file_names:
             
             print(f'{png_file_name=}')
-            ch = int(png_file_name.split('channel_')[1].split('.png')[0])
-            tiff_2d = tiff[tiff.shape[0]//2, ch]
-            axs[0].imshow(np.log(tiff_2d), cmap='gray')
-            axs[0].title.set_text('Raw Image')
-            
+
             #Loop through each check
             #-----------------------------------------------------
             for i in range(len(dirs_with_checks)):
@@ -106,8 +106,8 @@ def side_by_side_preprocess_checks(tiff_src, analysis_name, tiff):
                 
                 #Plot Image
                 #-----------------------------------------------------
-                axs[i+1].imshow(img, cmap='gray')
-                axs[i+1].title.set_text(os.path.basename(dirs_with_checks[i]))
+                axs[i].imshow(img, cmap='gray')
+                axs[i].title.set_text(os.path.basename(dirs_with_checks[i]))
                 #-----------------------------------------------------
                 
             #Save plot
@@ -120,11 +120,9 @@ def side_by_side_preprocess_checks(tiff_src, analysis_name, tiff):
             
 if sys.argv[1] == 'debug_side_by_side_check':
     
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/test1-big/HybCycle_1/MMStack_Pos0.ome.tif'
-    analysis_name = 'back_blob_removal'
-    tiff = tf.imread(tiff_src)
-    tiff_3d = tiff[:,0]
-    side_by_side_preprocess_checks(tiff_src, analysis_name, tiff)
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_4/MMStack_Pos3.ome.tif'
+    analysis_name = 'jina_pseudos_4_corrected_pos3_strict_0_tophat_back_sub'
+    side_by_side_preprocess_checks(tiff_src, analysis_name)
                 
             
         
