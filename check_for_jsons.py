@@ -21,9 +21,23 @@ import numpy as np
 import pandas as pd
 import re
 from helpers.excel2dict import get_dict_from_excel
+import linecache
 
 
 main_dir = '/groups/CaiLab'
+
+def PrintException():
+
+    #Print Exception with line number
+    #-------------------------------------------------
+    exc_type, exc_obj, tb = sys.exc_info()
+    f = tb.tb_frame
+    lineno = tb.tb_lineno
+    filename = f.f_code.co_filename
+    linecache.checkcache(filename)
+    line = linecache.getline(filename, lineno, f.f_globals)
+    print('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
+    #-------------------------------------------------
 
 def Diff(li1, li2):
     return (list(list(set(li1)-set(li2)) + list(set(li2)-set(li1))))
@@ -349,7 +363,7 @@ def get_slurm_params(json_name, data, position):
     #--------------------------------------------------------------
     
     return batch_name, nodes, ntasks, mem_per_cpu, time, output_file_path, running_in_slurm 
-    
+
 def check_if_all_hybs_exist(data):
     """
     Check to see if all hybs exist in data directory
@@ -456,8 +470,7 @@ else:
         #Try statement in case of error in opening json or making directories
         #============================================================================================================================
         try:
-            
-            print(.9)
+    
             filename, file_extension = os.path.splitext(json_name)
             if file_extension == '.json':
                 
@@ -466,7 +479,6 @@ else:
             elif file_extension == '.xlsx':
                 data, json_file_path = read_xlsx(json_name, args.source_of_jsons)
 
-            print(.905)
             #Check if all Hybs are present
             #--------------------------------------------------------------------------
             if 'decoding with previous locations variable' in data.keys():
@@ -477,10 +489,8 @@ else:
                 pass
                 #check_if_all_hybs_exist(data)
                 
-            print(.906)
             analyses_in_exp, analysis_name , exp_analyses_dir = make_analysis_dirs(data)
             
-            print(.91)
             #Try Statement to see if the same analysis name has been used
             #====================================================================
             try:
@@ -504,8 +514,6 @@ else:
                 # Go through each position
                 #----------------------------------------------------------
                 for position in positions:
-                    
-                    print(1)
                     #Make Position Directory
                     #----------------------------------------------------------
                     position_dir = os.path.join(exp_analyses_dir, analysis_name, position.split('.ome')[0])
@@ -558,7 +566,7 @@ else:
         
             
             except Exception as e:
-                print(e)
+                PrintException()
             #====================================================================
             #End of Try Statement to see if the same analysis name has been used
             

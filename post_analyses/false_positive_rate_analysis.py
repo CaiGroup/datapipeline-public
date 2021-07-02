@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.patches as mpatches
 import os
-
+import sys
 
 
 #Get Amount of Real and Fake
@@ -117,7 +117,7 @@ def get_false_pos_intensities_hist(genes_csv_src, dest):
     plt.legend(handles=[pop_a,pop_b], prop={'size': 30})
     plt.title('Intensity Analysis Across On/Off Barcodes', fontsize=40)
     y, x, patches = plt.hist([df_real.intensity, df_fake.intensity], stacked = True, \
-             rwidth=0.8, color = ['b', 'orange'])
+             rwidth=0.8, color = ['b', 'orange'], bins= 50)
     #------------------------------------------------------
 
 
@@ -135,7 +135,7 @@ def get_false_pos_intensities_hist(genes_csv_src, dest):
         
         #PLot it
         #------------------------------------------------------
-        plt.text(x[i], y[1][i], str(false_pos_rate), fontsize=25)
+        plt.text(x[i], y[1][i], str(false_pos_rate), fontsize=7)
         #------------------------------------------------------
     #------------------------------------------------------
     
@@ -144,6 +144,13 @@ def get_false_pos_intensities_hist(genes_csv_src, dest):
     plt.savefig(dest)
     print(f'{dest=}')
     #------------------------------------------------------
+    
+if sys.argv[1] == 'debug_false_pos_intensity_chart':
+    results_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation/Channel_2/gene_locations_assigned_to_cell.csv'
+    dest = 'foo/on_off_intensity_plot.png'
+    
+    get_false_pos_intensities_hist(results_src, dest)
+    
     
 def save_to_file_z(num_reals, num_fakes, ratio, z, dst):
     

@@ -274,7 +274,13 @@ def post_process(edge_delete_dist, dist_between_nuclei, label_img_src, labeled_c
         print("The labeled image was already transfferred")
     #-------------------------------------------------------------
     
-        
+def is_tiff_misformed(labeled_img_src):
+    
+    labeled_img = tf.imread(labeled_img_src)
+    
+    last_two_dims_equal = labeled_img.shape[1] != labeled_img.shape[2]
+    
+    return last_two_dims_equal
     
 def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist, dist_between_nuclei, bool_cyto_match, \
         area_tol, cyto_channel_num, get_nuclei_img, get_cyto_img, num_wav, nuclei_radius, num_z, flow_threshold, 
@@ -305,7 +311,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     #-------------------------------------------------------------
     
     
-    # For the case where you have a labeled image
+    # If you have a labeled image run post processing
     #-------------------------------------------------------------
     if labeled_img_path != None:
         label_img_post_processed_dst = os.path.join(segment_results_path, 'labeled_img_post.tif')
@@ -321,7 +327,8 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     #-------------------------------------------------------------
     
     
-    if num_z < 4 and 'Labeled_Images' not in tiff_for_segment:
+    if is_tiff_misformed(labeled_img_path) and 'Labeled_Images' not in tiff_for_segment:
+        print('Reshaping')
         print(f'{labeled_img_path=}')
         switch_low_z_to_right_shape(labeled_img_path)
         label_img = tf.imread(labeled_img_path)
@@ -353,12 +360,12 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
 
 
     
-if sys.argv[1] == 'debug_post':
+if sys.argv[1] == 'debug_post_1z':
     print('=---------------------------------------')
     tiff_dir = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_pool1'
     segment_results_path = '/home/nrezaee/temp2'
     position  = 'MMStack_Pos9.ome.tif'
-    edge = 5
+    edge = 1
     dist = 0
     bool_cyto_match = False
     area_tol = 1

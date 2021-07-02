@@ -45,7 +45,14 @@ def get_gene_to_gene_correlations(count_matrix_src, dst_dir):
     corr_matrix = df_count_matrix.values
     corr_matrix = 1 - sklearn.metrics.pairwise_distances(corr_matrix, metric='correlation')
     #--------------------------------------------------
-
+    
+    #Save Correlation Matrix 
+    #--------------------------------------------------
+    df_corr_matrix = pd.DataFrame(corr_matrix, columns = real_ids, index=real_ids)
+    corr_matrix_dst = os.path.join(dst_dir, 'correlation_matrix.csv')
+    print(f'{corr_matrix_dst=}')
+    df_corr_matrix.to_csv(corr_matrix_dst, index=False)
+    #--------------------------------------------------
 
     #Get Unclustered Correlation Matrix
     #--------------------------------------------------
