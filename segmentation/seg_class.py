@@ -18,13 +18,12 @@ from segmentation.cellpose_segment.helpers.combine_count_matrices import get_cou
 from post_analyses.gene_to_gene_corr_matrix import get_gene_to_gene_correlations
 #----------------------------
 
+#On Off Barcode plot function
+#----------------------------
+from helpers.combine_position_results.on_off_barcode_plot_all_pos import get_on_off_barcode_plot_all_pos
+#----------------------------
 
 main_dir = '/groups/CaiLab'
-# if os.environ.get('DATA_PIPELINE_MAIN_DIR') is not None:
-#     main_dir = os.environ['DATA_PIPELINE_MAIN_DIR']
-# else:
-#     raise Exception("The Main Directory env variable is not set. Set DATA_PIPELINE_MAIN_DIR!!!!!!!!")
-
 
 #Analysis Class to set and run parameters for analyses
 #=====================================================================================
@@ -228,6 +227,12 @@ class Segmentation:
         get_gene_to_gene_correlations(pos_count_matrix_dst, self.seg_dir)
         #----------------------------------------------
         
+        #Get On/Off Barcode plot
+        #----------------------------------------------
+        on_off_barcode_plot_dst = os.path.join(self.seg_dir, 'on_off_barcode_plot_all_channels_in_position.png')
+        get_on_off_barcode_plot_all_pos(pos_count_matrix_dst, on_off_barcode_plot_dst)
+        #----------------------------------------------
+        
     def retrieve_labeled_img(self):
         
         # Get Segmentation Dirs
@@ -264,6 +269,44 @@ if sys.argv[1] == 'debug_seg_class_indiv':
                             num_z_slices = None,
                             seg_type = 'cellpose', 
                             seg_data_dir = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/segmentation', 
+                            dimensions = 3, 
+                            num_zslices = 3, 
+                            labeled_img = labeled_img, 
+                            edge_dist = 0, 
+                            dist_between_nuclei = 0, 
+                            bool_cyto_match= False, 
+                            area_tol = False, 
+                            cyto_channel_num = False, 
+                            get_nuclei_img = True, 
+                            get_cyto_img = False, 
+                            num_wav = 4, 
+                            nuclei_radius = 0, 
+                            flow_threshold = .4, 
+                            cell_prob_threshold = 0,
+                            nuclei_channel_num = -1, 
+                            cyto_flow_threshold = 0, 
+                            cyto_cell_prob_threshold =0, 
+                            cyto_radius =0)
+    print("Created Segmentation Class")
+    
+    segmenter.run_segmentation_individually()
+    
+if sys.argv[1] == 'debug_seg_class_multiple_indiv':
+    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos1/Segmentation/labeled_img_post.tif'
+    
+    labeled_img = tf.imread(labeled_img_src)
+    segmenter = Segmentation(data_dir = '/central/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/', 
+                            position = 'MMStack_Pos.ome.tif', 
+                            seg_dir = 'foo/seg_test', 
+                            decoded_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos1/Decoded', 
+                            locations_dir ='/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos1/Dot_Locations', 
+                            barcode_dst = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/BarcodeKey', 
+                            barcode_src = '/central/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/barcode_key', 
+                            bool_fake_barcodes = True,
+                            bool_decoding_individual = [1,2,3], 
+                            num_z_slices = None,
+                            seg_type = 'cellpose', 
+                            seg_data_dir = '/central/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/segmentation', 
                             dimensions = 3, 
                             num_zslices = 3, 
                             labeled_img = labeled_img, 

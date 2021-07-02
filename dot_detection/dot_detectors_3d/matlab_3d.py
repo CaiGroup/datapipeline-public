@@ -276,17 +276,17 @@ elif sys.argv[1] == 'debug_matlab_3d':
     chromatic = False
     gaussian = False
     rad_center = False
-    strictness = 1
+    strictness = 0
     z_slices = None
     nbins= 100
-    threshold= 50.0
+    threshold= 80
     num_wav = 4
     rand_dir = 'foo/matlab_3d_old_load'
     os.makedirs(rand_dir, exist_ok= True)
     bool_stack_z_dots = False
     bool_blob_removal = False
-    tophat = True
-    rolling_ball = True
+    tophat = False
+    rolling_ball = False
     blur = True
     get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, back_sub, channels, 
                     chromatic, gaussian, rad_center, strictness, z_slices, nbins, 

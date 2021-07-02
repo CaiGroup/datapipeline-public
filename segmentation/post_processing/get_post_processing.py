@@ -157,6 +157,20 @@ def make_2d_into_3d(tiff_2d, num_z=20):
     #-------------------------------------------------------------
     return tiff_3d
     
+def save_tiff_3d_to_temp_file(tiff_3d):
+    
+    #Make temp_dir and save
+    #-------------------------------------------------------------
+    temp_dir = os.path.join('/tmp', ''.join(random.choices(string.ascii_uppercase +string.digits, k = 10)))
+    os.makedirs(temp_dir)
+    temp_dir_labeled_img = os.path.join(temp_dir, 'Labeled_Images')
+    os.makedirs(temp_dir_labeled_img)
+    tiff_for_segment = os.path.join(temp_dir_labeled_img, os.path.basename(tiff_for_segment))
+    #-------------------------------------------------------------    
+    
+    return tiff_for_segment
+    
+    
 def get_tiff_for_segment(tiff_dir, position, num_z):
     
     #Get all directories
@@ -165,30 +179,39 @@ def get_tiff_for_segment(tiff_dir, position, num_z):
     all_dirs = glob.glob(glob_me)
     #-------------------------------------------------------------
     
-    #Check to see if segmentation is specified
+    #Check to see if segmentation is specified in a dir
     #-------------------------------------------------------------
-    bool_seg_dir = [('segmentation' == a_dir.rsplit('/', 1)[-1]) for a_dir in all_dirs]
-    bool_labeled_img_dir = [('Labeled_Images' == a_dir.rsplit('/', 1)[-1]) for a_dir in all_dirs]
+    bools_seg_dir = [('segmentation' == a_dir.rsplit('/', 1)[-1]) for a_dir in all_dirs]
+    bool_seg_dir = any(bools_seg_dir)
+    
+    bools_labeled_img_dir = [('Labeled_Images' == a_dir.rsplit('/', 1)[-1]) for a_dir in all_dirs]
+    bool_labeled_img_dir = any(bools_labeled_img_dir)
     #-------------------------------------------------------------
 
     #If labeled image is already specified
     #-------------------------------------------------------------
-    if any(bool_labeled_img_dir):
+    if bool_labeled_img_dir:
+        
+        #Read in Labeled Image
+        #-------------------------------------------------------------
         tiff_for_segment = os.path.join(tiff_dir, 'Labeled_Images', position)
         tiff = tf.imread(tiff_for_segment)
+        #-------------------------------------------------------------
+        
+        #Check if 3d or 2d
+        #-------------------------------------------------------------
         if len(tiff.shape) == 3:
             pass
         elif len(tiff.shape) ==2:
-            tiff_3d = make_2d_into_3d(tiff, num_z)
-            # tiff_for_segment = tiff_for_segment.replace('.ome.', '2d_stacked.ome.')
             
-            #Make temp_dir and save
+            #Turn 2d into 3d
             #-------------------------------------------------------------
-            temp_dir = os.path.join('/tmp', ''.join(random.choices(string.ascii_uppercase +string.digits, k = 10)))
-            os.makedirs(temp_dir)
-            temp_dir_labeled_img = os.path.join(temp_dir, 'Labeled_Images')
-            os.makedirs(temp_dir_labeled_img)
-            tiff_for_segment = os.path.join(temp_dir_labeled_img, os.path.basename(tiff_for_segment))
+            tiff_3d = make_2d_into_3d(tiff, num_z)
+            #-------------------------------------------------------------
+            
+            #Save tiff 3d to temp dir
+            #-------------------------------------------------------------
+            tiff_for_segment = save_tiff_3d_to_temp_file(tiff_3d)
             #-------------------------------------------------------------
             
             print(f'{tiff_for_segment=}')
@@ -199,7 +222,7 @@ def get_tiff_for_segment(tiff_dir, position, num_z):
     
     #If tiff to segment is already specified
     #-------------------------------------------------------------
-    elif any(bool_seg_dir):
+    elif bool_seg_dir:
         tiff_for_segment = glob.glob(os.path.join(tiff_dir, 'segmentation', position))[0]
     #-------------------------------------------------------------
     
@@ -282,7 +305,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     #-------------------------------------------------------------
     
     
-    # For the case when you already have a labeled image
+    # For the case where you have a labeled image
     #-------------------------------------------------------------
     if labeled_img_path != None:
         label_img_post_processed_dst = os.path.join(segment_results_path, 'labeled_img_post.tif')
@@ -290,9 +313,12 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
         labeled_img_path = label_img_post_processed_dst
     #-------------------------------------------------------------
     
+    #Check for Shape and path of labeled image
+    #-------------------------------------------------------------
     print(f'{labeled_img_path=}')
     label_img = tf.imread(labeled_img_path)
     print(f'{label_img.shape=}')
+    #-------------------------------------------------------------
     
     
     if num_z < 4 and 'Labeled_Images' not in tiff_for_segment:
@@ -300,6 +326,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
         switch_low_z_to_right_shape(labeled_img_path)
         label_img = tf.imread(labeled_img_path)
         print(f'{label_img.shape=}')
+        
         
     # Match the nuclei and cytoplasm
     #-------------------------------------------------------------
@@ -314,27 +341,31 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     #or dont match    
     else:
         
+        #If there was no nuclei segmentation run return cytoplasm
+        #-------------------------------------------------------------
         if labeled_img_path == None:
             return labeled_cyto_path
         else:
             return labeled_img_path
+        #-------------------------------------------------------------
+        
     #-------------------------------------------------------------
 
 
     
 if sys.argv[1] == 'debug_post':
     print('=---------------------------------------')
-    tiff_dir = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013'
+    tiff_dir = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_pool1'
     segment_results_path = '/home/nrezaee/temp2'
     position  = 'MMStack_Pos9.ome.tif'
     edge = 5
     dist = 0
-    bool_cyto_match = True
+    bool_cyto_match = False
     area_tol = 1
     debug = False
     cyto_channel_num = 1
     get_nuc = True
-    get_cyto = True
+    get_cyto = False
     num_z=3
     num_wav=4
     nuclei_radius = 0

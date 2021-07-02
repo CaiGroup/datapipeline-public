@@ -55,13 +55,9 @@ def get_all_dirs_with_count_matrices(analysis_dir):
     #Get All Dirs with count Matrices
     #----------------------------------------
     #For Individual decoding
-    glob_me_for_channels = os.path.join(analysis_dir, 'MMStack_Pos*', 'Segmentation','Channel_*')
-    print(f'{glob_me_for_channels=}')
-    all_seg_dirs = glob.glob(glob_me_for_channels)
-    
-    #For Across Decoding
-    if len(all_seg_dirs) == 0:
-        all_seg_dirs = glob.glob(os.path.join(analysis_dir, 'MMStack_Pos*', 'Segmentation','*'))
+    glob_me_for_seg_dirs = os.path.join(analysis_dir, 'MMStack_Pos*', 'Segmentation')
+    print(f'{glob_me_for_seg_dirs=}')
+    all_seg_dirs = glob.glob(glob_me_for_seg_dirs)
     #----------------------------------------
 
     return all_seg_dirs
@@ -72,7 +68,7 @@ def add_count_matrix_to_end_of_path(all_seg_dirs):
     #Get All count_matrices
     #----------------------------------------
     assert len(all_seg_dirs) > 0, "There were no count matrices found."
-    all_count_matrices = [os.path.join(seg_dir, 'count_matrix.csv') for seg_dir in all_seg_dirs]
+    all_count_matrices = [os.path.join(seg_dir, 'count_matrix_all_channels.csv') for seg_dir in all_seg_dirs]
     
     for count_matrix in all_count_matrices:
         assert os.path.isfile(count_matrix), 'One of the count matrices is missing.'
@@ -97,17 +93,28 @@ def get_combined_count_matrix(analysis_dir, dst):
     Combine all count matrices for all positions
     """
     
+    #Make directory in case, and make sure analysis exists
+    #----------------------------------------
     os.makedirs(os.path.dirname(dst), exist_ok = True)
-    
     assert os.path.exists(analysis_dir), 'The analysis directory does not exist.'
+    #----------------------------------------
     
+    #Get all seg dirs
+    #----------------------------------------
     all_seg_dirs = get_all_dirs_with_count_matrices(analysis_dir)
+    #----------------------------------------
     
+    #Count matrix to end
+    #----------------------------------------
     all_count_matrices = add_count_matrix_to_end_of_path(all_seg_dirs)
     print(f'{all_count_matrices=}')
+    #----------------------------------------
     
-    
+    #Get initial count matrix
+    #----------------------------------------
     comb_count_matrices = get_initial_count_matrix(all_count_matrices)
+    #----------------------------------------
+    
     
     #Comebine all count matrices
     #----------------------------------------
@@ -123,8 +130,9 @@ def get_combined_count_matrix(analysis_dir, dst):
     #----------------------------------------
 
 if sys.argv[1] == 'debug_comb_count_matrices':
-    analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4/jina_pseudos_4_all_pos_all_chs/'
-    dst = 'foo/jina_4_combined.csv'
+    analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_2_pos_2_chs_pil_load_strict_2_only_blur_thresh_60'
+    dst = 'foo/foo.csv'
+    
     get_combined_count_matrix(analysis_dir, dst)
 
 

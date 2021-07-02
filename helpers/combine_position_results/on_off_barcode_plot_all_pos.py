@@ -54,7 +54,7 @@ def get_on_off_barcode_plot_all_pos(combined_count_matrix_src, png_dst):
     
     
 if sys.argv[1] == 'debug_on_off_plot_all_pos':
-    combined_count_matrix_src = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot_strict_1/All_Positions/Segmentation/count_matrix_all_pos.csv'
-    png_dst = 'foo/on_off_all_pos.png' 
+    combined_count_matrix_src = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos11/Segmentation/count_matrix_all_channels.csv'
+    png_dst = 'foo/on_off_all_chs.png' 
     
     get_on_off_barcode_plot_all_pos(combined_count_matrix_src, png_dst)
