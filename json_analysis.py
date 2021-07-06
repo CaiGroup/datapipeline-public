@@ -118,8 +118,6 @@ def run_analysis(json_name, position):
     #----------------------------------------------------------
     if 'alignment' in data.keys():
         if not data['alignment'] == 'none':
-            hi = 'hello'
-            print('---------------------------------', flush = True)
             print(f"{data['alignment']=}", flush=True)
             analysis.set_alignment_arg(data['alignment'])
     #----------------------------------------------------------
@@ -540,6 +538,10 @@ def run_analysis(json_name, position):
         if data['blur preprocessing'] != 'none':
             analysis.set_blur_preprocessing_true()
     #----------------------------------------------------------
+    
+    if 'blur kernel size' in data.keys():
+        if data['blur kernel size'] != 'none':
+            analysis.blur_kernel_size = data['blur kernel size']
     
     #Writ
     #----------------------------------------------------------

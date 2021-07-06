@@ -45,7 +45,7 @@ from align_errors import align_errors
 #Dot Detection Script
 #----------------------------
 print('Current Directory:', os.getcwd())
-from dot_detection.dot_detection_class8 import Dot_Detection
+from dot_detection.dot_detection_class9 import Dot_Detection
 #----------------------------
 
 #Barcode Script
@@ -92,7 +92,10 @@ import timer
 from analysis_warnings.all_warnings import get_all_warnings
 #----------------------------
 
-
+#Import opening tiff check
+#----------------------------
+from helpers.opening_tiff_check.check_for_opening_tiff_files import get_opening_tiff_check
+#----------------------------
 
 
 main_dir = '/groups/CaiLab'
@@ -210,6 +213,13 @@ class Analysis:
        
     #Set Parameters
     #--------------------------------------------------------------------------------
+    
+    # def __setattr__(self, name, value):
+    #     print(f'{name=}')
+    #     print(f'{value=}')
+    
+    #     print('    Set ' + name + ' to ' + str(value))
+    
     def set_alignment_arg(self, align_arg):
         self.align = align_arg.replace(" ", "_")
             
@@ -696,6 +706,12 @@ class Analysis:
     #--------------------------------------------------------------------------------
     def write_results(self, path):
         
+        #Get Opening tiff Check
+        #--------------------------------------------------------------------------------
+        dest = os.path.join(self.position_dir, 'Open_Tiff_Check', 'Plots_of_all_tiff_slices.png')
+        get_opening_tiff_check(self.data_dir, self.position, dest)
+        #--------------------------------------------------------------------------------
+        
         
         #Start Logging
         #--------------------------------------------------------------------------------
@@ -706,6 +722,8 @@ class Analysis:
         #Declare Segmentation
         #--------------------------------------------------------------------------------
         if self.segmentation != False:
+            
+            
             #Get Number of Z slices
             #--------------------------------------------------------------------------------
             subdirs = os.listdir(self.data_dir)

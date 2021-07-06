@@ -54,7 +54,8 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
 def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
                       strictness, bool_radial_center, z_slices, num_wav, num_z, nbins, dot_radius, threshold, \
-                      radius_step, num_radii, bool_stack_z_dots, bool_blob_removal, bool_rolling_ball, bool_tophat, rand_dir):
+                      radius_step, num_radii, bool_stack_z_dots, bool_blob_removal, bool_rolling_ball, bool_tophat,
+                      bool_blur, blur_kernel_size, blur_back_kernel_size, tophat_kernel_size, rand_dir):
     
     #Getting Background Src
     #--------------------------------------------------------------------
@@ -232,8 +233,12 @@ if 'debug' not in sys.argv[1]:
     parser.add_argument("--radius_step")
     parser.add_argument("--stack_z_s")
     parser.add_argument("--back_blob_removal")
-    parser.add_argument("--tophat")
     parser.add_argument("--rolling_ball")
+    parser.add_argument("--tophat")
+    parser.add_argument("--blur")
+    parser.add_argument("--blur_kernel_size")
+    parser.add_argument("--blur_back_kernel_size")
+    parser.add_argument("--tophat_kernel_size")
     
     args, unknown = parser.parse_known_args()
     
@@ -262,13 +267,41 @@ if 'debug' not in sys.argv[1]:
         args.z_slices = int(args.z_slices)
     #----------------------------------------------------------
     
+# tiff_src, offset, analysis_name, bool_visualize_dots, \
+#                       bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
+#                       strictness, bool_radial_center, z_slices, num_wav, num_z, nbins, dot_radius, threshold, \
+#                       radius_step, num_radii, bool_stack_z_dots, bool_blob_removal, bool_rolling_ball, bool_tophat,
+#                       bool_blur, blur_kernel_size, blur_back_kernel_size, tophat_kernel_size, rand_dir):
+                          
     #Run dot detection on tiff
     #----------------------------------------------------------
-    get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
-                          str2bool(args.back_subtract), channels, args.chromatic, str2bool(args.gaussian), int(args.strictness), \
-                          str2bool(args.radial_center), args.z_slices, args.num_wav, args.num_z, args.nbins, float(args.dot_radius), \
-                          float(args.threshold), float(args.radius_step), int(float((args.num_radii))), str2bool(args.stack_z_s),
-                          str2bool(args.back_blob_removal), str2bool(args.rolling_ball), str2bool(args.tophat), args.rand)
+    get_dots_for_tiff(tiff_src = args.tiff_src, 
+                        offset = offset,
+                        analysis_name = args.analysis_name,
+                        bool_visualize_dots = str2bool(args.vis_dots),
+                        bool_background_subtraction = str2bool(args.back_subtract), 
+                        channels_to_detect_dots = channels, 
+                        bool_chromatic = str2bool(args.chromatic), 
+                        bool_gaussian_fitting = str2bool(args.gaussian),
+                        strictness = int(args.strictness), 
+                        bool_radial_center = str2bool(args.radial_center),
+                        z_slices = args.z_slices, 
+                        num_wav = args.num_wav, 
+                        num_z = args.num_z, 
+                        nbins = args.nbins, 
+                        dot_radius = float(args.dot_radius), 
+                        threshold = float(args.threshold), 
+                        radius_step = float(args.radius_step),
+                        num_radii = int(float((args.num_radii))), 
+                        bool_stack_z_dots = str2bool(args.stack_z_s),
+                        bool_blob_removal = str2bool(args.back_blob_removal),
+                        bool_rolling_ball = str2bool(args.rolling_ball), 
+                        bool_tophat = str2bool(args.tophat),
+                        bool_blur = str2bool(args.blur),
+                        blur_kernel_size = float(args.blur_kernel_size), 
+                        blur_back_kernel_size = float(args.blur_back_kernel_size), 
+                        tophat_kernel_size = float(args.tophat_kernel_size),
+                        rand_dir = args.rand)
     #----------------------------------------------------------
     
     

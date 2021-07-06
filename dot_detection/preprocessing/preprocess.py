@@ -64,7 +64,7 @@ def tophat_3d(img_3d, kernel_size = 200):
     
     tophat_img_3d = np.zeros(img_3d.shape)
     for i in range(len(img_3d)):
-        print(f'{i=}')
+        print(f'{i=}') 
         tophat_img_3d[i] = tophat_2d(img_3d[i], kernel_size)
     return tophat_img_3d
 

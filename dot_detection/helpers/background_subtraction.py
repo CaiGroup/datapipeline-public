@@ -122,7 +122,6 @@ def get_shifted_background(back_3d, tiff_src, analysis_name):
     #Shift image
     #-------------------------------------------------------------
     print("Shifting Background")
-    print(f'{back_3d.shape=}')
     hyb_minus_back_offset =  hyb_offset - back_offset
     print(f'{hyb_minus_back_offset=}')
     

@@ -223,7 +223,8 @@ def get_tiff_for_segment(tiff_dir, position, num_z):
     #If tiff to segment is already specified
     #-------------------------------------------------------------
     elif bool_seg_dir:
-        tiff_for_segment = glob.glob(os.path.join(tiff_dir, 'segmentation', position))[0]
+        tiff_for_segment = os.path.join(tiff_dir, 'segmentation', position)
+        print(f'{tiff_for_segment=}')
     #-------------------------------------------------------------
     
     #Get the first tiff
@@ -362,7 +363,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     
 if sys.argv[1] == 'debug_post_1z':
     print('=---------------------------------------')
-    tiff_dir = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_pool1'
+    tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_062421_brain'
     segment_results_path = '/home/nrezaee/temp2'
     position  = 'MMStack_Pos9.ome.tif'
     edge = 1
