@@ -44,8 +44,6 @@ def Diff(li1, li2):
     
 def get_specific_positions(spec_positions, positions):
     
-    print(f'{spec_positions=}')
-    print(f'{positions=}')
     """
     Inputs:
         spec_postions: list of numbers

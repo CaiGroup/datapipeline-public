@@ -13,6 +13,7 @@ def get_plots_of_tiff_check(tiff_src, dest):
     #Read in tiff file
     #--------------------------------------------
     tiff = tiffy.load(tiff_src, dest)
+    print(f'{tiff.shape=}')
     #--------------------------------------------
     
     #Plot subplots of tiff
@@ -21,19 +22,23 @@ def get_plots_of_tiff_check(tiff_src, dest):
     for ch in range(tiff.shape[1]):
         for z in range(tiff.shape[0]):
             #axs[ch, z].set_title('Channel ' + str(ch) + ' Z ' + str(z))
-            axs[ch, z].imshow(np.log(tiff[z, ch]), cmap='gray')
+            if tiff.shape[0] > 1:
+                axs[ch, z].imshow(np.log(tiff[z, ch]), cmap='gray')
+            else:
+                axs[ch].imshow(np.log(tiff[z, ch]), cmap='gray')
     #--------------------------------------------
     
     #Label Rows and columns
     #--------------------------------------------
-    rows = ['Channel {}'.format(col) for col in range(1, tiff.shape[1] + 1)]
-    cols = ['Z {}'.format(row) for row in range(1, tiff.shape[0] + 1)]
-    
-    for ax, col in zip(axs[0], cols):
-        ax.set_title(col)
-    
-    for ax, row in zip(axs[:,0], rows):
-        ax.set_ylabel(row, rotation=0, size='large')
+    if tiff.shape[0] > 1:
+        rows = ['Channel {}'.format(col) for col in range(1, tiff.shape[1] + 1)]
+        cols = ['Z {}'.format(row) for row in range(1, tiff.shape[0] + 1)]
+        
+        for ax, col in zip(axs[0], cols):
+            ax.set_title(col)
+        
+        for ax, row in zip(axs[:,0], rows):
+            ax.set_ylabel(row, rotation=0, size='large')
     #--------------------------------------------
     
     #Save subplots
@@ -77,6 +82,14 @@ if sys.argv[1] == 'debug_tiff_check':
     
     data_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei'
     position = 'MMStack_Pos0.ome.tif'
-    dest = 'bar.png'
+    dest = 'foo/foo.png'
+    
+    get_opening_tiff_check(data_dir, position, dest)
+    
+if sys.argv[1] == 'debug_tiff_check_1z':
+    
+    data_dir = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_cellMarkers'
+    position = 'MMStack_Pos0.ome.tif'
+    dest = 'foo/foo_1z.png'
     
     get_opening_tiff_check(data_dir, position, dest)

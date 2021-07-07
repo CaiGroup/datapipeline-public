@@ -192,7 +192,6 @@ def get_labeled_img_cellpose(tiff_path, num_wav, nuclei_channel_num, dst=None, n
     #---------------------------------------------------------------------------
     num_z = len(shrinked)
     print(f'{num_z=}')
-    print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
     submit_seg_job(rand_dir, rand_list, num_z, nuclei_radius, flow_threshold, cell_prob_threshold)
 
     while not are_jobs_finished(rand_list):
@@ -221,7 +220,6 @@ def get_labeled_img_cellpose(tiff_path, num_wav, nuclei_channel_num, dst=None, n
     if num_z < 4:
         labeled_img = switch_low_z_to_right_shape(dst)
         
-    print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
     print(f'{labeled_img.shape=}')
         
     #---------------------------------------------------------------------------
@@ -233,8 +231,8 @@ def get_labeled_img_cellpose(tiff_path, num_wav, nuclei_channel_num, dst=None, n
     return labeled_img
 
 if sys.argv[1] == 'debug_cellpose':
-    labeled_img = get_labeled_img_cellpose(tiff_path = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_pool1/HybCycle_13/MMStack_Pos0.ome.tif', 
-                                            num_wav = 4,
+    labeled_img = get_labeled_img_cellpose(tiff_path = '/groups/CaiLab/personal/Lex/raw/20k_dash_062421_brain/segmentation/MMStack_Pos1.ome.tif', 
+                                            num_wav = 2,
                                             dst = '/home/nrezaee/temp/labeled_img_thresh_3.tif', 
                                             nuclei_radius=20, 
                                             nuclei_channel_num= -1, 

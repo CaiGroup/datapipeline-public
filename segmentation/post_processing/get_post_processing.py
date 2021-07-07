@@ -11,14 +11,29 @@ import glob
 import tifffile as tf
 import tempfile
 
-print(1)
 sys.path.insert(0, os.getcwd())
-from segmentation.cellpose_segment.helpers.get_cellpose_labeled_img import get_labeled_img_cellpose
-from segmentation.cellpose_segment.helpers import cellpose_segment_funcs
-from segmentation.cellpose_segment.helpers.reorder_hybs import get_and_sort_hybs
-from segmentation.post_processing.get_cyto_labeled_img import get_labeled_cyto_cellpose
 
-from segmentation.post_processing.nuccymatch import get_matched_3d_img
+#Import Functions for getting labeled images
+#-------------------------------------------------------------
+from segmentation.cellpose_segment.helpers.get_cellpose_labeled_img import get_labeled_img_cellpose
+from segmentation.post_processing.get_cyto_labeled_img import get_labeled_cyto_cellpose
+#-------------------------------------------------------------
+
+#Sort Hybs to get the first Hyb Cycle
+#-------------------------------------------------------------
+from segmentation.cellpose_segment.helpers.reorder_hybs import get_and_sort_hybs
+#-------------------------------------------------------------
+
+#Function for matching cytoplasm and nucleus
+#-------------------------------------------------------------
+from segmentation.post_processing.match_cyto_to_nuclei.nuccymatch import get_matched_3d_img
+#-------------------------------------------------------------
+
+#Edge deletion and distance between cells
+#-------------------------------------------------------------
+from segmentation.post_processing.edge_deletion.get_edge_deletion import delete_edges
+from segmentation.post_processing.distance_between_cells.get_distance_between_cells import make_distance_between_cells
+#-------------------------------------------------------------
 
 def switch_low_z_to_right_shape(labeled_src):
     label_img = tf.imread(labeled_src)
@@ -29,50 +44,6 @@ def switch_low_z_to_right_shape(labeled_src):
     tf.imwrite(labeled_src, label_img)
     return label_img
     
-
-def make_distance_between_cells(label_img_src, dist_between_nuclei, post_process_dir):
-    
-    #Specify directory and files
-    #-------------------------------------------------------------
-    label_img_dir = os.path.dirname(label_img_src)
-    nuctouchresize_file_path = os.path.join(post_process_dir, 'nuctouchresize')
-    #-------------------------------------------------------------
-    
-    #Run the distance maker
-    #-------------------------------------------------------------
-    print("Making Distance Between Cells")
-    print(f'{label_img_src=}')
-    subprocess.call(['sh', nuctouchresize_file_path, label_img_src, str(dist_between_nuclei)])
-    #-------------------------------------------------------------
-    
-    #Return Labeled image location
-    #-------------------------------------------------------------
-    label_img_src = os.path.join(label_img_dir, 'labeled_img_r' + str(dist_between_nuclei) + '.tif')
-    print(f'{label_img_src=}')
-    return label_img_src
-    #-------------------------------------------------------------
-    
-def delete_edges(label_img_src, edge_delete_dist, post_process_dir):
-
-    #Specify directory and files
-    #-------------------------------------------------------------
-    label_img_dir = os.path.dirname(label_img_src)
-    nucboundzap_file_path = os.path.join(post_process_dir, 'nucboundzap')    
-    #-------------------------------------------------------------
-    
-    #Run the edge deleter
-    #-------------------------------------------------------------
-    print("Deleting Edges")
-    subprocess.call(['sh', nucboundzap_file_path, label_img_src, str(edge_delete_dist)])
-    #-------------------------------------------------------------
-    
-    #Return dst of labeled image
-    #-------------------------------------------------------------
-    label_img_src = os.path.join(label_img_dir, label_img_src.replace('.tif', '') + '_bzap_d' + str(edge_delete_dist) + '.tif')
-    print(f'{label_img_src=}')
-    return label_img_src
-    #-------------------------------------------------------------
-
 def get_debug():
     
     #Get Past images to save time
@@ -82,6 +53,7 @@ def get_debug():
     #-------------------------------------------------------------
     
     return labeled_img_path, labeled_cyto_path
+    
     
     
 def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cyto_channel_num, get_nuclei_img, 
@@ -102,7 +74,7 @@ def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cy
         #-------------------------------------------------------------
         else:
             labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
-            label_img = get_labeled_img_cellpose(tiff_for_segment, dst = labeled_img_path, num_wav = num_wav, nuclei_channel_num = nuclei_channel_num)
+            label_img = get_labeled_img_cellpose(tiff_for_segment, dst = labeled_img_path, num_wav = num_wav, nuclei_channel_num = nuclei_channel_num, num_z = num_z)
         
         labeled_cyto_path = os.path.join(segment_results_path, 'labeled_cyto_img.tif')
         labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, dst = labeled_cyto_path, cyto_channel = cyto_channel_num, num_wav = num_wav)
@@ -124,8 +96,7 @@ def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cy
         elif get_nuclei_img == True:
             labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
             label_img = get_labeled_img_cellpose(tiff_for_segment, num_wav, nuclei_channel_num, labeled_img_path,
-                            nuclei_radius, flow_threshold, cell_prob_threshold,
-                            )
+                            nuclei_radius, flow_threshold, cell_prob_threshold, num_z = num_z)
         else:
             labeled_img_path = None
         #-------------------------------------------------------------
@@ -157,7 +128,7 @@ def make_2d_into_3d(tiff_2d, num_z=20):
     #-------------------------------------------------------------
     return tiff_3d
     
-def save_tiff_3d_to_temp_file(tiff_3d):
+def save_tiff_3d_to_temp_file(tiff_3d, tiff_for_segment):
     
     #Make temp_dir and save
     #-------------------------------------------------------------
@@ -211,7 +182,7 @@ def get_tiff_for_segment(tiff_dir, position, num_z):
             
             #Save tiff 3d to temp dir
             #-------------------------------------------------------------
-            tiff_for_segment = save_tiff_3d_to_temp_file(tiff_3d)
+            tiff_for_segment = save_tiff_3d_to_temp_file(tiff_3d, tiff_for_segment)
             #-------------------------------------------------------------
             
             print(f'{tiff_for_segment=}')
@@ -361,21 +332,21 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
 
 
     
-if sys.argv[1] == 'debug_post_1z':
+if sys.argv[1] == 'debug_post':
     print('=---------------------------------------')
-    tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_062421_brain'
+    tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_062421_brain/'
     segment_results_path = '/home/nrezaee/temp2'
-    position  = 'MMStack_Pos9.ome.tif'
-    edge = 1
-    dist = 0
+    position  = 'MMStack_Pos1.ome.tif'
+    edge = 8
+    dist = 2
     bool_cyto_match = False
     area_tol = 1
     debug = False
     cyto_channel_num = 1
     get_nuc = True
     get_cyto = False
-    num_z=3
-    num_wav=4
+    num_z=1
+    num_wav=2
     nuclei_radius = 0
     cell_prob_threshold= .5
     flow_threshold = .5
@@ -388,6 +359,34 @@ if sys.argv[1] == 'debug_post_1z':
                 cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold, 
                 cyto_radius = 10, debug=debug)
 
+if sys.argv[1] == 'debug_post_michal':
+    print('=---------------------------------------')
+    tiff_dir = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_pool1/'
+    segment_results_path = '/home/nrezaee/temp2'
+    position  = 'MMStack_Pos1.ome.tif'
+    edge = 8
+    dist = 2
+    bool_cyto_match = False
+    area_tol = 1
+    debug = False
+    cyto_channel_num = 1
+    get_nuc = True
+    get_cyto = False
+    num_z=1
+    num_wav=2
+    nuclei_radius = 0
+    cell_prob_threshold= .5
+    flow_threshold = .5
+    nuclei_channel_num = -1
+    cyto_flow_threshold = 0
+    cyto_cell_prob_threshold = 0
+    cyto_radius = 10
+    save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol, 
+                cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold, 
+                cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold, 
+                cyto_radius = 10, debug=debug)
+
+    
     
     
     
