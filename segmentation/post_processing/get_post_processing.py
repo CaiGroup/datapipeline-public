@@ -119,11 +119,18 @@ def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cy
     
 def make_2d_into_3d(tiff_2d, num_z=20):
     
+    #For edge case where num_z = 1
+    #-------------------------------------------------------------
+    if num_z == 1:
+        num_z = 2
+    #-------------------------------------------------------------
+    
     #Stack the same z on top of each other
     #-------------------------------------------------------------
     tiff_3d = []
     for i in range(num_z):
         tiff_3d.append(tiff_2d)
+        
     tiff_3d = np.array(tiff_3d).astype(np.int16)
     #-------------------------------------------------------------
     return tiff_3d
@@ -133,9 +140,12 @@ def save_tiff_3d_to_temp_file(tiff_3d, tiff_for_segment):
     #Make temp_dir and save
     #-------------------------------------------------------------
     temp_dir = os.path.join('/tmp', ''.join(random.choices(string.ascii_uppercase +string.digits, k = 10)))
-    os.makedirs(temp_dir)
     temp_dir_labeled_img = os.path.join(temp_dir, 'Labeled_Images')
     os.makedirs(temp_dir_labeled_img)
+    #-------------------------------------------------------------
+    
+    
+    
     tiff_for_segment = os.path.join(temp_dir_labeled_img, os.path.basename(tiff_for_segment))
     #-------------------------------------------------------------    
     
@@ -166,7 +176,9 @@ def get_tiff_for_segment(tiff_dir, position, num_z):
         #Read in Labeled Image
         #-------------------------------------------------------------
         tiff_for_segment = os.path.join(tiff_dir, 'Labeled_Images', position)
+        print(f'{tiff_for_segment=}')
         tiff = tf.imread(tiff_for_segment)
+        print(f'{tiff.shape=}')
         #-------------------------------------------------------------
         
         #Check if 3d or 2d
@@ -175,6 +187,7 @@ def get_tiff_for_segment(tiff_dir, position, num_z):
             pass
         elif len(tiff.shape) ==2:
             
+            print(f'{num_z=}')
             #Turn 2d into 3d
             #-------------------------------------------------------------
             tiff_3d = make_2d_into_3d(tiff, num_z)
