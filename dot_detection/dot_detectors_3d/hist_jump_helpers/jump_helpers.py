@@ -50,8 +50,9 @@ def get_hist(intense, strictness, hist_png_path, num_bins):
     
     #Save strictnesses
     #-------------------------------------------------------
-    strict_dst =  os.path.join(os.path.dirname(hist_png_path), 'strictnesses.csv')
-    save_strictnesses(x, y, thresh, strict_dst) 
+    if hist_png_path != None:
+        strict_dst =  os.path.join(os.path.dirname(hist_png_path), 'strictnesses.csv')
+        save_strictnesses(x, y, thresh, strict_dst) 
     #-------------------------------------------------------
     
     #Plot line on histogram
@@ -62,8 +63,9 @@ def get_hist(intense, strictness, hist_png_path, num_bins):
     
     #Only plot if fid not in path
     #-------------------------------------------------------
-    if 'fid' not in hist_png_path:
-        plt.savefig(hist_png_path)
+    if hist_png_path != None:
+        if 'fid' not in hist_png_path:
+            plt.savefig(hist_png_path)
     #-------------------------------------------------------
     
     return y,x, thresh
@@ -190,60 +192,80 @@ def get_intensities(points, tiff_3d):
     
 def get_hist_png_path(tiff_src, analysis_name):
 
-    #Get the locations dir
-    #------------------------------------------------------
-    tiff_split = tiff_src.split(os.sep)
-    personal = tiff_split[4]
-    exp_name = tiff_split[6]
-    hyb = tiff_split[7]
-    position = tiff_split[8].split('.ome')[0]
+    if analysis_name == None:
+        
+        #When there is not a place to save the analysis
+        #------------------------------------------------------
+        hist_png_path = None
+        #------------------------------------------------------
     
-    locs_dir = os.path.join('/groups/CaiLab/analyses', personal, exp_name, \
-                        analysis_name, position, 'Dot_Locations')
-    #------------------------------------------------------
-    
-    #Have to do this because of parallel processing
-    #------------------------------------------------------
-    if not os.path.exists(locs_dir):
-        try:
-            os.mkdir(locs_dir)
-        except:
-            pass 
-    #------------------------------------------------------
-    
-    hist_png_dir = os.path.join(locs_dir, 'Biggest_Jump_Histograms')
-    
-    #Have to do this because of parallel processing
-    #------------------------------------------------------
-    if not os.path.exists(hist_png_dir):
-        try:
-            os.mkdir(hist_png_dir)
-        except:
-            pass
-    #------------------------------------------------------
-    
-    #Set path of plotted histograms
-    #------------------------------------------------------
-    hist_png_path = os.path.join(hist_png_dir, hyb + '_' + 'Jump.png')
-    #------------------------------------------------------
+    else:
+        
+        #Get the locations dir
+        #------------------------------------------------------
+        tiff_split = tiff_src.split(os.sep)
+        personal = tiff_split[4]
+        exp_name = tiff_split[6]
+        hyb = tiff_split[7]
+        position = tiff_split[8].split('.ome')[0]
+        
+        locs_dir = os.path.join('/groups/CaiLab/analyses', personal, exp_name, \
+                            analysis_name, position, 'Dot_Locations')
+        #------------------------------------------------------
+        
+        #Have to do this because of parallel processing
+        #------------------------------------------------------
+        if not os.path.exists(locs_dir):
+            try:
+                os.mkdir(locs_dir)
+            except:
+                pass 
+        #------------------------------------------------------
+        
+        hist_png_dir = os.path.join(locs_dir, 'Biggest_Jump_Histograms')
+        
+        #Have to do this because of parallel processing
+        #------------------------------------------------------
+        if not os.path.exists(hist_png_dir):
+            try:
+                os.mkdir(hist_png_dir)
+            except:
+                pass
+        #------------------------------------------------------
+        
+        #Set path of plotted histograms
+        #------------------------------------------------------
+        hist_png_path = os.path.join(hist_png_dir, hyb + '_' + 'Jump.png')
+        #------------------------------------------------------
     
     return hist_png_path
     
 
-def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, dot_radius, threshold, radius_step, num_radii):
+def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, threshold, min_sigma, max_sigma, num_sigma, overlap):
     """
     Runs hist jump on 3d img
     """
-    
-    #Get right params
-    #------------------------------------------------------
-    nbins = float(nbins)
-    num_radii, min_radius, max_radius = get_laplacian_params(num_radii, dot_radius, radius_step)
-    #------------------------------------------------------
-    
+
     #Get points and intensities
     #------------------------------------------------------
-    res = blob_log(tiff_3d, min_sigma =min_radius, max_sigma =max_radius, num_sigma =num_radii, threshold = threshold, overlap=0)
+    print('Running Blob Log (in Python) with Params: [min sigma = ' + str(min_sigma) + \
+                                                ']   [max sigma = ' + str(max_sigma) + \
+                                                ']   [num sigma = ' + str(num_sigma) + \
+                                                ']   [threshold = ' + str(threshold) + \
+                                                ']   [overlap = ' + str(overlap) + ']')
+    
+    #Make sure Num sigma value is whole number
+    #------------------------------------------------------
+    if type(num_sigma) == float: 
+        assert (num_sigma).is_integer(), 'The num_sigma value must be a whole number.'
+    #------------------------------------------------------
+    print(f'{tiff_3d.shape=}')
+    exclude_border = (0, 2, 2)
+    print(f'{exclude_border=}')
+    #Run Laplacian of Gaussian Dot Detection
+    #------------------------------------------------------
+    res = blob_log(tiff_3d, min_sigma = min_sigma, max_sigma = max_sigma, num_sigma = int(num_sigma), 
+                    threshold = threshold, overlap=overlap, exclude_border = exclude_border)
     points = res[:,:3]
     intensities = get_intensities(points, tiff_3d)
     #------------------------------------------------------

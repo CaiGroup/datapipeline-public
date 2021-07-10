@@ -45,7 +45,7 @@ from align_errors import align_errors
 #Dot Detection Script
 #----------------------------
 print('Current Directory:', os.getcwd())
-from dot_detection.dot_detection_class9 import Dot_Detection
+from dot_detection.dot_detection_class10 import Dot_Detection
 #----------------------------
 
 #Barcode Script
@@ -185,8 +185,11 @@ class Analysis:
         self.rolling_ball = False
         self.blur_dot_detection = False
         self.blur_kernel_size = 5
-        self.blur_back_kernel_size = 1000
+        self.rolling_ball_kernel_size = 1000
         self.tophat_kernel_size = 200
+        self.max_sigma_dot_detection = 2
+        self.min_sigma_dot_detection = 1
+        self.num_sigma_dot_detection = 2
         #--------------------------------------------------------------
         
         
@@ -214,11 +217,6 @@ class Analysis:
     #Set Parameters
     #--------------------------------------------------------------------------------
     
-    # def __setattr__(self, name, value):
-    #     print(f'{name=}')
-    #     print(f'{value=}')
-    
-    #     print('    Set ' + name + ' to ' + str(value))
     
     def set_alignment_arg(self, align_arg):
         self.align = align_arg.replace(" ", "_")
@@ -529,15 +527,30 @@ class Analysis:
         
         print("    Set Blur Kernel Size to", str(self.blur_kernel_size))
         
-    def set_blur_back_sub_kernel_size_arg(self, back_sub_blur_kernel_size):
-        self.blur_back_kernel_size = float(blur_back_kernel_size)
+    def set_blur_back_sub_kernel_size_arg(self, rolling_ball_kernel_size):
+        self.rolling_ball_kernel_size = float(rolling_ball_kernel_size)
         
-        print("    Set Back Blur Kernel Size to", str(self.blur_kernel_size))
+        print("    Set Back Blur Kernel Size to", str(self.rolling_ball_kernel_size))
         
     def set_tophat_kernel_size_arg(self, tophat_kernel_size):
         self.tophat_kernel_size = float(tophat_kernel_size)
         
         print("    Set Tophat Kernel Size to", str(self.blur_kernel_size))
+        
+    def set_max_sigma_arg(self, max_sigma):
+        self.max_sigma_dot_detection = float(max_sigma)
+        
+        print("    Set Max Sigma to", str(self.max_sigma_dot_detection))
+        
+    def set_min_sigma_arg(self, min_sigma):
+        self.min_sigma_dot_detection = float(min_sigma)
+        
+        print("    Set Min Sigma to", str(self.min_sigma_dot_detection))
+    
+    def set_num_sigma_arg(self, num_sigma):
+        self.num_sigma_dot_detection = float(num_sigma)
+        
+        print("    Set Num Sigma to", str(self.num_sigma_dot_detection))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -561,10 +574,11 @@ class Analysis:
                                                self.decoding_individual, self.chromatic_abberration, self.dot_detection, self.gaussian_fitting, 
                                                self.strictness_dot_detection, self.dimensions, self.radial_center, self.num_zslices, 
                                                self.nbins, self.threshold, self.num_wav, self.num_z, 
-                                               self.dot_radius, self.radius_step, self.num_radii, self.debug_dot_detection,
+                                               self.radius_step, self.num_radii, self.debug_dot_detection,
                                                self.min_weight_adcg, self.final_loss_adcg, self.stack_z_dots, self.background_blob_removal,
                                                self.tophat, self.rolling_ball, self.blur_dot_detection, self.blur_kernel_size, 
-                                               self.blur_back_kernel_size, self.tophat_kernel_size)
+                                               self.rolling_ball_kernel_size, self.tophat_kernel_size, self.min_sigma_dot_detection,
+                                               self.max_sigma_dot_detection, self.num_sigma_dot_detection)
                                               
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 
@@ -698,10 +712,8 @@ class Analysis:
             #--------------------------------------------------------------------------------
 
         #--------------------------------------------------------------------------------
-        
-        
-        send_analysis_to_onedrive(self.analysis_dir)
-            
+
+
     #Runs the Parameters and functions
     #--------------------------------------------------------------------------------
     def write_results(self, path):

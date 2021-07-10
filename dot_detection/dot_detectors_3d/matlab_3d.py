@@ -48,11 +48,11 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
     return df
     
 
-def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
-                      bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
-                      bool_radial_center, strictness, z_slices, nbins, threshold, num_wav, bool_stack_z_dots, 
-                      bool_blob_removal, bool_rolling_ball, bool_tophat, bool_blur, blur_kernel_size, blur_back_kernel_size, 
-                      tophat_kernel_size, rand_dir):
+def get_dots_for_tiff(tiff_src, offset = [0,0,0] , analysis_name = None, bool_visualize_dots = False, \
+                      bool_background_subtraction = False, channels_to_detect_dots = [0], bool_chromatic = False, bool_gaussian_fitting = False, \
+                      bool_radial_center = False, strictness = 5, z_slices = None, nbins = 100, threshold = 300, num_wav = 4, bool_stack_z_dots = False, 
+                      bool_blob_removal = False, bool_rolling_ball = False, bool_tophat = False, bool_blur = False, blur_kernel_size = 5, blur_back_kernel_size =5, 
+                      tophat_kernel_size =5, rand_dir = '/tmp'):
     
     #Getting Background Src
     #--------------------------------------------------------------------
@@ -238,7 +238,7 @@ if 'debug' not in sys.argv[1]:
     parser.add_argument("--tophat")
     parser.add_argument("--blur")
     parser.add_argument("--blur_kernel_size")
-    parser.add_argument("--blur_back_kernel_size")
+    parser.add_argument("--rolling_ball_kernel_size")
     parser.add_argument("--tophat_kernel_size")
     
     args, unknown = parser.parse_known_args()
@@ -260,12 +260,7 @@ if 'debug' not in sys.argv[1]:
         
     if args.z_slices != 'all':
         args.z_slices = int(args.z_slices)
-    
-    # (tiff_src, offset, analysis_name, bool_visualize_dots, \
-    #                   bool_background_subtraction, channels_to_detect_dots, bool_chromatic, bool_gaussian_fitting, \
-    #                   bool_radial_center, strictness, z_slices, nbins, threshold, num_wav, bool_stack_z_dots, 
-    #                   bool_blob_removal, bool_rolling_ball, bool_tophat, bool_blur, blur_kernel_size, blur_back_kernel_size, 
-    #                   tophat_kernel_size, rand_dir)
+
     
     get_dots_for_tiff(tiff_src = args.tiff_src,
                         offset =offset,
@@ -287,38 +282,19 @@ if 'debug' not in sys.argv[1]:
                         bool_tophat = str2bool(args.tophat),
                         bool_blur = str2bool(args.blur),
                         blur_kernel_size = float(args.blur_kernel_size),
-                        blur_back_kernel_size = float(args.blur_back_kernel_size),
+                        blur_back_kernel_size = float(args.rolling_ball_kernel_size),
                         tophat_kernel_size = float(args.tophat_kernel_size),
                         rand_dir = args.rand)
         
 elif sys.argv[1] == 'debug_matlab_3d':
     
     print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_4/MMStack_Pos3.ome.tif'
-    offset = [0,0]
-    channels = [1]
-    analysis_name = 'jina_pseudos_4_corrected_pos3_strict_0_tophat_back_sub'
-    visualize_dots = False
-    back_sub = False
-    chromatic = False
-    gaussian = False
-    rad_center = False
-    strictness = 0
-    z_slices = None
-    nbins= 100
-    threshold= 80
-    num_wav = 4
-    rand_dir = 'foo/matlab_3d_old_load'
-    os.makedirs(rand_dir, exist_ok= True)
-    bool_stack_z_dots = False
-    bool_blob_removal = False
-    tophat = False
-    rolling_ball = False
-    blur = True
-    get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, back_sub, channels, 
-                    chromatic, gaussian, rad_center, strictness, z_slices, nbins, 
-                    threshold, num_wav, bool_stack_z_dots, bool_blob_removal, rolling_ball, 
-                    tophat, blur, rand_dir)
+    get_dots_for_tiff(tiff_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_4/MMStack_Pos3.ome.tif', 
+                    offset = [0,0], 
+                    analysis_name = 'jina_pseudos_4_corrected_pos3_strict_0_tophat_back_sub', 
+                    channels_to_detect_dots = [1], 
+                    strictness = 5,
+                    num_wav = 4)
                     
 elif sys.argv[1] == 'debug_matlab_3d_takei':
     

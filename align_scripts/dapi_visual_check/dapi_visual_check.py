@@ -67,16 +67,12 @@ def get_stacked_dapi_s_align_check(offset_path, dst, num_wav=4, num_dapi_stacked
         x_max = round((shifted_dapi_2d.shape[1]/5)*3)
         y_min = round((shifted_dapi_2d.shape[0]/5)*2)
         y_max = round((shifted_dapi_2d.shape[1]/5)*3)
-                
-        print(f'{shifted_dapi_2d.shape=}')
         stacked_dapi_s.append(shifted_dapi_2d[x_min:x_max, y_min:y_max])
         #--------------------------------------------------------
     
     stacked_dapi_s = np.array(stacked_dapi_s)
-    print(f'{stacked_dapi_s.shape=}')
     
     tf.imwrite(dst, stacked_dapi_s,imagej=True)
-    print(f'{dst=}')
     #--------------------------------------------------------
     
 if sys.argv[1] == 'debug_align_visual_check':

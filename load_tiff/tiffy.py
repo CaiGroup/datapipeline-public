@@ -4,7 +4,7 @@ import sys
 import os
 
 sys.path.insert(0, os.getcwd())
-from load_tiff.util import pil_imread
+from .util import pil_imread
 
 def load(tiff_src, num_wav=4, num_z=None):    
 

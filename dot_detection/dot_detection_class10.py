@@ -35,7 +35,6 @@ from dot_detection.location_checks import get_location_checks
 from timer import timer_tools
 #--------------------------------------------------------------------------------
 
-
 main_dir = '/groups/CaiLab'
 #Dot Detection class for setting dot detection
 #=====================================================================================
@@ -45,9 +44,11 @@ class Dot_Detection:
                    decoding_individual, chromatic_abberration, dot_detection, gaussian_fitting, 
                    strictness_dot_detection, dimensions, radial_center, num_zslices, 
                    nbins, threshold, num_wav, z_slices, 
-                   dot_radius, radius_step, num_radii, debug_dot_detection,
-                   min_weight_adcg, final_loss_adcg, stack_z_dots, background_blob_removal):
-                    
+                   radius_step, num_radii, debug_dot_detection, min_weight_adcg, 
+                   final_loss_adcg, stack_z_dots, background_blob_removal, tophat, 
+                   rolling_ball, blur, blur_kernel_size, rolling_ball_kernel_size, 
+                   tophat_kernel_size, min_sigma_dot_detection, max_sigma_dot_detection, num_sigma_dot_detection):
+                
         self.experiment_name = experiment_name
         self.personal = personal
         self.position = position 
@@ -69,7 +70,6 @@ class Dot_Detection:
         self.num_wav = num_wav
         self.num_z = z_slices
         self.nbins = float(nbins)
-        self.dot_radius = dot_radius
         self.radius_step = radius_step
         self.num_radii = num_radii
         self.debug_dot_detection = debug_dot_detection
@@ -77,6 +77,16 @@ class Dot_Detection:
         self.final_loss_adcg = final_loss_adcg
         self.stack_z_dots = stack_z_dots
         self.background_blob_removal = background_blob_removal
+        self.tophat = tophat
+        self.rolling_ball = rolling_ball
+        self.blur = blur
+        self.blur_kernel_size = blur_kernel_size
+        self.rolling_ball_kernel_size = rolling_ball_kernel_size
+        self.tophat_kernel_size = tophat_kernel_size
+        
+        self.min_sigma = min_sigma_dot_detection
+        self.max_sigma = max_sigma_dot_detection
+        self.num_sigma = num_sigma_dot_detection
         
         #Set Directories
         #--------------------------------------------------------------
@@ -325,8 +335,7 @@ class Dot_Detection:
         
         #Get locations checks 
         #--------------------------------------------------------------------
-        self.get_location_checks(locations_path)
-        #self.save_locs_shape(locations_path)
+        get_location_checks.get_location_checks_xyz(locations_path)
         #--------------------------------------------------------------------
         
         #Add strictness column
@@ -345,8 +354,6 @@ class Dot_Detection:
         
     def get_dot_locations(self, z_slice= 'all'):
         
-        print(f'{self.stack_z_dots=}')
-
         #Setting Proper Directories
         #-----------------------------------------------------------------
         exp_dir = os.path.join('/groups/CaiLab/personal', self.personal, 'raw', self.experiment_name)
@@ -432,7 +439,8 @@ class Dot_Detection:
                             '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
                             '--chromatic', self.chromatic_abberration, '--n_dots', n_dots, '--num_wav', self.num_wav, '--rand', rand_dir, \
-                            '--num_z', self.num_z, '--stack_z_s', self.stack_z_dots]
+                            '--num_z', self.num_z, '--stack_z_s', self.stack_z_dots, '--rolling_ball', self.rolling_ball, '--tophat', self.tophat,
+                            '--blur', self.blur]
                     
                     list_cmd = [str(i) for i in list_cmd]
                
@@ -460,7 +468,9 @@ class Dot_Detection:
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
                             '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
                             '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,'--z_slices', z_slice, '--nbins',  \
-                            self.nbins, '--threshold', self.threshold, '--stack_z_s', self.stack_z_dots, '--back_blob_removal', self.background_blob_removal]
+                            self.nbins, '--threshold', self.threshold, '--stack_z_s', self.stack_z_dots, '--back_blob_removal', self.background_blob_removal, 
+                            '--rolling_ball', self.rolling_ball, '--tophat', self.tophat, '--blur', self.blur, '--blur_kernel_size', self.blur_kernel_size,
+                            '--rolling_ball_kernel_size', self.rolling_ball_kernel_size, '--tophat_kernel_size', self.tophat_kernel_size]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
@@ -488,9 +498,12 @@ class Dot_Detection:
                             '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
                             '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
                             '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav',  \
-                            self.num_wav, '--z_slices', z_slice, '--num_z', self.num_z, '--nbins', self.nbins, '--dot_radius', self.dot_radius, \
+                            self.num_wav, '--z_slices', z_slice, '--num_z', self.num_z, '--nbins', self.nbins, \
                             '--threshold', self.threshold, '--radius_step', self.radius_step, '--num_radii', self.num_radii,
-                            '--stack_z_s', self.stack_z_dots, '--back_blob_removal', self.background_blob_removal]
+                            '--stack_z_s', self.stack_z_dots, '--back_blob_removal', self.background_blob_removal, 
+                            '--rolling_ball', self.rolling_ball, '--tophat', self.tophat, '--blur', self.blur, '--blur_kernel_size', self.blur_kernel_size,
+                            '--rolling_ball_kernel_size', self.rolling_ball_kernel_size, '--tophat_kernel_size', self.tophat_kernel_size, 
+                            '--min_sigma', self.min_sigma, '--max_sigma', self.max_sigma, '--num_sigma', self.num_sigma]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     

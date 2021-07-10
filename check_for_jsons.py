@@ -22,7 +22,7 @@ import pandas as pd
 import re
 from helpers.excel2dict import get_dict_from_excel
 import linecache
-
+import random
 
 main_dir = '/groups/CaiLab'
 
@@ -52,23 +52,30 @@ def get_specific_positions(spec_positions, positions):
         list of MMStack_Pos{n}.ome.tif's in spec_positions
     """
     
+    #Split positions to get position numbers
+    #-------------------------------------------------
     spec_positions = spec_positions.replace(' ', '').split(',')
     print(f'{spec_positions=}')
-    #Split positions to get position numbers
+    
     positions_split = [re.split('Pos|,|.ome.tif', position) 
                        for position in positions]
+    #-------------------------------------------------
     
     #Check if position number in .ome.tif's and add to list
+    #-------------------------------------------------
     spec_positions_split = []
     for spec_position in spec_positions:
         for position_split in positions_split:
             if spec_position in position_split:
                 print(f'{position_split=}')
                 spec_positions_split.append(position_split)
+    #-------------------------------------------------
     
     #Combine splitted positions
+    #-------------------------------------------------
     result_positions = [spec_position_split[0] + 'Pos' + spec_position_split[1] \
                     + '.ome.tif' for spec_position_split in spec_positions_split]
+    #-------------------------------------------------
     
     return result_positions
     
@@ -235,39 +242,68 @@ def move_json_file_to_analysis_dir(json_name, main_dir, data):
     
 def hasNumbers(inputString):
     return any(char.isdigit() for char in inputString)
+
+def get_random_positions(positions, rand_sample_num):
+    
+    
+    print('positions', str(len(positions)))
+    #Edge case where the number of random sample is more than the positions
+    #-----------------------------------------
+    if rand_sample_num > len(positions):
+        rand_sample_num = len(positions)
+    #-----------------------------------------
+    
+    #Random positions
+    #-----------------------------------------
+    rand_positions = random.sample(positions, rand_sample_num)
+    #-----------------------------------------
+    
+    return rand_positions 
     
 def get_positions_in_data(data, main_dir):
     """
     Check to see if specific positions are specified in the json
     Then get those positions and return
     """
-
     #Get single position
     #----------------------------------------------------------
     if 'decoding with previous locations variable' in data.keys():
         if data['decoding with previous locations variable'] == 'true':
             
             positions = ['MMStack_Pos0.ome.tif']
-
+    #----------------------------------------------------------
+    
+    
     else:
         
+        #Get Path to a hyb dir
+        #----------------------------------------------------------
         exp_dir = os.path.join(main_dir, "personal", data["personal"], "raw", data["experiment_name"])
-        
         hybs = [hyb for hyb in os.listdir(exp_dir) if 'Hyb' in hyb]
-        
         path_to_sub_dir = os.path.join(exp_dir, hybs[0])
+        #----------------------------------------------------------
         
+        #Get all ome position files in dir
+        #----------------------------------------------------------
         positions = os.listdir(path_to_sub_dir)
-        
-        
+        #----------------------------------------------------------
+        print('Positions 287', str(positions))
         if 'positions' in data.keys():
-            if data['positions'] != 'NaN':
-                print(f'{data["positions"]=}')
+            
+            #Get random positions
+            #----------------------------------------------------------
+            if 'random' in data['positions']:
+                rand_sample_num = int(data['positions'].split(' ')[1])
+                positions = get_random_positions(positions, rand_sample_num)
+            #----------------------------------------------------------
+            
+            #Get Specific positions
+            #----------------------------------------------------------
+            else:
                 if data['positions'].replace(' ', '') != '':
                     if hasNumbers(data['positions']):
                         positions = get_specific_positions(data['positions'], positions)
-                        
-        print(2)
+            #----------------------------------------------------------
 
     return positions
     

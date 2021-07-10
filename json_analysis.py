@@ -531,17 +531,49 @@ def run_analysis(json_name, position):
         if data['blur preprocessing'] != 'none':
             analysis.set_blur_preprocessing_true()
     #----------------------------------------------------------
-
-    #Blur Preprocessing
-    #----------------------------------------------------------
-    if 'blur preprocessing' in data.keys():
-        if data['blur preprocessing'] != 'none':
-            analysis.set_blur_preprocessing_true()
-    #----------------------------------------------------------
     
+    #Blur Kernel Size
+    #----------------------------------------------------------
     if 'blur kernel size' in data.keys():
         if data['blur kernel size'] != 'none':
-            analysis.blur_kernel_size = data['blur kernel size']
+            analysis.set_blur_preprocessing_kernel_size_arg(data['blur kernel size'])
+    #----------------------------------------------------------
+    
+    #Rolling Ball size
+    #----------------------------------------------------------
+    if 'blur back kernel size' in data.keys():
+        if data['blur back kernel size'] != 'none':
+            analysis.set_blur_back_sub_kernel_size_arg(data['blur back kernel size'])
+    #----------------------------------------------------------
+    
+    #Tophat Ball size
+    #----------------------------------------------------------
+    if 'tophat kernel size' in data.keys():
+        if data['tophat kernel size'] != 'none':
+            analysis.set_tophat_kernel_size_arg(data['tophat kernel size'])
+    #----------------------------------------------------------
+
+    #Set Dot Radius
+    #----------------------------------------------------
+    if 'min sigma dot detection' in data.keys():
+        if not data['min sigma dot detection'] == 'none':
+            analysis.set_min_sigma_arg(data['min sigma dot detection'])
+    #----------------------------------------------------------
+    
+    #Set Max Sigma
+    #----------------------------------------------------
+    if 'max sigma dot detection' in data.keys():
+        if not data['max sigma dot detection'] == 'none':
+            analysis.set_max_sigma_arg(data['max sigma dot detection'])
+    #----------------------------------------------------------
+    
+    #Set Dot Radius
+    #----------------------------------------------------
+    if 'num sigma dot detection' in data.keys():
+        if not data['num sigma dot detection'] == 'none':
+            analysis.set_num_sigma_arg(data['num sigma dot detection'])
+    #----------------------------------------------------------
+    
     
     #Writ
     #----------------------------------------------------------

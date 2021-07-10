@@ -122,13 +122,16 @@ def get_shifted_background(back_3d, tiff_src, analysis_name):
     #Shift image
     #-------------------------------------------------------------
     print("Shifting Background")
-    hyb_minus_back_offset =  hyb_offset - back_offset
-    print(f'{hyb_minus_back_offset=}')
+    offset_back_minus_hyb = back_offset - hyb_offset
+    print(f'{offset_back_minus_hyb=}')
     
     if len(back_offset) == 3:
-        shifted_back = shift(back_3d, hyb_minus_back_offset)
+        
+        raise ValueError('The background subtraction for 3d needs to be double checked to see if the offset is aligning stuff correctly.')
+        shifted_back = shift(back_3d, offset_back_minus_hyb)
+        
     elif len(back_offset) == 2:
-        shifted_back = shift_each_2d_in_3d(back_3d, hyb_minus_back_offset)
+        shifted_back = shift_each_2d_in_3d(back_3d, offset_back_minus_hyb)
     #-------------------------------------------------------------
     
     return shifted_back

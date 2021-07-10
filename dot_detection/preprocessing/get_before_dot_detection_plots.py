@@ -97,18 +97,24 @@ def side_by_side_preprocess_checks(tiff_src, analysis_name):
             #-----------------------------------------------------
             for i in range(len(dirs_with_checks)):
                 print(f'{i=}')
-                #Load img from check
-                #-----------------------------------------------------
+                
+                #Get img path
+                #--------------------------------------------------
                 img_src = os.path.join(dirs_with_checks[i], png_file_name)
                 print(f'{img_src=}')
-                img = io.imread(img_src)
-                #-----------------------------------------------------
+                #--------------------------------------------------
                 
-                #Plot Image
-                #-----------------------------------------------------
-                axs[i].imshow(img, cmap='gray')
-                axs[i].title.set_text(os.path.basename(dirs_with_checks[i]))
-                #-----------------------------------------------------
+                #Plot if path exists (sometimes one path may not exist because of the dot detection notebook
+                #--------------------------------------------------
+                if os.path.exists(img_src):
+                    img = io.imread(img_src)
+                
+                    axs[i].imshow(img, cmap='gray')
+                    axs[i].title.set_text(os.path.basename(dirs_with_checks[i]))
+                else:
+                    pass
+                #--------------------------------------------------
+                
                 
             #Save plot
             #-----------------------------------------------------
@@ -120,8 +126,8 @@ def side_by_side_preprocess_checks(tiff_src, analysis_name):
             
 if sys.argv[1] == 'debug_side_by_side_check':
     
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_4/MMStack_Pos3.ome.tif'
-    analysis_name = 'jina_pseudos_4_corrected_pos3_strict_0_tophat_back_sub'
+    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_15/MMStack_Pos1.ome.tif'
+    analysis_name = 'jina_pseudos_4_corrected_2_pos_2_chs_pil_load_strict_2_only_blur_thresh_60'
     side_by_side_preprocess_checks(tiff_src, analysis_name)
                 
             
