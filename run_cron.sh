@@ -1,8 +1,8 @@
 
 #Activate conda environment to get correct packages
 #----------------------------------------------
-source ~/miniconda3/etc/profile.d/conda.sh
-conda activate data-pipeline
+source /groups/CaiLab/personal/python_env/bin/activate
+#conda activate data-pipeline
 #----------------------------------------------
 
 
