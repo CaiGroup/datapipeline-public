@@ -234,7 +234,6 @@ class Segmentation:
         #----------------------------------------------
 
     def retrieve_labeled_img(self):
-        breakpoint()
         # Get Segmentation Dirs
         #----------------------------------------------
         if not os.path.exists(self.seg_dir):
