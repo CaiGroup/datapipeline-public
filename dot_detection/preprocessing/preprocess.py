@@ -33,6 +33,8 @@ def blur_back_subtract(tiff_2d, kernel_size):
     blurry_img = cv2.blur(tiff_2d, blur_kernel)
     rolling_ball_subtracted_2d = cv2.subtract(tiff_2d, blurry_img)
     
+    rolling_ball_subtracted_2d = np.where(rolling_ball_subtracted_2d == 0, 0, rolling_ball_subtracted_2d)
+    
     return rolling_ball_subtracted_2d
 
 def blur_back_subtract_3d(img_3d, kernel_size=1000):
@@ -77,6 +79,9 @@ def tophat_3d(img_3d, kernel_size = 200):
     tophat_img_3d = np.zeros(img_3d.shape)
     for i in range(len(img_3d)):
         tophat_img_3d[i] = tophat_2d(img_3d[i], kernel_size)
+        
+    tophat_img_3d = np.where(tophat_img_3d < 0, 0, tophat_img_3d)
+    
     return tophat_img_3d
 
 def preprocess_img(img_3d):

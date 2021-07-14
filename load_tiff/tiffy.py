@@ -6,14 +6,14 @@ import os
 sys.path.insert(0, os.getcwd())
 from .util import pil_imread
 
-def load(tiff_src, num_wav=4, num_z=None):    
+def load(tiff_src, num_wav=4, num_z=None, swapaxes = True):    
 
     
     print(f'{tiff_src=}')
     
     try:
         print("Reading with Lincoln's pil_imread")
-        tiff = pil_imread(tiff_src, swapaxes=True)
+        tiff = pil_imread(tiff_src, swapaxes=swapaxes)
 
         if tiff.shape[1] == 1:
             print('Swapping axes')

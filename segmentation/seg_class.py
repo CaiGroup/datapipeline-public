@@ -116,6 +116,11 @@ class Segmentation:
         decoded_genes_path = decoded_genes_paths[0]
         #----------------------------------------------
         
+        #Get Barcode csv
+        #----------------------------------------------
+        barcode_key_src = os.path.join(self.barcode_dst, 'barcode.csv')
+        #----------------------------------------------
+        
         #If Roi
         #----------------------------------------------
         if 'roi' in self.seg_type:
@@ -138,8 +143,8 @@ class Segmentation:
         
         elif "cellpose" in self.seg_type:
             
-                
-            run_cellpose.run_me(self.data_dir, self.seg_dir, decoded_genes_path, self.position, self.labeled_img)
+                    
+            run_cellpose.run_me(self.data_dir, self.seg_dir, decoded_genes_path, barcode_key_src, self.position, self.labeled_img)
             #----------------------------------------------
 
     def run_segmentation_non_barcoded(self):
@@ -367,5 +372,42 @@ if sys.argv[1] == 'debug_seg_class_non_barcoded':
     
     segmenter.run_segmentation_non_barcoded()
 
- 
+if sys.argv[1] == 'debug_seg_class_across':
+    labeled_img_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug3/MMStack_Pos0/Segmentation/labeled_img_post.tif'
+    
+    labeled_img = tf.imread(labeled_img_src)
+    segmenter = Segmentation(data_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/', 
+                            position = 'MMStack_Pos0.ome.tif', 
+                            seg_dir = 'foo/seg_test_across', 
+                            decoded_dir = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug3/MMStack_Pos0/Decoded', 
+                            locations_dir ='//groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug3/MMStack_Pos0/Dot_Locations', 
+                            barcode_dst = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug3/BarcodeKey', 
+                            barcode_src = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/barcode_key/barcode_key', 
+                            bool_fake_barcodes = True,
+                            bool_decoding_individual = [1], 
+                            num_z_slices = None,
+                            seg_type = 'cellpose', 
+                            seg_data_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/segmentation/', 
+                            dimensions = 3, 
+                            num_zslices = 3, 
+                            labeled_img = labeled_img, 
+                            edge_dist = 0, 
+                            dist_between_nuclei = 0, 
+                            bool_cyto_match= False, 
+                            area_tol = False, 
+                            cyto_channel_num = False, 
+                            get_nuclei_img = True, 
+                            get_cyto_img = False, 
+                            num_wav = 4, 
+                            nuclei_radius = 0, 
+                            flow_threshold = .4, 
+                            cell_prob_threshold = 0,
+                            nuclei_channel_num = -1, 
+                            cyto_flow_threshold = 0, 
+                            cyto_cell_prob_threshold =0, 
+                            cyto_radius =0)
+    print("Created Segmentation Class")
+    
+    segmenter.run_segmentation_across()
+
                 

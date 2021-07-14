@@ -51,7 +51,7 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
 def get_dots_for_tiff(tiff_src, offset = [0,0,0] , analysis_name = None, bool_visualize_dots = False, \
                       bool_background_subtraction = False, channels_to_detect_dots = [0], bool_chromatic = False, bool_gaussian_fitting = False, \
                       bool_radial_center = False, strictness = 5, z_slices = None, nbins = 100, threshold = 300, num_wav = 4, bool_stack_z_dots = False, 
-                      bool_blob_removal = False, bool_rolling_ball = False, bool_tophat = False, bool_blur = False, blur_kernel_size = 5, blur_back_kernel_size =5, 
+                      bool_blob_removal = False, bool_rolling_ball = False, bool_tophat = False, bool_blur = False, blur_kernel_size = 5, rolling_ball_kernel_size =5, 
                       tophat_kernel_size =5, rand_dir = '/tmp'):
     
     #Getting Background Src
@@ -106,6 +106,7 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0] , analysis_name = None, bool_vi
             print(f'{channel=}')
             back_3d = get_shifted_background(background[:, channel], tiff_src, analysis_name)
             tiff_3d = cv2.subtract(tiff_3d, back_3d)
+            tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
             get_back_sub_check(tiff_src, analysis_name, tiff_3d, channel)
         #---------------------------------------------------------------------
         
@@ -121,21 +122,21 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0] , analysis_name = None, bool_vi
         #Blur 3d
         #---------------------------------------------------------------------
         if bool_blur == True:
-            tiff_3d = blur_3d(tiff_3d)
+            tiff_3d = blur_3d(tiff_3d, blur_kernel_size)
             get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel, 'Blur_Check')
         #---------------------------------------------------------------------
         
         #Run Rolling Ball
         #---------------------------------------------------------------------
         if bool_rolling_ball == True:
-            tiff_3d = blur_back_subtract_3d(tiff_3d)
+            tiff_3d = blur_back_subtract_3d(tiff_3d, rolling_ball_kernel_size)
             get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel, 'Rolling_Ball_Check')
         #---------------------------------------------------------------------
 
         #Run Tophat
         #---------------------------------------------------------------------
         if bool_tophat == True:
-            tiff_3d = tophat_3d(tiff_3d)
+            tiff_3d = tophat_3d(tiff_3d, tophat_kernel_size)
             get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel, 'Tophat_Check')
         #---------------------------------------------------------------------
         
@@ -149,7 +150,7 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0] , analysis_name = None, bool_vi
         
         #Threshold on Biggest Jump for matlab 3d
         #---------------------------------------------------------------------
-        dot_analysis = get_matlab_detected_dots(tiff_3d_mat_dst, channel, strictness, nbins, threshold)
+        dot_analysis = get_matlab_detected_dots(tiff_3d_mat_dst, channel, strictness, nbins, threshold, tiff_src, analysis_name)
         
         #print(f'{len(dot_analysis[1])=}')
 
@@ -190,6 +191,21 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0] , analysis_name = None, bool_vi
         print(f'{df_tiff.shape=}')
         #----------------------------------------------------------
         
+    #Subtract all z's by 1 because matlab indexing starts at 1
+    #----------------------------------------------------------
+    df_tiff.z = df_tiff.z - 1    
+    df_tiff.x = df_tiff.x - 1
+    df_tiff.y = df_tiff.y - 1    
+    #----------------------------------------------------------
+    
+    #Remove Edges
+    #----------------------------------------------------------
+    df_tiff = df_tiff[(df_tiff.x < tiff.shape[2] - 5 ) 
+                  & (df_tiff.y < tiff.shape[3] - 5)  
+                  & (df_tiff.y > 5) 
+                  & (df_tiff.x > 5)]
+    #----------------------------------------------------------
+    
     #Stack z dots
     #----------------------------------------------------------
     if bool_stack_z_dots:
@@ -208,121 +224,124 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0] , analysis_name = None, bool_vi
     side_by_side_preprocess_checks(tiff_src, analysis_name)
     #----------------------------------------------------------
     
-if 'debug' not in sys.argv[1]:
-    def str2bool(v):
-      return v.lower() == "true"
+    return df_tiff, tiff
     
-    import argparse
-    
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--tiff_src")
-    parser.add_argument("--offset0")
-    parser.add_argument("--offset1")
-    parser.add_argument("--offset2")
-    parser.add_argument("--analysis_name")
-    parser.add_argument("--vis_dots")
-    parser.add_argument("--back_subtract")
-    parser.add_argument("--channels", nargs = '+')
-    parser.add_argument("--chromatic")
-    parser.add_argument("--rand")
-    parser.add_argument("--gaussian")
-    parser.add_argument("--radial_center")
-    parser.add_argument("--strictness")
-    parser.add_argument("--z_slices")
-    parser.add_argument("--num_wav")
-    parser.add_argument("--nbins")
-    parser.add_argument("--threshold")
-    parser.add_argument("--stack_z_s")
-    parser.add_argument("--back_blob_removal")
-    parser.add_argument("--rolling_ball")
-    parser.add_argument("--tophat")
-    parser.add_argument("--blur")
-    parser.add_argument("--blur_kernel_size")
-    parser.add_argument("--rolling_ball_kernel_size")
-    parser.add_argument("--tophat_kernel_size")
-    
-    args, unknown = parser.parse_known_args()
-    
-    #print(f'{args.offset=}')
-    
-    print('hello')
-    
-    if args.offset2 == 'None':
-        offset = [float(args.offset0), float(args.offset1)]
-    else:    
-        offset = [float(args.offset0), float(args.offset1), float(args.offset2)]
-    
-    
-    if args.channels[0] == 'all':
-        channels = 'all'
-    else:
-        channels = [int(i.replace('[', '').replace(']','').replace(',','')) for i in args.channels]
+if 'ipykernel' not in sys.argv[0]:
+    if 'debug' not in sys.argv[1]:
+        def str2bool(v):
+          return v.lower() == "true"
         
-    if args.z_slices != 'all':
-        args.z_slices = int(args.z_slices)
-
-    
-    get_dots_for_tiff(tiff_src = args.tiff_src,
-                        offset =offset,
-                        analysis_name = args.analysis_name, 
-                        bool_visualize_dots = str2bool(args.vis_dots), 
-                        bool_background_subtraction = args.back_subtract, 
-                        channels_to_detect_dots = channels, 
-                        bool_chromatic = args.chromatic, 
-                        bool_gaussian_fitting = str2bool(args.gaussian), 
-                        bool_radial_center = str2bool(args.radial_center), 
-                        strictness = int(args.strictness),
-                        z_slices = args.z_slices, 
-                        nbins = int(float(args.nbins)), 
-                        threshold = int(float(args.threshold)),
-                        num_wav = args.num_wav, 
-                        bool_stack_z_dots = str2bool(args.stack_z_s),
-                        bool_blob_removal = str2bool(args.back_blob_removal), 
-                        bool_rolling_ball = str2bool(args.rolling_ball), 
-                        bool_tophat = str2bool(args.tophat),
-                        bool_blur = str2bool(args.blur),
-                        blur_kernel_size = float(args.blur_kernel_size),
-                        blur_back_kernel_size = float(args.rolling_ball_kernel_size),
-                        tophat_kernel_size = float(args.tophat_kernel_size),
-                        rand_dir = args.rand)
+        import argparse
         
-elif sys.argv[1] == 'debug_matlab_3d':
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--tiff_src")
+        parser.add_argument("--offset0")
+        parser.add_argument("--offset1")
+        parser.add_argument("--offset2")
+        parser.add_argument("--analysis_name")
+        parser.add_argument("--vis_dots")
+        parser.add_argument("--back_subtract")
+        parser.add_argument("--channels", nargs = '+')
+        parser.add_argument("--chromatic")
+        parser.add_argument("--rand")
+        parser.add_argument("--gaussian")
+        parser.add_argument("--radial_center")
+        parser.add_argument("--strictness")
+        parser.add_argument("--z_slices")
+        parser.add_argument("--num_wav")
+        parser.add_argument("--nbins")
+        parser.add_argument("--threshold")
+        parser.add_argument("--stack_z_s")
+        parser.add_argument("--back_blob_removal")
+        parser.add_argument("--rolling_ball")
+        parser.add_argument("--tophat")
+        parser.add_argument("--blur")
+        parser.add_argument("--blur_kernel_size")
+        parser.add_argument("--rolling_ball_kernel_size")
+        parser.add_argument("--tophat_kernel_size")
+        
+        args, unknown = parser.parse_known_args()
+        
+        #print(f'{args.offset=}')
+        
+        print('hello')
+        
+        if args.offset2 == 'None':
+            offset = [float(args.offset0), float(args.offset1)]
+        else:    
+            offset = [float(args.offset0), float(args.offset1), float(args.offset2)]
+        
+        
+        if args.channels[0] == 'all':
+            channels = 'all'
+        else:
+            channels = [int(i.replace('[', '').replace(']','').replace(',','')) for i in args.channels]
+            
+        if args.z_slices != 'all':
+            args.z_slices = int(args.z_slices)
     
-    print('Debugging')
-    get_dots_for_tiff(tiff_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_4/MMStack_Pos3.ome.tif', 
-                    offset = [0,0], 
-                    analysis_name = 'jina_pseudos_4_corrected_pos3_strict_0_tophat_back_sub', 
-                    channels_to_detect_dots = [1], 
-                    strictness = 5,
-                    num_wav = 4)
-                    
-elif sys.argv[1] == 'debug_matlab_3d_takei':
-    
-    print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_4/MMStack_Pos0.ome.tif'
-    offset = [0,0]
-    channels = [1]
-    analysis_name = 'takei_align'
-    visualize_dots = False
-    back_sub = False
-    chromatic = False
-    gaussian = False
-    rad_center = False
-    strictness = 0
-    z_slices = None
-    nbins= 100
-    threshold= 300
-    num_wav = 4
-    rand_dir = 'foo/matlab_3d'
-    os.makedirs(rand_dir, exist_ok= True)
-    bool_stack_z_dots = False
-    bool_blob_removal = False
-    tophat = False
-    rolling_ball = False
-    get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, back_sub, channels, 
-                    chromatic, gaussian, rad_center, strictness, z_slices, nbins, 
-                    threshold, num_wav, bool_stack_z_dots, bool_blob_removal, rolling_ball, tophat, 
-                    rand_dir)
-                    
-                    
-                    
+        
+        get_dots_for_tiff(tiff_src = args.tiff_src,
+                            offset =offset,
+                            analysis_name = args.analysis_name, 
+                            bool_visualize_dots = str2bool(args.vis_dots), 
+                            bool_background_subtraction = args.back_subtract, 
+                            channels_to_detect_dots = channels, 
+                            bool_chromatic = args.chromatic, 
+                            bool_gaussian_fitting = str2bool(args.gaussian), 
+                            bool_radial_center = str2bool(args.radial_center), 
+                            strictness = int(args.strictness),
+                            z_slices = args.z_slices, 
+                            nbins = int(float(args.nbins)), 
+                            threshold = int(float(args.threshold)),
+                            num_wav = args.num_wav, 
+                            bool_stack_z_dots = str2bool(args.stack_z_s),
+                            bool_blob_removal = str2bool(args.back_blob_removal), 
+                            bool_rolling_ball = str2bool(args.rolling_ball), 
+                            bool_tophat = str2bool(args.tophat),
+                            bool_blur = str2bool(args.blur),
+                            blur_kernel_size = float(args.blur_kernel_size),
+                            rolling_ball_kernel_size = float(args.rolling_ball_kernel_size),
+                            tophat_kernel_size = float(args.tophat_kernel_size),
+                            rand_dir = args.rand)
+            
+    elif sys.argv[1] == 'debug_matlab_3d':
+        
+        print('Debugging')
+        get_dots_for_tiff(tiff_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_4/MMStack_Pos3.ome.tif', 
+                        offset = [0,0], 
+                        analysis_name = 'jina_pseudos_4_corrected_pos3_strict_0_tophat_back_sub', 
+                        channels_to_detect_dots = [1], 
+                        strictness = 5,
+                        num_wav = 4)
+                        
+    elif sys.argv[1] == 'debug_matlab_3d_takei':
+        
+        print('Debugging')
+        tiff_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/HybCycle_4/MMStack_Pos0.ome.tif'
+        offset = [0,0]
+        channels = [1]
+        analysis_name = 'takei_align'
+        visualize_dots = False
+        back_sub = False
+        chromatic = False
+        gaussian = False
+        rad_center = False
+        strictness = 0
+        z_slices = None
+        nbins= 100
+        threshold= 300
+        num_wav = 4
+        rand_dir = 'foo/matlab_3d'
+        os.makedirs(rand_dir, exist_ok= True)
+        bool_stack_z_dots = False
+        bool_blob_removal = False
+        tophat = False
+        rolling_ball = False
+        get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, back_sub, channels, 
+                        chromatic, gaussian, rad_center, strictness, z_slices, nbins, 
+                        threshold, num_wav, bool_stack_z_dots, bool_blob_removal, rolling_ball, tophat, 
+                        rand_dir)
+                        
+                        
+                        

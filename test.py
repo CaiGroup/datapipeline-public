@@ -18,10 +18,19 @@ def remove_clusters(json_src):
     return data
 
 json_name = sys.argv[1]
- 
+
+
+#Get username
+#----------------------------------------------------------
+username =  os.environ["USER"]
+#----------------------------------------------------------
+
+
+
+
 # Opening JSON file 
 #----------------------------------------------------------
-json_path = os.path.join('/home/nrezaee/test_analyses/', json_name)
+json_path = os.path.join('/home', username, 'test_analyses', json_name)
 
 filename, file_extension = os.path.splitext(json_name)
 if file_extension == '.json':
@@ -57,11 +66,13 @@ if len(sys.argv) > 2:
     if sys.argv[2] == 'no_slurm':
         remove_clusters(json_path)
         
-shutil.copyfile(json_path, os.path.join('/home/nrezaee/json_analyses', json_name))
+json_analyses_dir = os.path.join('/home', username, 'json_analyses')
+
+shutil.copyfile(json_path, os.path.join(json_analyses_dir, json_name))
 #----------------------------------------------------------
 
 
 #Run test
 #----------------------------------------------------------
-os.system('sh run_cron.sh /home/nrezaee/json_analyses')
+os.system('sh run_cron.sh ' + json_analyses_dir)
 #----------------------------------------------------------

@@ -171,6 +171,7 @@ def get_tiff_for_segment(tiff_dir, position, num_z):
 
     #If labeled image is already specified
     #-------------------------------------------------------------
+
     if bool_labeled_img_dir:
         
         #Read in Labeled Image
@@ -347,7 +348,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     
 if sys.argv[1] == 'debug_post':
     print('=---------------------------------------')
-    tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_062421_brain/'
+    tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/'
     segment_results_path = '/home/nrezaee/temp2'
     position  = 'MMStack_Pos1.ome.tif'
     edge = 8

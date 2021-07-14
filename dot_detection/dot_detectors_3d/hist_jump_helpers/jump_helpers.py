@@ -265,7 +265,7 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, t
     #Run Laplacian of Gaussian Dot Detection
     #------------------------------------------------------
     res = blob_log(tiff_3d, min_sigma = min_sigma, max_sigma = max_sigma, num_sigma = int(num_sigma), 
-                    threshold = threshold, overlap=overlap, exclude_border = exclude_border)
+                    threshold = threshold, overlap=overlap)
     points = res[:,:3]
     intensities = get_intensities(points, tiff_3d)
     #------------------------------------------------------

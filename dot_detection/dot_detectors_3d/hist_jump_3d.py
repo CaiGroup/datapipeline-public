@@ -112,6 +112,7 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
             
             back_3d = get_shifted_background(background[:, channel], tiff_src, analysis_name)
             tiff_3d = cv2.subtract(tiff_3d, back_3d)
+            tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
             get_back_sub_check(tiff_src, analysis_name, tiff_3d, channel)
         #---------------------------------------------------------------------
         
@@ -156,7 +157,7 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
         dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, \
                         threshold, min_sigma, max_sigma, num_sigma, overlap))
 
-        assert len(dot_analysis[1]) >0
+        assert len(dot_analysis[1]) >0, 'No dots where found in image. Try decreasing threshold. (recommended .001)'
         #---------------------------------------------------------------------
         
         
@@ -202,6 +203,14 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
     #----------------------------------------------------------
     if bool_stack_z_dots:
         df_tiff.z = 1 
+    #----------------------------------------------------------
+    
+    #Remove Edges
+    #----------------------------------------------------------
+    df_tiff = df_tiff[(df_tiff.x < tiff.shape[2] - 5 ) 
+                  & (df_tiff.y < tiff.shape[3] - 5)  
+                  & (df_tiff.y > 5) 
+                  & (df_tiff.x > 5)]
     #----------------------------------------------------------
     
     #Save to csv file

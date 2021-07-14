@@ -5,7 +5,8 @@ import imageio as io
 import tifffile as tf
 import numpy as np
 import sys
-
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 def get_analysis_pos_dir(tiff_src, analysis_name):
     

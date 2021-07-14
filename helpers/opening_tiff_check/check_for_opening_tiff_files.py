@@ -8,7 +8,7 @@ sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
 from load_tiff import tiffy
 
 
-def get_plots_of_tiff_check(tiff_src, dest):
+def get_plots_of_tiff_check(tiff_src, dest = None):
 
     #Read in tiff file
     #--------------------------------------------
@@ -40,12 +40,13 @@ def get_plots_of_tiff_check(tiff_src, dest):
         for ax, row in zip(axs[:,0], rows):
             ax.set_ylabel(row, rotation=0, size='large')
     #--------------------------------------------
-    
-    #Save subplots
-    #--------------------------------------------
-    fig.savefig(dest)
-    print(f'{dest=}')
-    #--------------------------------------------
+        
+    if dest != None:
+        #Save subplots
+        #--------------------------------------------
+        fig.savefig(dest)
+        print(f'{dest=}')
+        #--------------------------------------------
     
     
 def get_opening_tiff_check(data_dir, position, dest):
@@ -73,7 +74,7 @@ def get_opening_tiff_check(data_dir, position, dest):
     
     
 if sys.argv[1] == 'debug_plot_from_tiff_src':
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_5/MMStack_Pos2.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/jina/raw/2021-06-11-USCKidney_35MaleR86_pseudo_4/HybCycle_5/MMStack_Pos0.ome.tif'
     dest = 'foo2.png'
     
     get_plots_of_tiff_check(tiff_src, dest)
