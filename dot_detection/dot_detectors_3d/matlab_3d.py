@@ -106,7 +106,6 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0] , analysis_name = None, bool_vi
             print(f'{channel=}')
             back_3d = get_shifted_background(background[:, channel], tiff_src, analysis_name)
             tiff_3d = cv2.subtract(tiff_3d, back_3d)
-            tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
             get_back_sub_check(tiff_src, analysis_name, tiff_3d, channel)
         #---------------------------------------------------------------------
         
@@ -116,8 +115,6 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0] , analysis_name = None, bool_vi
         if bool_blob_removal == True:
             tiff_3d = remove_blobs_with_masks_3d(background[:, channel], tiff_3d, tiff_src, analysis_name, channel)
         #---------------------------------------------------------------------
-        
-        print((channel+1), end = " ", flush =True)
         
         #Blur 3d
         #---------------------------------------------------------------------
@@ -150,7 +147,7 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0] , analysis_name = None, bool_vi
         
         #Threshold on Biggest Jump for matlab 3d
         #---------------------------------------------------------------------
-        dot_analysis = get_matlab_detected_dots(tiff_3d_mat_dst, channel, strictness, nbins, threshold, tiff_src, analysis_name)
+        dot_analysis = get_matlab_detected_dots(tiff_3d_mat_dst, channel, strictness, nbins, threshold)
         
         #print(f'{len(dot_analysis[1])=}')
 
@@ -191,21 +188,6 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0] , analysis_name = None, bool_vi
         print(f'{df_tiff.shape=}')
         #----------------------------------------------------------
         
-    #Subtract all z's by 1 because matlab indexing starts at 1
-    #----------------------------------------------------------
-    df_tiff.z = df_tiff.z - 1    
-    df_tiff.x = df_tiff.x - 1
-    df_tiff.y = df_tiff.y - 1    
-    #----------------------------------------------------------
-    
-    #Remove Edges
-    #----------------------------------------------------------
-    df_tiff = df_tiff[(df_tiff.x < tiff.shape[2] - 5 ) 
-                  & (df_tiff.y < tiff.shape[3] - 5)  
-                  & (df_tiff.y > 5) 
-                  & (df_tiff.x > 5)]
-    #----------------------------------------------------------
-    
     #Stack z dots
     #----------------------------------------------------------
     if bool_stack_z_dots:
@@ -223,10 +205,9 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0] , analysis_name = None, bool_vi
     #----------------------------------------------------------
     side_by_side_preprocess_checks(tiff_src, analysis_name)
     #----------------------------------------------------------
-    
-    return df_tiff, tiff
-    
+        
 if 'ipykernel' not in sys.argv[0]:
+    print(f'{sys.argv=}')
     if 'debug' not in sys.argv[1]:
         def str2bool(v):
           return v.lower() == "true"

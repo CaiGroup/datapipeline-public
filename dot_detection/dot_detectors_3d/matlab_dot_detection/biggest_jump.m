@@ -1,4 +1,4 @@
-function [thresh_dots, thresh_ints] = biggest_jump(tiff_ch_mat_src, channel, threshold, nbins, strictness, dest, biggest_jump_fig_dst, varargin)
+function [dots, thresh_ints] = biggest_jump(tiff_ch_mat_src, channel, threshold, nbins, strictness, dest, varargin)
 % Process the image and check the threshold. Find dots using a
 % laplacian filter. Code is usually used for detecting dots for exons as
 % they are not as bright as introns. For 'exons', threshold values are
@@ -61,21 +61,6 @@ function [thresh_dots, thresh_ints] = biggest_jump(tiff_ch_mat_src, channel, thr
         end
     end
     
-    %Get tiff channel
-    %------------------------------------------------------------
-    % tiff_src
-    % tiff= loadometiff(tiff_src, get_pos_from_path(tiff_src));
-    % size(tiff)
-    % mat_channel = channel +1
-    % image = squeeze(tiff(:,mat_channel,:,:));
-    % size(image)
-    % %------------------------------------------------------------
-    
-    % %Resize tiff image
-    % %------------------------------------------------------------
-    % image = permute(image, [3 2 1]);
-    % size(image)
-    %------------------------------------------------------------
     
     tiff_ch_struct = load(tiff_ch_mat_src);
     image = tiff_ch_struct.tiff_ch;
@@ -235,8 +220,58 @@ function [thresh_dots, thresh_ints] = biggest_jump(tiff_ch_mat_src, channel, thr
         intensity(removeDots) = [];
         %-------------------------------------------------------------
         
+        disp('size dots')
+        size(dots)
         
-        [dots, thresh_ints] = biggest_jump_in_cdf(intensity, dots, strictness, nbins, biggest_jump_fig_dst);
+        %Get Biggest Jump Thresh
+        %--------------------------------------------
+        f = figure;
+        hist = histogram(intensity,nbins,'Normalization','cdf');
+        
+        [filepath,name,ext] = fileparts(dest)
+        
+        dst_histogram = fullfile(filepath, 'hist.png')
+        saveas(f, dst_histogram)
+        
+        hist_heights = hist.Values;
+
+        diffs = diff(hist_heights);
+
+        thresh_index = find(diffs==max(diffs));
+        threshs = hist.BinEdges;
+
+        index = thresh_index + strictness;
+        
+        disp('thresh index')
+        thresh_index
+        
+        disp('strictness')
+        strictness
+        
+        disp('threshs')
+        threshs;
+        
+        biggest_jump_thresh = threshs(thresh_index + strictness);
+        %---------------------------------------------
+
+
+        %Get intensities to threshold
+        %---------------------------------------------
+        thresh_ints_bools = intensity > biggest_jump_thresh;
+
+        thresh_ints = intensity(thresh_ints_bools);
+        %---------------------------------------------
+
+        
+        %Remove Dots based off intensities
+        %---------------------------------------------
+        thresh_ints_ind = find(thresh_ints_bools);
+        size_dots = size(dots);
+
+        all_indices = 1:size_dots(1);
+        remove_inds = setdiff(all_indices,thresh_ints_ind);
+        dots(remove_inds, :) = [];
+        %---------------------------------------------
         
         save(dest, 'dots', 'thresh_ints')
 

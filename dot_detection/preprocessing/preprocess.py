@@ -33,7 +33,7 @@ def blur_back_subtract(tiff_2d, kernel_size):
     blurry_img = cv2.blur(tiff_2d, blur_kernel)
     rolling_ball_subtracted_2d = cv2.subtract(tiff_2d, blurry_img)
     
-    rolling_ball_subtracted_2d = np.where(rolling_ball_subtracted_2d == 0, 0, rolling_ball_subtracted_2d)
+    rolling_ball_subtracted_2d = np.where(rolling_ball_subtracted_2d < 0, 0, rolling_ball_subtracted_2d)
     
     return rolling_ball_subtracted_2d
 
@@ -102,7 +102,7 @@ def get_preprocess_check(tiff_src, analysis_name, preprocess_3d, channel, dir_ch
     """
     
     #Only save preprocess check if there is analysis name
-    if analysis_name != None:
+    if analysis_name != None and 'ipykernel' not in sys.argv[0]:
         
         #Split Tiff src
         #------------------------------------------------

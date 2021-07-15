@@ -74,7 +74,7 @@ def get_opening_tiff_check(data_dir, position, dest):
     
     
 if sys.argv[1] == 'debug_plot_from_tiff_src':
-    tiff_src = '/groups/CaiLab/personal/jina/raw/2021-06-11-USCKidney_35MaleR86_pseudo_4/HybCycle_5/MMStack_Pos0.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/jina/raw/2021-06-11-USCKidney_35MaleR86_pseudo_4_shifted/HybCycle_16/MMStack_Pos15.ome.tif'
     dest = 'foo2.png'
     
     get_plots_of_tiff_check(tiff_src, dest)

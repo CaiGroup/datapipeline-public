@@ -67,10 +67,10 @@ def get_gene_to_gene_correlations(count_matrix_src, dst_dir):
 
     #Get Clustered 
     #--------------------------------------------------
-    clustered_corr_plot_dst = os.path.join(dst_dir, 'clustered_corr_plot.png')
-    sns_cluster = sns.clustermap(corr_matrix, metric='canberra')
-    sns_cluster.savefig(clustered_corr_plot_dst)
-    print(f'{clustered_corr_plot_dst=}')
+    # clustered_corr_plot_dst = os.path.join(dst_dir, 'clustered_corr_plot.png')
+    # sns_cluster = sns.clustermap(corr_matrix, metric='canberra')
+    # sns_cluster.savefig(clustered_corr_plot_dst)
+    #print(f'{clustered_corr_plot_dst=}')
     #--------------------------------------------------
 
 if sys.argv[1] == 'debug_corr_matrix_plot':

@@ -235,3 +235,4 @@ if sys.argv[1] == 'debug_cellpose_low_z':
                                             nuclei_channel_num= -1,
                                             num_z = 1)
     print(f'{labeled_img.shape=}')
+

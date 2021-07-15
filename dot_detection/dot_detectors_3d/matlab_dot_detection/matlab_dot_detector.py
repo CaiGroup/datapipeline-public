@@ -32,44 +32,9 @@ def get_dot_analysis(mat_src):
     #-------------------------------------------------------------------
     
     return dot_analysis
-    
-def get_dot_locations_dir(tiff_src, analysis_name, channel):
-    
-    #Split Tiff src
-    #------------------------------------------------
-    all_analyses_dir = '/groups/CaiLab/analyses'
-    
-    splitted_tiff_src = tiff_src.split(os.sep)
-    personal = splitted_tiff_src[4]
-    exp_name = splitted_tiff_src[6]
-    hyb = splitted_tiff_src[-2]
-    pos = tiff_src.split(os.sep)[-1].split('.ome')[0]
-    #------------------------------------------------
-    
-    #Get destination for Dot Locations
-    #------------------------------------------------
-    pos_analysis_dir = os.path.join(all_analyses_dir, personal, exp_name, analysis_name, pos)
-    dot_locations_dir = os.path.join(pos_analysis_dir, 'Dot_Locations')
-    #------------------------------------------------
-    
-    #Get Biggest Jump dst
-    #------------------------------------------------
-    biggest_jump_dir = os.path.join(dot_locations_dir, 'Biggest_Jump_Histograms')
-    os.makedirs(biggest_jump_dir, exist_ok = True)
-    biggest_jump_dst = os.path.join(biggest_jump_dir, hyb + '_channel_' + str(channel) + '.png')
-    #------------------------------------------------
-    
-    return biggest_jump_dst
-    
-    
 
-def get_matlab_detected_dots(tiff_3d_mat_dst, channel, strictness, nbins, threshold, tiff_src, analysis_name):
+def get_matlab_detected_dots(tiff_src, channel, strictness, nbins, threshold):
     
-    
-    #Get Biggest Jump Histograms dst
-    #-------------------------------------------------------------------
-    biggest_jump_dst = get_dot_locations_dir(tiff_src, analysis_name, channel)
-    #-------------------------------------------------------------------
     
     #Create Dest
     #-------------------------------------------------------------------
@@ -80,10 +45,12 @@ def get_matlab_detected_dots(tiff_3d_mat_dst, channel, strictness, nbins, thresh
     
     #Create Paths to add
     #-------------------------------------------------------------------
-    if 'ipykernel' in sys.argv[0]:
-        cwd = '/home/nrezaee/test_cronjob_multi_dot'
-    else:
+    if 'ipykernel' not in sys.argv[0]:
         cwd = os.getcwd()
+    else:
+        cwd = '/home/nrezaee/data-pipeline'
+    
+
     
     bfmatlab_dir = os.path.join(cwd, 'dot_detection', 'dot_detectors_3d', 'matlab_dot_detection', 'bfmatlab')
     functions_dir = os.path.join(cwd, 'dot_detection', 'dot_detectors_3d', 'matlab_dot_detection')
@@ -93,9 +60,9 @@ def get_matlab_detected_dots(tiff_3d_mat_dst, channel, strictness, nbins, thresh
     
     #Create Matlab Command and Call it
     #-------------------------------------------------------------------
-    cmd = """  /software/Matlab/R2019a/bin/matlab -r "addpath('{0}');addpath('{1}');biggest_jump('{2}', {3}, {4}, {5}, {6}, '{7}', '{8}'); quit"; """ 
+    cmd = """  /software/Matlab/R2019a/bin/matlab -r "addpath('{0}');addpath('{1}');biggest_jump('{2}', {3}, {4}, {5}, {6}, '{7}'); quit"; """ 
     
-    cmd = cmd.format(bfmatlab_dir, functions_dir, tiff_3d_mat_dst, channel, threshold, nbins, strictness, dest, biggest_jump_dst)
+    cmd = cmd.format(bfmatlab_dir, functions_dir, tiff_src, channel, threshold, nbins, strictness, dest)
     #tiff_src, channel, threshold, nbins, strictness,
     
     os.system(cmd)

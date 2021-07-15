@@ -553,7 +553,7 @@ def run_analysis(json_name, position):
             analysis.set_tophat_kernel_size_arg(data['tophat kernel size'])
     #----------------------------------------------------------
 
-    #Set Dot Radius
+    #Set Min Sigma
     #----------------------------------------------------
     if 'min sigma dot detection' in data.keys():
         if not data['min sigma dot detection'] == 'none':
@@ -567,13 +567,19 @@ def run_analysis(json_name, position):
             analysis.set_max_sigma_arg(data['max sigma dot detection'])
     #----------------------------------------------------------
     
-    #Set Dot Radius
+    #Set Num Sigma
     #----------------------------------------------------
     if 'num sigma dot detection' in data.keys():
         if not data['num sigma dot detection'] == 'none':
             analysis.set_num_sigma_arg(data['num sigma dot detection'])
     #----------------------------------------------------------
-    
+
+    #Set Remove Extremely Bright dots
+    #----------------------------------------------------
+    if 'remove very bright dots' in data.keys():
+        if not data['remove very bright dots'] == 'none':
+            analysis.set_remove_very_bright_dots_arg(data['remove very bright dots'])
+    #----------------------------------------------------------
     
     #Writ
     #----------------------------------------------------------

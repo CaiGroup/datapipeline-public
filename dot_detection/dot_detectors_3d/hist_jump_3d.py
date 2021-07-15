@@ -100,6 +100,7 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
         tiff_3d = tiff[:, channel,:,:]
         
         if analysis_name != None:
+            
             #Save Raw image to png file
             #---------------------------------------------------------------------
             get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel, 'Raw_Image')

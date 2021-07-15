@@ -190,6 +190,7 @@ class Analysis:
         self.max_sigma_dot_detection = 2
         self.min_sigma_dot_detection = 1
         self.num_sigma_dot_detection = 2
+        self.bool_remove_bright_dots = True
         #--------------------------------------------------------------
         
         
@@ -551,6 +552,11 @@ class Analysis:
         self.num_sigma_dot_detection = float(num_sigma)
         
         print("    Set Num Sigma to", str(self.num_sigma_dot_detection))
+        
+    def set_remove_very_bright_dots_arg(self, bool_remove_bright_dots):
+        self.bool_remove_bright_dots = bool_remove_bright_dots
+        
+        print("    Set Remove Very Bright dots to", str(self.bool_remove_bright_dots))
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
