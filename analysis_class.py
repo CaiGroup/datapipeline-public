@@ -584,7 +584,7 @@ class Analysis:
                                                self.min_weight_adcg, self.final_loss_adcg, self.stack_z_dots, self.background_blob_removal,
                                                self.tophat, self.rolling_ball, self.blur_dot_detection, self.blur_kernel_size, 
                                                self.rolling_ball_kernel_size, self.tophat_kernel_size, self.min_sigma_dot_detection,
-                                               self.max_sigma_dot_detection, self.num_sigma_dot_detection)
+                                               self.max_sigma_dot_detection, self.num_sigma_dot_detection, self.bool_remove_bright_dots)
                                               
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 

@@ -188,8 +188,6 @@ def find_dots(chan_img: np.ndimage) -> Tuple[np.ndarray, np.ndarray, int]:
     points = log_result[:, :2].astype(np.int64)
     intensities = chan_img.transpose()[points[:, 1], points[:, 0]]
 
-    # Suggest dots brighter than 15th percentile of dot intensities
-    #suggested_threshold = int(np.percentile(intensities, 15))
 
     return points, intensities #, suggested_threshold
 

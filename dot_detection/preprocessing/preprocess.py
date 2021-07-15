@@ -103,7 +103,8 @@ def get_preprocess_check(tiff_src, analysis_name, preprocess_3d, channel, dir_ch
     
     #Only save preprocess check if there is analysis name
     if analysis_name != None and 'ipykernel' not in sys.argv[0]:
-        
+        print(f'{sys.argv=}')
+        print('Running the Preprocess Checks and making images')
         #Split Tiff src
         #------------------------------------------------
         all_analyses_dir = '/groups/CaiLab/analyses'

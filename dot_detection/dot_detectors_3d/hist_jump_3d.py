@@ -57,7 +57,7 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
                       strictness = 5, bool_radial_center = False, z_slices = 'all', num_wav = 4, num_z = None, nbins= 100, dot_radius = 1, threshold = .0001, \
                       radius_step = 1, num_radii = 2, bool_stack_z_dots = False, bool_blob_removal = False, bool_rolling_ball = False, bool_tophat = False,
                       bool_blur = False, blur_kernel_size = 5, rolling_ball_kernel_size = 5, tophat_kernel_size = 100, overlap = .5,
-                      min_sigma = 1, max_sigma = 2, num_sigma = 2, rand_dir= '/tmp'):
+                      min_sigma = 1, max_sigma = 2, num_sigma = 2, bool_remove_bright_dots = True, rand_dir= '/tmp'):
 
     
     #Getting Background Src
@@ -156,7 +156,7 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
         #Threshold on Biggest Jump
         #---------------------------------------------------------------------
         dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, \
-                        threshold, min_sigma, max_sigma, num_sigma, overlap))
+                        threshold, min_sigma, max_sigma, num_sigma, overlap, bool_remove_bright_dots))
 
         assert len(dot_analysis[1]) >0, 'No dots where found in image. Try decreasing threshold. (recommended .001)'
         #---------------------------------------------------------------------
@@ -223,7 +223,7 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
     
     #Get side by side checks
     #----------------------------------------------------------
-    if analysis_name != None:
+    if analysis_name != None and 'ipykernel' not in sys.argv[0]:
         side_by_side_preprocess_checks(tiff_src, analysis_name)
     #----------------------------------------------------------
     
@@ -270,6 +270,7 @@ if 'ipykernel' not in sys.argv[0]:
         parser.add_argument("--min_sigma")
         parser.add_argument("--max_sigma")
         parser.add_argument("--num_sigma")
+        parser.add_argument("--bool_remove_bright_dots")
         
         args, unknown = parser.parse_known_args()
         
@@ -329,6 +330,7 @@ if 'ipykernel' not in sys.argv[0]:
                             min_sigma = float(args.min_sigma),
                             max_sigma = float(args.max_sigma),
                             num_sigma = float(args.num_sigma),
+                            bool_remove_bright_dots = str2bool(args.bool_remove_bright_dots),
                             rand_dir = args.rand)
         #----------------------------------------------------------
         
@@ -359,6 +361,7 @@ if 'ipykernel' not in sys.argv[0]:
                             bool_blob_removal = False,
                             bool_rolling_ball = False,
                             bool_tophat = False,
+                            bool_remove_bright_dots = False,
                             rand_dir = '/home/nrezaee/temp')
         
         

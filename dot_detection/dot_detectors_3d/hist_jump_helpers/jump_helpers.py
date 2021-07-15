@@ -50,7 +50,7 @@ def get_hist(intense, strictness, hist_png_path, num_bins):
     
     #Save strictnesses
     #-------------------------------------------------------
-    if hist_png_path != None:
+    if hist_png_path != None and 'ipykernel' not in sys.argv[0]:
         strict_dst =  os.path.join(os.path.dirname(hist_png_path), 'strictnesses.csv')
         save_strictnesses(x, y, thresh, strict_dst) 
     #-------------------------------------------------------
@@ -64,7 +64,7 @@ def get_hist(intense, strictness, hist_png_path, num_bins):
     #Only plot if fid not in path
     #-------------------------------------------------------
     if hist_png_path != None:
-        if 'fid' not in hist_png_path:
+        if 'fid' not in hist_png_path and 'ipykernel' not in sys.argv[0]:
             plt.savefig(hist_png_path)
     #-------------------------------------------------------
     
@@ -241,7 +241,7 @@ def get_hist_png_path(tiff_src, analysis_name):
     return hist_png_path
     
 
-def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, threshold, min_sigma, max_sigma, num_sigma, overlap):
+def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, threshold, min_sigma, max_sigma, num_sigma, overlap, bool_remove_bright_dots):
     """
     Runs hist jump on 3d img
     """
@@ -291,10 +291,11 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, t
         points_threshed, intensities_threshed = apply_thresh(list(dot_analysis), thresh)
         #------------------------------------------------------
         
-        #Apply the reverse threhold to the dots
-        #------------------------------------------------------
-        points_threshed, intensities_threshed = apply_reverse_thresh([points_threshed, intensities_threshed], reverse_threshold)
-        #------------------------------------------------------
+        if bool_remove_bright_dots == True:
+            #Apply the reverse threhold to the dots
+            #------------------------------------------------------
+            points_threshed, intensities_threshed = apply_reverse_thresh([points_threshed, intensities_threshed], reverse_threshold)
+            #------------------------------------------------------
         
         return points_threshed, intensities_threshed
     else:

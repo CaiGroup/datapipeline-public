@@ -47,7 +47,8 @@ class Dot_Detection:
                    radius_step, num_radii, debug_dot_detection, min_weight_adcg, 
                    final_loss_adcg, stack_z_dots, background_blob_removal, tophat, 
                    rolling_ball, blur, blur_kernel_size, rolling_ball_kernel_size, 
-                   tophat_kernel_size, min_sigma_dot_detection, max_sigma_dot_detection, num_sigma_dot_detection):
+                   tophat_kernel_size, min_sigma_dot_detection, max_sigma_dot_detection,
+                   num_sigma_dot_detection, bool_remove_bright_dots):
                 
         self.experiment_name = experiment_name
         self.personal = personal
@@ -87,6 +88,8 @@ class Dot_Detection:
         self.min_sigma = min_sigma_dot_detection
         self.max_sigma = max_sigma_dot_detection
         self.num_sigma = num_sigma_dot_detection
+        
+        self.bool_remove_bright_dots = bool_remove_bright_dots
         
         #Set Directories
         #--------------------------------------------------------------
@@ -503,7 +506,8 @@ class Dot_Detection:
                             '--stack_z_s', self.stack_z_dots, '--back_blob_removal', self.background_blob_removal, 
                             '--rolling_ball', self.rolling_ball, '--tophat', self.tophat, '--blur', self.blur, '--blur_kernel_size', self.blur_kernel_size,
                             '--rolling_ball_kernel_size', self.rolling_ball_kernel_size, '--tophat_kernel_size', self.tophat_kernel_size, 
-                            '--min_sigma', self.min_sigma, '--max_sigma', self.max_sigma, '--num_sigma', self.num_sigma]
+                            '--min_sigma', self.min_sigma, '--max_sigma', self.max_sigma, '--num_sigma', self.num_sigma, 
+                            '--bool_remove_bright_dots', self.bool_remove_bright_dots] 
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
