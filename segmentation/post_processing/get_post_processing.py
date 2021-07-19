@@ -56,7 +56,7 @@ def get_debug():
     
     
     
-def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cyto_channel_num, get_nuclei_img, 
+def get_labeled_imgs(raw_dir, position, segment_results_path, tiff_for_segment, bool_cyto_match, cyto_channel_num, get_nuclei_img, 
                      get_cyto_img, num_wav, nuclei_radius, num_z, flow_threshold, cell_prob_threshold, nuclei_channel_num,
                      cyto_flow_threshold, cyto_cell_prob_threshold, cyto_radius):
     
@@ -68,27 +68,45 @@ def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cy
         #Ignore if you already have the labeled image
         #-------------------------------------------------------------
         if 'Labeled_Images' in tiff_for_segment:
+            print('Using premade Labeled Image for Nuclei')
             labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
             copyfile(tiff_for_segment, labeled_img_path)
-            labeled_cyto_path = None
+        #-------------------------------------------------------------
+        
+        #Get Labeled Image with Cellpose
         #-------------------------------------------------------------
         else:
             labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
             label_img = get_labeled_img_cellpose(tiff_for_segment, dst = labeled_img_path, num_wav = num_wav, nuclei_channel_num = nuclei_channel_num, num_z = num_z)
         
-        labeled_cyto_path = os.path.join(segment_results_path, 'labeled_cyto_img.tif')
-        labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, dst = labeled_cyto_path, cyto_channel = cyto_channel_num, num_wav = num_wav)
+        #Ignore if you already have the labeled image
+        #-------------------------------------------------------------
+        labeled_cyto_dir_path = os.path.join(raw_dir, 'Labeled_Images_Cytoplasm')
+        print(f'{labeled_cyto_dir_path=}')
+        if os.path.exists(labeled_cyto_dir_path):
+            print('Using premade Labeled Image for Cytoplasm')
+            labeled_cyto_path = os.path.join(segment_results_path, 'labeled_img_cyto.tif')
+            already_labeled_image_cyto_path = os.path.join(labeled_cyto_dir_path, position)
+            print(f'{already_labeled_image_cyto_path=}')
+            copyfile(already_labeled_image_cyto_path, labeled_cyto_path)
+        #-------------------------------------------------------------
+        
+        
+        #-------------------------------------------------------------
+        else:
+            labeled_cyto_path = os.path.join(segment_results_path, 'labeled_cyto_img.tif')
+            labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, dst = labeled_cyto_path, cyto_channel = cyto_channel_num, num_wav = num_wav)
+        #-------------------------------------------------------------
     #-------------------------------------------------------------
 
     else:
         
         
-        #Ignore if you already have the labeled image
+        #Ignore if you already have the labeled image for nuclei
         #-------------------------------------------------------------
         if 'Labeled_Images' in tiff_for_segment:
             labeled_img_path = os.path.join(segment_results_path, 'labeled_img.tif')
             copyfile(tiff_for_segment, labeled_img_path)
-            labeled_cyto_path = None
         #-------------------------------------------------------------
         
         # Get nuclei labeled image if true
@@ -102,9 +120,21 @@ def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cy
         #-------------------------------------------------------------
         
         
+        #Ignore if you already have the labeled image for cytoplasm
+        #-------------------------------------------------------------
+        labeled_cyto_dir_path = os.path.join(raw_dir, 'Labeled_Images_Cytoplasm')
+        print(f'{labeled_cyto_dir_path=}')
+        if os.path.exists(labeled_cyto_dir_path):
+            print('Using premade Labeled Image for Cytoplasm')
+            labeled_cyto_path = os.path.join(segment_results_path, 'labeled_img_cyto.tif')
+            already_labeled_image_cyto_path = os.path.join(labeled_cyto_dir_path, position)
+            print(f'{already_labeled_image_cyto_path=}')
+            copyfile(already_labeled_image_cyto_path, labeled_cyto_path)
+        #-------------------------------------------------------------
+        
         #Get Cytoplasm labeled image if true
         #-------------------------------------------------------------
-        if get_cyto_img == True:
+        elif get_cyto_img == True:
             labeled_cyto_path = os.path.join(segment_results_path, 'labeled_cyto_img.tif')
             labeled_cyto = get_labeled_cyto_cellpose(tiff_for_segment, dst = labeled_cyto_path, 
                                 cyto_channel = cyto_channel_num, num_wav = num_wav, 
@@ -114,6 +144,9 @@ def get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, cy
         else:
             labeled_cyto_path = None
         #-------------------------------------------------------------
+        
+        assert labeled_cyto_path != None or labeled_img_path != None 
+        
 
     return labeled_img_path, labeled_cyto_path
     
@@ -172,8 +205,8 @@ def get_tiff_for_segment(tiff_dir, position, num_z):
     #If labeled image is already specified
     #-------------------------------------------------------------
 
-    if bool_labeled_img_dir:
-        
+    #if bool_labeled_img_dir:
+    if bool_labeled_img_dir:    
         #Read in Labeled Image
         #-------------------------------------------------------------
         tiff_for_segment = os.path.join(tiff_dir, 'Labeled_Images', position)
@@ -290,7 +323,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
         labeled_img_path, labeled_cyto_path = get_debug()
         
     else:
-        labeled_img_path, labeled_cyto_path = get_labeled_imgs(segment_results_path, tiff_for_segment, bool_cyto_match, 
+        labeled_img_path, labeled_cyto_path = get_labeled_imgs(tiff_dir, position, segment_results_path, tiff_for_segment, bool_cyto_match, 
                                                 cyto_channel_num, get_nuclei_img, get_cyto_img, num_wav, nuclei_radius, 
                                                 num_z, flow_threshold, cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold,
                                                 cyto_cell_prob_threshold, cyto_radius)
@@ -327,7 +360,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
         print("Running Nuccy Match")
         nuclei_dst = os.path.join(segment_results_path, 'nuclei_labeled_img_matched.tif')
         cyto_dst = os.path.join(segment_results_path, 'cyto_labeled_img_matched.tif')
-        get_matched_3d_img(labeled_img_path, labeled_cyto_path, area_tol, post_process_dir, nuclei_dst, cyto_dst)
+        get_matched_3d_img(labeled_img_path, labeled_cyto_path, area_tol, post_process_dir, segment_results_path, nuclei_dst, cyto_dst)
         
         return nuclei_dst
     
@@ -345,7 +378,61 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     #-------------------------------------------------------------
 
 
-    
+if sys.argv[1] == 'debug_post_labeled_cyto':
+    print('=---------------------------------------')
+    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/test1-big'
+    segment_results_path = '/home/nrezaee/temp2'
+    position  = 'MMStack_Pos0.ome.tif'
+    edge = 0
+    dist = 0
+    bool_cyto_match = False
+    area_tol = 1
+    debug = False
+    cyto_channel_num = 1
+    get_nuc = True
+    get_cyto = True
+    num_z=2
+    num_wav=4
+    nuclei_radius = 0
+    cell_prob_threshold= .5
+    flow_threshold = .5
+    nuclei_channel_num = -1
+    cyto_flow_threshold = 0
+    cyto_cell_prob_threshold = 0
+    cyto_radius = 10
+    save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol, 
+                cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold, 
+                cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold, 
+                cyto_radius = 10, debug=debug)
+                
+if sys.argv[1] == 'debug_post_labeled_cyto_lex':
+    print('=---------------------------------------')
+    tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3'
+    segment_results_path = '/home/nrezaee/temp2'
+    position  = 'MMStack_Pos0.ome.tif'
+    edge = 0
+    dist = 0
+    bool_cyto_match = False
+    area_tol = 1
+    debug = False
+    cyto_channel_num = 1
+    get_nuc = True
+    get_cyto = True
+    num_z=2
+    num_wav=4
+    nuclei_radius = 0
+    cell_prob_threshold= .5
+    flow_threshold = .5
+    nuclei_channel_num = -1
+    cyto_flow_threshold = 0
+    cyto_cell_prob_threshold = 0
+    cyto_radius = 10
+    save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol, 
+                cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold, 
+                cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold, 
+                cyto_radius = 10, debug=debug)
+
+
 if sys.argv[1] == 'debug_post':
     print('=---------------------------------------')
     tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/'
@@ -353,7 +440,7 @@ if sys.argv[1] == 'debug_post':
     position  = 'MMStack_Pos1.ome.tif'
     edge = 8
     dist = 2
-    bool_cyto_match = False
+    bool_cyto_match = True
     area_tol = 1
     debug = False
     cyto_channel_num = 1
@@ -399,6 +486,7 @@ if sys.argv[1] == 'debug_post_michal':
                 cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold, 
                 cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold, 
                 cyto_radius = 10, debug=debug)
+
 
     
     

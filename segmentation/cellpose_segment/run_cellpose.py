@@ -17,7 +17,6 @@ from clustering.initial_clustering import basic_clustering
 
 def run_me(tiff_dir, segment_results_path, decoded_genes_src, barcode_key_src, position, label_img):
     
-    
     #Get Gene List
     #------------------------------------------------------------------
     df_gene_list = pd.read_csv(decoded_genes_src).rename({'geneID': 'gene'}, axis='columns')
@@ -25,6 +24,7 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, barcode_key_src, p
     
     #Assign genes to cells
     #-------------------------------------------
+    print('Getting Genes Assigned to Cells')
     print(f'{label_img.shape=}')
     df_gene_list_assigned_cell = cellpose_segment_funcs.assign_to_cells(df_gene_list, label_img)
     
@@ -35,19 +35,9 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, barcode_key_src, p
     #-------------------------------------------
     
     
-    #Get Cell Info
-    #-------------------------------------------
-    df_cell_info = cellpose_segment_funcs.get_cell_info(label_img)
-    
-
-    df_cell_info_path = os.path.join(segment_results_path, 'cell_info.csv')
-    print(f'{df_cell_info_path=}')    
-    df_cell_info.to_csv(df_cell_info_path)
-    #-------------------------------------------
-    
-    
     #Get Gene Cell Matrix (Count Matrix)
     #-------------------------------------------
+    print('Getting Gene Cell Matrix')
     df_gene_cell_matrix = cellpose_segment_funcs.get_gene_cell_matrix(df_gene_list_assigned_cell, label_img)
     df_gene_cell_matrix_path = os.path.join(segment_results_path, 'count_matrix.csv')
     print(f'{df_gene_cell_matrix_path=}')
@@ -58,6 +48,7 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, barcode_key_src, p
     
     #Plot Genes Assigned to Cell
     #-------------------------------------------
+    print('Getting Plot of Genes Assigned to Cell')
     plot_dst = os.path.join(segment_results_path, 'Genes_Assigned_to_Cells_Plotted.png')
     
     cellpose_segment_funcs.get_plotted_assigned_genes(df_gene_list_assigned_cell_path, plot_dst, label_img)
@@ -70,6 +61,7 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, barcode_key_src, p
     
     #Get Count Matrix Analytics
     #-------------------------------------------
+    print('Getting Count Matrices')
     png_dst = os.path.join(segment_results_path, "Number_Of_Barcodes_Per_Cell_Plot.png")
     count_matrix_analytics.save_plot_of_number_of_barcodes_per_cell(df_gene_cell_matrix_path, png_dst)
     print(f'{png_dst=}')
@@ -79,7 +71,16 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, barcode_key_src, p
     print(f'{txt_dst=}')
     #-------------------------------------------
     
+    #Get Cell Info
+    #-------------------------------------------
+    print('Getting Cell INfo')
+    df_cell_info = cellpose_segment_funcs.get_cell_info(label_img)
     
+
+    df_cell_info_path = os.path.join(segment_results_path, 'cell_info.csv')
+    print(f'{df_cell_info_path=}')    
+    df_cell_info.to_csv(df_cell_info_path)
+    #-------------------------------------------    
     
 if sys.argv[1] == 'debug_run_cellpose':
     
@@ -94,6 +95,22 @@ if sys.argv[1] == 'debug_run_cellpose':
     labeled_img = tifffile.imread(labeled_img_src)
     
     run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)
+    
+if sys.argv[1] == 'debug_run_cellpose_lex':
+    
+    tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/'
+    segmented_dst_dir = '/home/nrezaee/test_cronjob_multi_dot/foo/cellpose_test'
+    os.makedirs(segmented_dst_dir, exist_ok=True)
+    
+    decoded_genes_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug4/MMStack_Pos0/Segmentation/gene_locations_assigned_to_cell.csv'
+    position = 'MMStack_Pos0.ome.tif'
+    barcode_key_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug4/BarcodeKey/barcode.csv'
+    
+    labeled_img_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug4/MMStack_Pos0/Segmentation/labeled_img_post.tif'
+    labeled_img = tifffile.imread(labeled_img_src)
+    
+    run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)
+    
     
 if sys.argv[1] == 'debug_run_cellpose_non_barcoded':
     

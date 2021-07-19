@@ -70,7 +70,7 @@ def get_temp_dir():
     return temp_dir
     
     
-def get_matched_3d_img(nuclei_3d_src, cyto_2d_src, area_tol, post_process_dir, nuclei_dst = None, cyto_dst = None):
+def get_matched_3d_img(nuclei_3d_src, cyto_2d_src, area_tol, post_process_dir, segment_results_path, nuclei_dst = None, cyto_dst = None):
 
     temp_dir = get_temp_dir()
 
@@ -115,6 +115,13 @@ def get_matched_3d_img(nuclei_3d_src, cyto_2d_src, area_tol, post_process_dir, n
     if cyto_dst != None:
         print(f'{cyto_labeled_img.shape=}')
         imageio.imwrite(cyto_dst, cyto_matched)
+    #------------------------------------------------
+    
+    
+    #Copy nuclei match to labele_img_post.tif
+    #------------------------------------------------
+    labeled_img_post_dst = os.path.join(segment_results_path, 'labeled_img_post.tif')
+    shutil.copyfile(nuclei_dst, labeled_img_post_dst)
     #------------------------------------------------
         
     #Remove temp dir

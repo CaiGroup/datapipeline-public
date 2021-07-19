@@ -57,7 +57,7 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
                       strictness = 5, bool_radial_center = False, z_slices = 'all', num_wav = 4, num_z = None, nbins= 100, dot_radius = 1, threshold = .0001, \
                       radius_step = 1, num_radii = 2, bool_stack_z_dots = False, bool_blob_removal = False, bool_rolling_ball = False, bool_tophat = False,
                       bool_blur = False, blur_kernel_size = 5, rolling_ball_kernel_size = 5, tophat_kernel_size = 100, overlap = .5,
-                      min_sigma = 1, max_sigma = 2, num_sigma = 2, bool_remove_bright_dots = True, rand_dir= '/tmp'):
+                      min_sigma = 1, max_sigma = 2, num_sigma = 2, bool_remove_bright_dots = True, rand_dir= None):
 
     
     #Getting Background Src
@@ -214,12 +214,13 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
                   & (df_tiff.x > 5)]
     #----------------------------------------------------------
     
-    #Save to csv file
-    #----------------------------------------------------------
-    csv_path = os.path.join(rand_dir, 'locs.csv')
-    print(f'{csv_path=}')
-    df_tiff.to_csv(csv_path, index=False)
-    #----------------------------------------------------------
+    if rand_dir != None:
+        #Save to csv file
+        #----------------------------------------------------------
+        csv_path = os.path.join(rand_dir, 'locs.csv')
+        print(f'{csv_path=}')
+        df_tiff.to_csv(csv_path, index=False)
+        #----------------------------------------------------------
     
     #Get side by side checks
     #----------------------------------------------------------
@@ -227,7 +228,7 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
         side_by_side_preprocess_checks(tiff_src, analysis_name)
     #----------------------------------------------------------
     
-    return df_tiff, tiff
+    return df_tiff, tiff, tiff_3d
 
 if 'ipykernel' not in sys.argv[0]:
     print(f'{sys.argv=}')
@@ -361,8 +362,7 @@ if 'ipykernel' not in sys.argv[0]:
                             bool_blob_removal = False,
                             bool_rolling_ball = False,
                             bool_tophat = False,
-                            bool_remove_bright_dots = False,
-                            rand_dir = '/home/nrezaee/temp')
+                            bool_remove_bright_dots = False)
         
         
     

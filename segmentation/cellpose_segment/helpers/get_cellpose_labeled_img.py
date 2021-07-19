@@ -151,6 +151,14 @@ def expand_img(masked_file_path, tiff, dst):
     #---------------------------------------------------------------------------
 
 def get_3d_from_2d(src, num_z):
+    
+    
+    #Case where num_z is 1
+    #---------------------------------------------------------------------------
+    if num_z == 1:
+        num_z = 2
+    #---------------------------------------------------------------------------
+    
     #Stack 2d into 3d
     #---------------------------------------------------------------------------
     tiff_2d = tf.imread(src)
@@ -235,4 +243,14 @@ if sys.argv[1] == 'debug_cellpose_low_z':
                                             nuclei_channel_num= -1,
                                             num_z = 1)
     print(f'{labeled_img.shape=}')
+
+elif sys.argv[1] == 'debug_cellpose_michal':
+    labeled_img = get_labeled_img_cellpose(tiff_path = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_pool1/HybCycle_9/MMStack_Pos1.ome.tif',
+                                            num_wav = 4,
+                                            dst = '/home/nrezaee/temp/labeled_img_thresh_4.tif',
+                                            nuclei_radius=20,
+                                            nuclei_channel_num= -1,
+                                            num_z = 1)
+    print(f'{labeled_img.shape=}')
+
 

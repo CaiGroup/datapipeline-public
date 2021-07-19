@@ -114,8 +114,8 @@ def get_plotted_assigned_genes(assigned_genes_csv_src, dst, label_img):
     for cell in cellIDs:
         
         df_genes_cell = df_genes[df_genes.cellID == cell]
-        plt.xlim((0,2048))
-        plt.ylim((0,2048))
+        plt.xlim((0, label_img.shape[1]))
+        plt.ylim((0, label_img.shape[2]))
         plt.scatter(list(df_genes_cell.x), list(df_genes_cell.y), s = 1)
     #-------------------------------------------------
     
@@ -283,6 +283,30 @@ def add_empty_cells(df_gene_cell, labels):
     
     return df_gene_cell_all_sorted
 
+def get_count_matrix(df_gene_list):
+   
+    #I found a one liner to get the count matrix lolololololololol
+    #--------------------------------------------
+    df_count_matrix = pd.crosstab(index=df_gene_list['gene'], columns=df_gene_list['cellID'])
+    #--------------------------------------------
+        
+    #Clean up the indexes
+    #--------------------------------------------
+    df_count_matrix_reset_index = df_count_matrix.reset_index()
+    df_count_matrix_reset_index.columns.name = None
+    #--------------------------------------------
+    
+    #Add Cell to column names
+    #--------------------------------------------
+    column_list = list(df_count_matrix_reset_index.columns)
+    cell_column_list = ['cell_' + str(cell_num) for cell_num in column_list if type(cell_num) != str]
+    cell_column_list_with_gene = ['gene'] + cell_column_list
+
+    df_count_matrix_reset_index.columns = cell_column_list_with_gene
+    #--------------------------------------------
+    
+    return df_count_matrix_reset_index
+    
 def get_gene_cell_matrix(df_gene_list, labeled_img):
     """
     Inputs:
@@ -291,55 +315,10 @@ def get_gene_cell_matrix(df_gene_list, labeled_img):
     Outputs:
         count_matrix
     """
-
-    # keep all cells > 0
+    
+    #Get count matrix
     # ---------------------------------------------------------------------
-    keep = df_gene_list['cellID'] > 0
-    df_keep = df_gene_list[keep]
-    # ---------------------------------------------------------------------
-
-    # unique gene dict and add to df
-    # ---------------------------------------------------------------------
-    dict_keep = {"gene": df_keep.gene.unique()}
-    df_gene_cell = pd.DataFrame.from_dict(dict_keep)
-    # ---------------------------------------------------------------------
-
-    # get and sort all unique cellIDs
-    # ---------------------------------------------------------------------
-    u_cell = df_keep.cellID.unique()
-    u_cell = np.sort(u_cell)
-    # ---------------------------------------------------------------------
-
-    # Convert to list
-    u_cell_list = u_cell.tolist()
-    # Dictionary with index as value for correct column
-    #  note: cells with 0 counts in all genes are excluded -> need to reindex
-    cell_index = {val: idx + 1 for idx, val in enumerate(u_cell_list)}
-    # ---------------------------------------------------------------------
-
-    # print columns for each unique cell, set = 0
-    # ---------------------------------------------------------------------
-    for cell in u_cell:
-        str_cell = 'cell_' + cell.astype(str)
-        df_gene_cell[str_cell] = 0
-    # ---------------------------------------------------------------------
-
-    # loop through each gene, retrieve counts for each cellID
-    # ---------------------------------------------------------------------
-    num_rows = df_gene_cell.shape[0]
-    for i in range(num_rows):
-        # get each gene ID
-        gene_name = df_gene_cell["gene"].iloc[i]
-
-        # get all cells from df_keep
-        df_section = df_keep[df_keep["gene"] == gene_name]
-
-        # group by cell
-        df_cell = df_section.groupby("cellID")
-
-        # for each cell_id, add the number of points in the group
-        for cell_id, group in df_cell:
-            df_gene_cell.iloc[i, cell_index[cell_id]] += group.shape[0]
+    df_gene_cell = get_count_matrix(df_gene_list)
     # ---------------------------------------------------------------------
     
     #Add Cells that do not have genes
