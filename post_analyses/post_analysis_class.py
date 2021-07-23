@@ -85,14 +85,27 @@ class Post_Analyses:
         #RUn for Segmentation
         #----------------------------------------------------------------------------------
         if self.segmentation != False:
+            
+            #Get decoded genes
+            #----------------------------------------------------------------------------------
             genes_assigned_to_cell_src = os.path.join(self.position_dir, 'Segmentation', 'gene_locations_assigned_to_cell.csv')
-    
+            #----------------------------------------------------------------------------------
+                
+            #Set destination
+            #----------------------------------------------------------------------------------
             if not os.path.exists(self.false_pos_dir):
                 os.makedirs(self.false_pos_dir)
                 
             dst_file_path = os.path.join(self.false_pos_dir, 'false_positives_after_segmentation.txt')
+            #----------------------------------------------------------------------------------
             
-            get_false_pos_rate_post_seg(genes_assigned_to_cell_src, dst_file_path)
+            #Get barcodes
+            #----------------------------------------------------------------------------------    
+            on_barcode_path = os.path.join(self.barcode_key_src, 'barcode.csv')
+            off_barcode_path = os.path.join(self.barcode_key_src, 'fake_barcode.csv')
+            #----------------------------------------------------------------------------------
+            
+            get_false_pos_rate_post_seg(genes_assigned_to_cell_src, on_barcode_path, off_barcode_path, dst_file_path)
         #----------------------------------------------------------------------------------
     #--------------------------------------------------------------------------------
     
@@ -184,7 +197,19 @@ if sys.argv[1] == 'debug_post_analyses_class':
     
     post_analysis.run_false_positive_rate_analysis_indiv()
     
+if sys.argv[1] == 'debug_post_analyses_class_across':
+    print('Debugging')
+    post_analysis = Post_Analyses(position_dir = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/071621_matlabdotdetection/MMStack_Pos1/', 
+                                false_pos_dir = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/071621_matlabdotdetection/MMStack_Pos1/False_Positive_Rate_Analysis/', 
+                                seg_dir = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/071621_matlabdotdetection/MMStack_Pos1/Segmentation/',
+                                hamming_dir = None,
+                                bool_fake_barcodes = True, 
+                                barcode_key_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/071621_matlabdotdetection/BarcodeKey/', 
+                                num_zslices= None, 
+                                segmentation = 'cellpose', 
+                                channels = None)
     
+    post_analysis.run_false_positive_rate_analysis_across()
     
     
     

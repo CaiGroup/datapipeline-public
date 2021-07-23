@@ -11,35 +11,9 @@ import pandas as pd
 from read_roi import read_roi_zip
 
 
-def get_labeled_img(roi_src, num_z=30, upto_cell=1000000000000):
-    roi = read_roi_zip(roi_src)
-    while len(roi) > upto_cell:
-        roi.popitem()
-    # convert polygon vertices to labeled image for each cell
-    # ---------------------------------------------------------------------
-    label_img = np.zeros((2048, 2048, num_z), dtype=np.uint8)
-    cell_id = 1
-
-    # Create polygon from vertices
-    # ---------------------------------------------------------------------
-    for key in roi:
-        # get x, y indices of polygon
-        r = roi[key]['y']
-        c = roi[key]['x']
-
-        # make polygon
-        rr, cc = polygon(r, c)
-        label_img[rr, cc, :] = cell_id
-        cell_id += 1
-    # ---------------------------------------------------------------------
-
-    return label_img
-
-
 def get_dot_analysis_for_channel(locs_ch, labeled_img):
     
-    # np.save('locs_ch_1000.npy', locs_ch)
-    # np.save('labeled_img_1000.npy', labeled_img)
+
     print(f'{labeled_img.shape=}')
     points = locs_ch[0]
     intensities = locs_ch[1]
@@ -58,7 +32,7 @@ def get_dot_analysis_for_channel(locs_ch, labeled_img):
         if x < labeled_img.shape[1] and x >= 0 and \
             y < labeled_img.shape[2] and y >= 0 and \
             z < labeled_img.shape[0] and z >= 0:
-            seg_dict[labeled_img[z, x, y]].append(i)
+            seg_dict[labeled_img[z, y, x]].append(i)
     #---------------------------------------------
     
 
@@ -104,45 +78,63 @@ def save_plotted_cell(labeled_img, seg_dict_channel, fig_dest):
             print(f'{points.shape=}')
             print(f'{points[:2]=}')
             
-            plt.scatter(points[:,1][:100], points[:,0][:100], s=10)
+            plt.scatter(points[:,0][:100000], points[:,1][:100000], s=10)
             print(f'{fig_dest=}')
         
     plt.savefig(fig_dest)
         
 
 def get_points_from_csv(locs_csv_src):
+    
+    #Read in points csv
+    #----------------------------------------------
     my_points = pd.read_csv(locs_csv_src)
+    #----------------------------------------------
+    
+    #Get unique hybs and channels
+    #----------------------------------------------
     hybs = my_points.hyb.unique()
     print(f'{hybs=}')
     chs = my_points.ch.unique()
     print(f'{chs=}')
+    #----------------------------------------------
 
+    #Get Locs list of hyb and channels
+    #----------------------------------------------
     locs = []
     for hyb in hybs:
         for ch in chs:
             locs_ch = my_points[(my_points.hyb == hyb) & (my_points.ch == ch)]
-            # all_points.append(np.array(locs_ch[['x','y','z']]))
-            # all_intensities.append(np.array(locs_ch[['int']]))
             locs.append([ np.array(locs_ch[['x','y','z']]), np.array(locs_ch[['int']])])
-            
+    #----------------------------------------------
+    
     return locs
     
 def get_segmentation_dict_dots(locations_src, labeled_img, fig_dest):
 
+    #Get locs list of hybs and channels
+    #----------------------------------------------
     locs = get_points_from_csv(locations_src)
+    #----------------------------------------------
 
-    #Get Segmented Dictionary
+    #Set initial variables
     #----------------------------------------------
     all_seg_dict = {}
     check_if_first_channel = 0
     i = 0
+    #----------------------------------------------
+    
     #Go through Each Channel
+    #----------------------------------------------
     for locs_ch in locs:
         print(f'{i=}')
-
+        
+        
+        #----------------------------------------------
         seg_dict_channel = get_dot_analysis_for_channel(locs_ch, labeled_img)
+        #----------------------------------------------
         #print(f'{np.unique(labeled_img)=}')
-        print(f'{len(seg_dict_channel[0])=}')
+        print(f'{len(seg_dict_channel[i])=}')
         if i == 1:
             print('Plotting')
             #fig_dest = 'plotted_cells.png'

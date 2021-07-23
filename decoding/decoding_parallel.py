@@ -25,13 +25,13 @@ print(f'{sys.argv=}')
 
 if sys.argv[1] == 'debug_parallel':
     os.chdir('decoding')
-    from helpers.parallel.seg_locs import get_segmentation_dict_dots, get_labeled_img
+    from helpers.parallel.seg_locs import get_segmentation_dict_dots
     from helpers.parallel.rand_list import are_jobs_finished, get_random_list
     from helpers.parallel.combine_csv_s import get_combined_csv
     os.chdir('../')
     print(f'{os.getcwd()=}')
 else:
-    from decoding.helpers.parallel.seg_locs import get_segmentation_dict_dots, get_labeled_img
+    from decoding.helpers.parallel.seg_locs import get_segmentation_dict_dots
     from decoding.helpers.parallel.rand_list import are_jobs_finished, get_random_list
     from decoding.helpers.parallel.combine_csv_s import get_combined_csv
 

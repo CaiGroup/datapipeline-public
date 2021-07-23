@@ -116,7 +116,7 @@ def get_plotted_assigned_genes(assigned_genes_csv_src, dst, label_img):
         df_genes_cell = df_genes[df_genes.cellID == cell]
         plt.xlim((0, label_img.shape[1]))
         plt.ylim((0, label_img.shape[2]))
-        plt.scatter(list(df_genes_cell.x), list(df_genes_cell.y), s = 1)
+        plt.scatter(list(df_genes_cell.y), list(df_genes_cell.x), s = 1)
     #-------------------------------------------------
     
     #Save figure
@@ -182,7 +182,7 @@ def assign_to_cells(df_gene_list, label_img):
         print(z.head())
         print(x.head())
         print(y.head())
-        df_gene_list['cellID'] = label_img[z, x, y]
+        df_gene_list['cellID'] = label_img[z, y, x]
     else:
         df_gene_list['cellID'] = label_img[x, y]
     # ---------------------------------------------------------------------

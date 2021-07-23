@@ -4,7 +4,16 @@ import sys
 import os
 
 sys.path.insert(0, os.getcwd())
-from .util import pil_imread
+try:
+    from util import pil_imread
+except:
+    pass
+
+try:
+    from load_tiff.util import pil_imread
+except:
+    pass
+
 
 def load(tiff_src, num_wav=4, num_z=None, swapaxes = True):    
 
@@ -12,12 +21,26 @@ def load(tiff_src, num_wav=4, num_z=None, swapaxes = True):
     print(f'{tiff_src=}')
     
     try:
+        #Read with Lincoln's function
+        #---------------------------------------------------------------------
         print("Reading with Lincoln's pil_imread")
         tiff = pil_imread(tiff_src, swapaxes=swapaxes)
-
+        #---------------------------------------------------------------------
+        
+        #Switch 1z if it is mixed up
+        #---------------------------------------------------------------------
         if tiff.shape[1] == 1:
             print('Swapping axes')
             tiff = np.swapaxes(tiff, 0, 1)
+        #---------------------------------------------------------------------
+        
+        #Check if channel and z need to be switched
+        #---------------------------------------------------------------------
+        if tiff.shape[1] != num_wav:
+            if tiff.shape[0] == num_wav:
+                tiff = np.swapaxes(tiff, 0, 1)
+        
+        #---------------------------------------------------------------------
             
         
     except Exception as e:
@@ -88,6 +111,16 @@ if sys.argv[1] == 'debug_load_tiff':
     tiff_src = '/groups/CaiLab/personal/Lex/raw/20k_dash_062421_brain/segmentation/MMStack_Pos0.ome.tif'
     num_wav = 2
     num_z = 1
+    
+    tiff = load(tiff_src, num_wav, num_z)
+    
+    print(f'{tiff.shape=}')
+    
+if sys.argv[1] == 'debug_load_tiff_takei':
+    
+    tiff_src = '/groups/CaiLab/personal/Yodai/raw/2021-03-30-E14-100k-DNAfull-rep2-laminB1-H3K27me3-DAPI-H4K20me3/HybCycle_0/MMStack_Pos0.ome.tif'
+    num_wav = 4
+    num_z = None
     
     tiff = load(tiff_src, num_wav, num_z)
     

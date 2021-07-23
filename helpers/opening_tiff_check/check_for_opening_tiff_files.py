@@ -8,11 +8,11 @@ sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
 from load_tiff import tiffy
 
 
-def get_plots_of_tiff_check(tiff_src, dest = None):
+def get_plots_of_tiff_check(tiff_src, num_wav, dest = None):
 
     #Read in tiff file
     #--------------------------------------------
-    tiff = tiffy.load(tiff_src, dest)
+    tiff = tiffy.load(tiff_src, num_wav, dest)
     print(f'{tiff.shape=}')
     #--------------------------------------------
     
@@ -49,7 +49,7 @@ def get_plots_of_tiff_check(tiff_src, dest = None):
         #--------------------------------------------
     
     
-def get_opening_tiff_check(data_dir, position, dest):
+def get_opening_tiff_check(data_dir, position, num_wav, dest):
     
     #Make directory that dest is in
     #--------------------------------------------
@@ -69,15 +69,16 @@ def get_opening_tiff_check(data_dir, position, dest):
     
     #Get Plots for tiff check
     #--------------------------------------------
-    get_plots_of_tiff_check(tiff_for_check_src, dest)
+    get_plots_of_tiff_check(tiff_for_check_src, num_wav, dest)
     #--------------------------------------------
     
     
 if sys.argv[1] == 'debug_plot_from_tiff_src':
-    tiff_src = '/groups/CaiLab/personal/jina/raw/2021-06-11-USCKidney_35MaleR86_pseudo_4_shifted/HybCycle_10/MMStack_Pos15.ome.tif'
+    tiff_src = '/groups/CaiLab/personal/Yodai/raw/2021-03-30-E14-100k-DNAfull-rep2-laminB1-H3K27me3-DAPI-H4K20me3/HybCycle_0/MMStack_Pos0.ome.tif'
     dest = 'foo2.png'
+    num_wav = 4
     
-    get_plots_of_tiff_check(tiff_src, dest)
+    get_plots_of_tiff_check(tiff_src, num_wav, dest)
 
 if sys.argv[1] == 'debug_tiff_check':
     

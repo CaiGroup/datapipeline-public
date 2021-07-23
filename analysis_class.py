@@ -735,7 +735,7 @@ class Analysis:
         #--------------------------------------------------------------------------------
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Open Tiff Check')
         dest = os.path.join(self.position_dir, 'Open_Tiff_Check', 'Plots_of_all_tiff_slices.png')
-        get_opening_tiff_check(self.data_dir, self.position, dest)
+        get_opening_tiff_check(self.data_dir, self.position, self.num_wav, dest)
         timer_tools.logg_elapsed_time(self.start_time, 'Ending Open Tiff Check')
         #--------------------------------------------------------------------------------
         
