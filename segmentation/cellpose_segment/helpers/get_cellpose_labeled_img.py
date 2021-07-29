@@ -1,4 +1,4 @@
-  
+
 import argparse
 import subprocess
 import tifffile
@@ -86,7 +86,7 @@ def submit_seg_job(rand_dir, rand_list, num_z, nuclei_radius, flow_threshold, ce
 
     #Set command and default params
     #---------------------------------------------------------------------------
-    sing_and_cellpose_cmd = 'singularity  exec --bind /central/scratch/$USER,/groups/CaiLab/personal/temp --nv /groups/CaiLab/personal/lincoln/tensorflow-20.02-tf1-py3.sif python -m cellpose '
+    sing_and_cellpose_cmd = 'singularity  exec --bind /central/scratch/$USER,/groups/CaiLab/personal/temp,/groups/CaiLab/personal/lincoln/py3.6_local_install:/home/$USER/.local/ --nv /groups/CaiLab/personal/lincoln/tensorflow-20.02-tf1-py3.sif python -m cellpose '
     default_params = ' --img_filter dapi_channel --pretrained_model cyto --use_gpu --no_npy --save_tif --dir '
     import time; time.sleep(1)
     #---------------------------------------------------------------------------
@@ -151,14 +151,14 @@ def expand_img(masked_file_path, tiff, dst):
     #---------------------------------------------------------------------------
 
 def get_3d_from_2d(src, num_z):
-    
-    
+
+
     #Case where num_z is 1
     #---------------------------------------------------------------------------
     if num_z == 1:
         num_z = 2
     #---------------------------------------------------------------------------
-    
+
     #Stack 2d into 3d
     #---------------------------------------------------------------------------
     tiff_2d = tf.imread(src)
