@@ -14,6 +14,7 @@ import time
 import shutil
 import tifffile as tf
 
+USER = os.getenv('USER')
 sys.path.insert(0, os.getcwd())
 from helpers.rand_list import get_random_list, are_jobs_finished
 from load_tiff import tiffy
@@ -86,7 +87,8 @@ def submit_seg_job(rand_dir, rand_list, num_z, nuclei_radius, flow_threshold, ce
 
     #Set command and default params
     #---------------------------------------------------------------------------
-    sing_and_cellpose_cmd = 'singularity  exec --bind /central/scratch/$USER,/groups/CaiLab/personal/temp,/groups/CaiLab/personal/lincoln/py3.6_local_install:/home/$USER/.local/ --nv /groups/CaiLab/personal/lincoln/tensorflow-20.02-tf1-py3.sif python -m cellpose '
+    bind_paths = f'/central/scract/{USER},/groups/CaiLab/personal/temp,/home/lombelet/.local/lib/python3.6/site-packages:/usr/lib/python3.6/site-packages'
+    sing_and_cellpose_cmd = f'singularity  exec --bind {bind_paths} --nv /groups/CaiLab/personal/lincoln/tensorflow-20.02-tf1-py3.sif python -m cellpose '
     default_params = ' --img_filter dapi_channel --pretrained_model cyto --use_gpu --no_npy --save_tif --dir '
     import time; time.sleep(1)
     #---------------------------------------------------------------------------
