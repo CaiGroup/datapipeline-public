@@ -19,7 +19,7 @@ from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_
 from dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
 from dot_detection.preprocessing.preprocess import preprocess_img, get_preprocess_check
 from dot_detection.preprocessing.get_before_dot_detection_plots import side_by_side_preprocess_checks
-from dot_detection.preprocessing.preprocess import get_preprocess_check, tophat_3d, blur_back_subtract_3d, blur_3d
+from dot_detection.preprocessing.preprocess import get_preprocess_check, tophat_3d, blur_back_subtract_3d, blur_3d, dilate_3d
 
 
 warnings.filterwarnings("ignore")
@@ -56,8 +56,9 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
                       bool_background_subtraction = False, channels_to_detect_dots = [0], bool_chromatic = False, bool_gaussian_fitting = False, \
                       strictness = 5, bool_radial_center = False, z_slices = 'all', num_wav = 4, num_z = None, nbins= 100, dot_radius = 1, threshold = .0001, \
                       radius_step = 1, num_radii = 2, bool_stack_z_dots = False, bool_blob_removal = False, bool_rolling_ball = False, bool_tophat = False,
-                      bool_blur = False, blur_kernel_size = 5, rolling_ball_kernel_size = 5, tophat_kernel_size = 100, overlap = .5,
-                      min_sigma = 1, max_sigma = 2, num_sigma = 2, bool_remove_bright_dots = True, rand_dir= None):
+                      bool_tophat_raw_data = False, bool_blur = False, blur_kernel_size = 5, rolling_ball_kernel_size = 5, tophat_kernel_size = 100, 
+                      tophat_raw_data_kernel_size = 0, overlap = .5, min_sigma = 1, max_sigma = 2, num_sigma = 2, bool_remove_bright_dots = True, 
+                      dilate_background_kernel_size = 0, rand_dir= None):
 
     
     #Getting Background Src
@@ -81,7 +82,7 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
     
     tiff_shape = tiff.shape
     #---------------------------------------------------------------------
-
+    
 
     df_tiff = pd.DataFrame(columns = ['hyb','ch', 'x', 'y', 'z', 'int'])
         
@@ -106,6 +107,16 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
             get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel, 'Raw_Image')
             #---------------------------------------------------------------------
 
+        
+        #Run Tophat
+        #---------------------------------------------------------------------
+        print(f'{tophat_raw_data_kernel_size=}')
+        if tophat_raw_data_kernel_size != 0:
+            print('Running Tophat on Raw Data')
+            tiff_3d = tophat_3d(tiff_3d, tophat_raw_data_kernel_size).astype(np.uint16)
+            get_preprocess_check(tiff_src, analysis_name, tiff_3d, channel, 'Tophat_Raw_Data_Check')
+        #---------------------------------------------------------------------
+        
         #Background Subtraction
         #---------------------------------------------------------------------
         if bool_background_subtraction == True:
@@ -113,6 +124,12 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
             
             back_3d = get_shifted_background(background[:, channel], tiff_src, analysis_name)
             tiff_3d = cv2.subtract(tiff_3d, back_3d)
+            
+            if float(dilate_background_kernel_size) != 0:
+                print('Dilating background by ', dilate_background_kernel_size)
+                back_3d = dilate_3d(back_3d, dilate_background_kernel_size)
+            
+            
             tiff_3d = np.where(tiff_3d < 0, 0, tiff_3d)
             get_back_sub_check(tiff_src, analysis_name, tiff_3d, channel)
         #---------------------------------------------------------------------
@@ -264,14 +281,17 @@ if 'ipykernel' not in sys.argv[0]:
         parser.add_argument("--back_blob_removal")
         parser.add_argument("--rolling_ball")
         parser.add_argument("--tophat")
+        parser.add_argument("--tophat_raw_data")
         parser.add_argument("--blur")
         parser.add_argument("--blur_kernel_size")
         parser.add_argument("--rolling_ball_kernel_size")
         parser.add_argument("--tophat_kernel_size")
+        parser.add_argument("--tophat_raw_data_kernel_size")
         parser.add_argument("--min_sigma")
         parser.add_argument("--max_sigma")
         parser.add_argument("--num_sigma")
         parser.add_argument("--bool_remove_bright_dots")
+        parser.add_argument("--dilate_background_kernel_size")
         
         args, unknown = parser.parse_known_args()
         
@@ -328,10 +348,12 @@ if 'ipykernel' not in sys.argv[0]:
                             blur_kernel_size = float(args.blur_kernel_size), 
                             rolling_ball_kernel_size = float(args.rolling_ball_kernel_size), 
                             tophat_kernel_size = float(args.tophat_kernel_size),
+                            tophat_raw_data_kernel_size = float(args.tophat_raw_data_kernel_size),
                             min_sigma = float(args.min_sigma),
                             max_sigma = float(args.max_sigma),
                             num_sigma = float(args.num_sigma),
                             bool_remove_bright_dots = str2bool(args.bool_remove_bright_dots),
+                            dilate_background_kernel_size = float(args.dilate_background_kernel_size),
                             rand_dir = args.rand)
         #----------------------------------------------------------
         
@@ -340,11 +362,11 @@ if 'ipykernel' not in sys.argv[0]:
         
         print('Debugging')
     
-        get_dots_for_tiff(tiff_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_12/MMStack_Pos12.ome.tif', 
+        get_dots_for_tiff(tiff_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_12/MMStack_Pos0.ome.tif', 
                             offset = [0,0,0], 
-                            analysis_name = None, 
+                            analysis_name = 'anthony_test_1', 
                             bool_visualize_dots = False, 
-                            bool_background_subtraction = False, 
+                            bool_background_subtraction = True, 
                             channels_to_detect_dots = [1], 
                             bool_chromatic = False, 
                             bool_gaussian_fitting= False, 
@@ -362,7 +384,11 @@ if 'ipykernel' not in sys.argv[0]:
                             bool_blob_removal = False,
                             bool_rolling_ball = False,
                             bool_tophat = False,
-                            bool_remove_bright_dots = False)
+                            bool_remove_bright_dots = False,
+                            bool_tophat_raw_data = True,
+                            tophat_raw_data_kernel_size = 100,
+                            dilate_background_kernel_size = 10
+                            )
         
         
     

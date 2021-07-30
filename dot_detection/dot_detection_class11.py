@@ -48,7 +48,7 @@ class Dot_Detection:
                    final_loss_adcg, stack_z_dots, background_blob_removal, tophat, 
                    rolling_ball, blur, blur_kernel_size, rolling_ball_kernel_size, 
                    tophat_kernel_size, min_sigma_dot_detection, max_sigma_dot_detection,
-                   num_sigma_dot_detection, bool_remove_bright_dots):
+                   num_sigma_dot_detection, bool_remove_bright_dots, self.tophat_raw_data, self.tophat_raw_data_kernel_size):
                 
         self.experiment_name = experiment_name
         self.personal = personal

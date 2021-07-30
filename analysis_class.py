@@ -45,7 +45,7 @@ from align_errors import align_errors
 #Dot Detection Script
 #----------------------------
 print('Current Directory:', os.getcwd())
-from dot_detection.dot_detection_class11 import Dot_Detection
+from dot_detection.dot_detection_class12 import Dot_Detection
 #----------------------------
 
 #Barcode Script
@@ -182,15 +182,18 @@ class Analysis:
         self.stack_z_dots = False
         self.background_blob_removal = False
         self.tophat = False
+        self.tophat_raw_data = False
         self.rolling_ball = False
         self.blur_dot_detection = False
         self.blur_kernel_size = 5
         self.rolling_ball_kernel_size = 1000
         self.tophat_kernel_size = 200
+        self.tophat_raw_data_kernel_size = 200
         self.max_sigma_dot_detection = 2
         self.min_sigma_dot_detection = 1
         self.num_sigma_dot_detection = 2
         self.bool_remove_bright_dots = True
+        self.dilate_background_kernel = 0
         #--------------------------------------------------------------
         
         
@@ -512,6 +515,11 @@ class Analysis:
         self.tophat = True
         
         print("    Set Tophat to True")
+
+    def set_tophat_raw_data_true(self):
+        self.tophat_raw_data = True
+        
+        print("    Set Tophat Raw Data to True")
         
     def set_rolling_ball_true(self):
         self.rolling_ball = True
@@ -536,7 +544,12 @@ class Analysis:
     def set_tophat_kernel_size_arg(self, tophat_kernel_size):
         self.tophat_kernel_size = float(tophat_kernel_size)
         
-        print("    Set Tophat Kernel Size to", str(self.blur_kernel_size))
+        print("    Set Tophat Kernel Size to", str(self.tophat_kernel_size))
+        
+    def set_tophat_raw_data_kernel_size_arg(self, tophat_raw_data_kernel_size):
+        self.tophat_raw_data_kernel_size = float(tophat_raw_data_kernel_size)
+        
+        print("    Set Tophat Raw Data Kernel Size to", str(tophat_raw_data_kernel_size))
         
     def set_max_sigma_arg(self, max_sigma):
         self.max_sigma_dot_detection = float(max_sigma)
@@ -557,6 +570,11 @@ class Analysis:
         self.bool_remove_bright_dots = bool_remove_bright_dots
         
         print("    Set Remove Very Bright dots to", str(self.bool_remove_bright_dots))
+        
+    def set_dilate_background_kernel_arg(self, dilate_background_kernel):
+        self.dilate_background_kernel = float(dilate_background_kernel)
+        
+        print("    Set Dilate Background Kernel to", str(self.dilate_background_kernel))        
     #--------------------------------------------------------------------
     #Finished Setting Parameters
     
@@ -584,7 +602,8 @@ class Analysis:
                                                self.min_weight_adcg, self.final_loss_adcg, self.stack_z_dots, self.background_blob_removal,
                                                self.tophat, self.rolling_ball, self.blur_dot_detection, self.blur_kernel_size, 
                                                self.rolling_ball_kernel_size, self.tophat_kernel_size, self.min_sigma_dot_detection,
-                                               self.max_sigma_dot_detection, self.num_sigma_dot_detection, self.bool_remove_bright_dots)
+                                               self.max_sigma_dot_detection, self.num_sigma_dot_detection, self.bool_remove_bright_dots,
+                                               self.tophat_raw_data, self.tophat_raw_data_kernel_size, self.dilate_background_kernel)
                                               
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 
@@ -836,13 +855,14 @@ class Analysis:
                         json.dump(offset, jsonfile)
                     #-----------------------------------------------------
                     
-                    #Get Visual Check for DAPI 
-                    #-------------------------------------------------
-                    dapi_check_dir = os.path.join(self.position_dir, 'Alignment_Checks')
-                    os.makedirs(dapi_check_dir, exist_ok=True)
-                    dapi_check_dst = os.path.join(dapi_check_dir, 'Aligned_and_Stacked_DAPI_S.tif')
-                    get_stacked_dapi_s_align_check(offsets_path, dapi_check_dst, self.num_wav)
-                    #-------------------------------------------------
+                    if self.align != None:
+                        #Get Visual Check for DAPI 
+                        #-------------------------------------------------
+                        dapi_check_dir = os.path.join(self.position_dir, 'Alignment_Checks')
+                        os.makedirs(dapi_check_dir, exist_ok=True)
+                        dapi_check_dst = os.path.join(dapi_check_dir, 'Aligned_and_Stacked_DAPI_S.tif')
+                        get_stacked_dapi_s_align_check(offsets_path, dapi_check_dst, self.num_wav)
+                        #-------------------------------------------------
                     
                     timer_tools.logg_elapsed_time(self.start_time, 'Ending Alignment')
             #--------------------------------------------------------------------------------

@@ -517,6 +517,13 @@ def run_analysis(json_name, position):
         if data['tophat preprocessing'] != 'none':
             analysis.set_tophat_true()
     #----------------------------------------------------------
+
+    #Tophat Preprocessing
+    #----------------------------------------------------------
+    if 'tophat raw data preprocessing' in data.keys():
+        if data['tophat raw data preprocessing'] != 'none':
+            analysis.set_tophat_raw_data_true()
+    #----------------------------------------------------------
     
     #Rolling ball background subtraction
     #----------------------------------------------------------
@@ -553,6 +560,13 @@ def run_analysis(json_name, position):
             analysis.set_tophat_kernel_size_arg(data['tophat kernel size'])
     #----------------------------------------------------------
 
+    #Tophat Ball size
+    #----------------------------------------------------------
+    if 'tophat raw data kernel size' in data.keys():
+        if data['tophat raw data kernel size'] != 'none':
+            analysis.set_tophat_raw_data_kernel_size_arg(data['tophat raw data kernel size'])
+    #----------------------------------------------------------
+    
     #Set Min Sigma
     #----------------------------------------------------
     if 'min sigma dot detection' in data.keys():
@@ -579,6 +593,13 @@ def run_analysis(json_name, position):
     if 'remove very bright dots' in data.keys():
         if not data['remove very bright dots'] == 'none':
             analysis.set_remove_very_bright_dots_arg(data['remove very bright dots'])
+    #----------------------------------------------------------
+    
+    #Set Dilate Background Kernel
+    #----------------------------------------------------
+    if 'dilate background kernel' in data.keys():
+        if not data['dilate background kernel'] == 'none':
+            analysis.set_dilate_background_kernel_arg(data['dilate background kernel'])
     #----------------------------------------------------------
     
     #Writ

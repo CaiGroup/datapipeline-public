@@ -205,6 +205,8 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0] , analysis_name = None, bool_vi
     #----------------------------------------------------------
     side_by_side_preprocess_checks(tiff_src, analysis_name)
     #----------------------------------------------------------
+    
+    return df_tiff, tiff
         
 if 'ipykernel' not in sys.argv[0]:
     print(f'{sys.argv=}')

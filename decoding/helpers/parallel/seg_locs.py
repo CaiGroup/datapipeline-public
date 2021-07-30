@@ -5,7 +5,7 @@ from skimage.draw import polygon
 from skimage.measure import regionprops_table
 import matplotlib.pyplot as plt
 import sys
-
+import tifffile as tf
 import numpy as np
 import pandas as pd
 from read_roi import read_roi_zip
@@ -71,13 +71,9 @@ def save_plotted_cell(labeled_img, seg_dict_channel, fig_dest):
     plt.ylim([0,labeled_img.shape[2]])
     
     for i in range(len(seg_dict_channel)):#len(seg_dict_channel)):
-        print(f'{seg_dict_channel.keys()=}')
             
         if i in list(seg_dict_channel.keys()):
             points = seg_dict_channel[i][0]
-            print(f'{points.shape=}')
-            print(f'{points[:2]=}')
-            
             plt.scatter(points[:,0][:100000], points[:,1][:100000], s=10)
             print(f'{fig_dest=}')
         
@@ -134,7 +130,7 @@ def get_segmentation_dict_dots(locations_src, labeled_img, fig_dest):
         seg_dict_channel = get_dot_analysis_for_channel(locs_ch, labeled_img)
         #----------------------------------------------
         #print(f'{np.unique(labeled_img)=}')
-        print(f'{len(seg_dict_channel[i])=}')
+    
         if i == 1:
             print('Plotting')
             #fig_dest = 'plotted_cells.png'
@@ -164,5 +160,13 @@ if sys.argv[1] == 'debug_seg_dict':
     labeled_img  = get_labeled_img(roi_src)
     
     locations_src = '/groups/CaiLab/analyses/nrezaee/test1-big/cellpose/MMStack_Pos0/Dot_Locations/locations.csv'
+    fig_dst = '/tmp/fig.png'
+    seg_dict = get_segmentation_dict_dots(locations_src, labeled_img, fig_dst)
+    
+if sys.argv[1] == 'debug_seg_dict_michal':    
+    tiff_src = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_pool1/test_pos33_strict7_thresh50/MMStack_Pos33/Segmentation/labeled_img_post.tif'
+    labeled_img  = tf.imread(tiff_src)
+    
+    locations_src = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_pool1/test_pos33_strict7_thresh50/MMStack_Pos33/Dot_Locations/locations.csv'
     fig_dst = '/tmp/fig.png'
     seg_dict = get_segmentation_dict_dots(locations_src, labeled_img, fig_dst)

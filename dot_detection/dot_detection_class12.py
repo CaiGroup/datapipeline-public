@@ -48,7 +48,8 @@ class Dot_Detection:
                    final_loss_adcg, stack_z_dots, background_blob_removal, tophat, 
                    rolling_ball, blur, blur_kernel_size, rolling_ball_kernel_size, 
                    tophat_kernel_size, min_sigma_dot_detection, max_sigma_dot_detection,
-                   num_sigma_dot_detection, bool_remove_bright_dots, tophat_raw_data, tophat_raw_data_kernel_size):
+                   num_sigma_dot_detection, bool_remove_bright_dots, tophat_raw_data, 
+                   tophat_raw_data_kernel_size, dilate_background_kernel_size):
                 
         self.experiment_name = experiment_name
         self.personal = personal
@@ -84,6 +85,9 @@ class Dot_Detection:
         self.blur_kernel_size = blur_kernel_size
         self.rolling_ball_kernel_size = rolling_ball_kernel_size
         self.tophat_kernel_size = tophat_kernel_size
+        self.tophat_raw_data = tophat_raw_data
+        self.tophat_raw_data_kernel_size = tophat_raw_data_kernel_size
+        self.dilate_background_kernel_size = dilate_background_kernel_size
         
         self.min_sigma = min_sigma_dot_detection
         self.max_sigma = max_sigma_dot_detection
@@ -507,7 +511,8 @@ class Dot_Detection:
                             '--rolling_ball', self.rolling_ball, '--tophat', self.tophat, '--blur', self.blur, '--blur_kernel_size', self.blur_kernel_size,
                             '--rolling_ball_kernel_size', self.rolling_ball_kernel_size, '--tophat_kernel_size', self.tophat_kernel_size, 
                             '--min_sigma', self.min_sigma, '--max_sigma', self.max_sigma, '--num_sigma', self.num_sigma, 
-                            '--bool_remove_bright_dots', self.bool_remove_bright_dots] 
+                            '--bool_remove_bright_dots', self.bool_remove_bright_dots, '--tophat_raw_data', self.tophat_raw_data, 
+                            '--tophat_raw_data_kernel', self.tophat_raw_data_kernel_size, '--dilate_background_kernel', self.dilate_background_kernel_size] 
                     
                     list_cmd = [str(i) for i in list_cmd]
                     

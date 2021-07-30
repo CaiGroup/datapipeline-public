@@ -68,6 +68,27 @@ def tophat_2d(img_2d, kernel_size):
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(int(kernel_size), int(kernel_size)))
     tophat_img = cv2.morphologyEx(img_2d, cv2.MORPH_TOPHAT, kernel)
     return tophat_img
+    
+    
+def dilate_2d(img_2d, kernel_size):
+    
+    kernel = np.ones((int(kernel_size), int(kernel_size)), np.uint8)
+    back_3d = cv2.dilate(img_2d, kernel).astype(np.uint16)
+    
+def dilate_3d(img_3d, kernel_size = 200):
+    """
+    Run dilate processing on a 3d img
+    """
+    
+    print('Running Dilation with kernel size ' + str(kernel_size))
+    
+    dilate_img_3d = np.zeros(img_3d.shape)
+    for i in range(len(img_3d)):
+        dilate_img_3d[i] = dilate_2d(img_3d[i], kernel_size)
+        
+    dilate_img_3d = np.where(dilate_img_3d < 0, 0, dilate_img_3d)
+    
+    return dilate_img_3d           
 
 def tophat_3d(img_3d, kernel_size = 200):
     """
