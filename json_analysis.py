@@ -144,7 +144,7 @@ def run_analysis(json_name, position):
     #----------------------------------------------------------
     if 'chromatic aberration' in data.keys():
         if data['chromatic aberration'] == 'true':
-            analysis.set_chromatic_abberration_true()
+            analysis.set_chromatic_aberration_true()
     #----------------------------------------------------------
     
     

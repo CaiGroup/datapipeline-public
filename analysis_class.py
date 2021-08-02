@@ -119,7 +119,7 @@ class Analysis:
         #Set Parameters
         #--------------------------------------------------------------
         self.align = None
-        self.chromatic_abberration =False
+        self.chromatic_aberration =False
         self.normalization=False
         self.deconvolution=False
         self.get_align_errors = False
@@ -237,8 +237,8 @@ class Analysis:
         assert os.path.isfile(background_file), "The background file for subtraction is missing at " + str(background_file) 
         print("    Set Background Subtraction", flush=True)
         
-    def set_chromatic_abberration_true(self):
-        self.chromatic_abberration = True
+    def set_chromatic_aberration_true(self):
+        self.chromatic_aberration = True
         print("    Set Chromatic Abberration", flush=True)
         
     def set_normalization_true(self):
@@ -595,7 +595,7 @@ class Analysis:
         #print(f'{Dot_Detection=}')
         dot_detector = Dot_Detection(self.experiment_name, self.personal, self.position, self.locations_dir, 
                                                self.analysis_name, self.visualize_dots, self.normalization, self.background_subtraction, 
-                                               self.decoding_individual, self.chromatic_abberration, self.dot_detection, self.gaussian_fitting, 
+                                               self.decoding_individual, self.chromatic_aberration, self.dot_detection, self.gaussian_fitting,
                                                self.strictness_dot_detection, self.dimensions, self.radial_center, self.num_zslices, 
                                                self.nbins, self.threshold, self.num_wav, self.num_z, 
                                                self.radius_step, self.num_radii, self.debug_dot_detection,
@@ -880,7 +880,7 @@ class Analysis:
         
         #Get Chromatic Aberration
         #--------------------------------------------------------------------------------
-        if self.chromatic_abberration == True:
+        if self.chromatic_aberration == True:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Chromatic Aberration')
             self.run_chromatic_aberration()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Chromatic Aberration')

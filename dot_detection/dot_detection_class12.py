@@ -41,7 +41,7 @@ main_dir = '/groups/CaiLab'
 class Dot_Detection:
     def __init__(self, experiment_name, personal, position, locations_dir, 
                    analysis_name, visualize_dots, normalization, background_subtraction,
-                   decoding_individual, chromatic_abberration, dot_detection, gaussian_fitting, 
+                   decoding_individual, chromatic_aberration, dot_detection, gaussian_fitting,
                    strictness_dot_detection, dimensions, radial_center, num_zslices, 
                    nbins, threshold, num_wav, z_slices, 
                    radius_step, num_radii, debug_dot_detection, min_weight_adcg, 
@@ -60,7 +60,7 @@ class Dot_Detection:
         self.normalization = normalization
         self.background_subtraction = background_subtraction
         self.decoding_individual = decoding_individual
-        self.chromatic_abberration = chromatic_abberration
+        self.chromatic_aberration = chromatic_aberration
         self.dot_detection = dot_detection
         self.gaussian_fitting = gaussian_fitting
         self.strictness_dot_detection = strictness_dot_detection
@@ -442,12 +442,15 @@ class Dot_Detection:
                     
                     n_dots = int(self.dot_detection.split('top')[1].split('dots')[0])
                     
-                    list_cmd = ['python', dot_detection_dir+ '/get_top_n_dots.py', '--offset0', offset[0], '--offset1', offset[1], '--offset2', offset[2], '--analysis_name', self.analysis_name, \
-                            '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
-                            '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
-                            '--chromatic', self.chromatic_abberration, '--n_dots', n_dots, '--num_wav', self.num_wav, '--rand', rand_dir, \
-                            '--num_z', self.num_z, '--stack_z_s', self.stack_z_dots, '--rolling_ball', self.rolling_ball, '--tophat', self.tophat,
-                            '--blur', self.blur]
+                    list_cmd = [
+                        'python', dot_detection_dir+ '/get_top_n_dots.py', '--offset0', offset[0],
+                        '--offset1', offset[1], '--offset2', offset[2], '--analysis_name', self.analysis_name,
+                        '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction,
+                        '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual,
+                        '--chromatic', self.chromatic_aberration, '--n_dots', n_dots, '--num_wav', self.num_wav,
+                        '--rand', rand_dir, '--num_z', self.num_z, '--stack_z_s', self.stack_z_dots,
+                        '--rolling_ball', self.rolling_ball, '--tophat', self.tophat, '--blur', self.blur
+                    ]
                     
                     list_cmd = [str(i) for i in list_cmd]
                
@@ -456,12 +459,14 @@ class Dot_Detection:
                 elif self.dot_detection == "biggest jump":
                     
 
-                    list_cmd = ['python', dot_detection_dir+ '/hist_jump.py', '--offset0', offset[0], '--offset1', offset[1], '--offset2', offset[2], \
-                    '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
-                            '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
-                            '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
-                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,'--z_slices', z_slice,
-                            '--back_blob_removal', self.background_blob_removal]
+                    list_cmd = [
+                        'python', dot_detection_dir+ '/hist_jump.py', '--offset0', offset[0], '--offset1', offset[1], '--offset2', offset[2],
+                        '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction,
+                        '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual,
+                        '--chromatic', self.chromatic_aberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting,
+                        '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection,
+                        '--num_wav', self.num_wav,'--z_slices', z_slice, '--back_blob_removal', self.background_blob_removal
+                    ]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
@@ -470,14 +475,18 @@ class Dot_Detection:
                 elif self.dot_detection == "matlab 3d":
                     
 
-                    list_cmd = ['python', dot_detection_dir + '/matlab_3d.py', '--offset0', offset[0], '--offset1', offset[1], '--offset2', offset[2], \
-                    '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
-                            '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
-                            '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
-                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,'--z_slices', z_slice, '--nbins',  \
-                            self.nbins, '--threshold', self.threshold, '--stack_z_s', self.stack_z_dots, '--back_blob_removal', self.background_blob_removal, 
-                            '--rolling_ball', self.rolling_ball, '--tophat', self.tophat, '--blur', self.blur, '--blur_kernel_size', self.blur_kernel_size,
-                            '--rolling_ball_kernel_size', self.rolling_ball_kernel_size, '--tophat_kernel_size', self.tophat_kernel_size]
+                    list_cmd = [
+                        'python', dot_detection_dir + '/matlab_3d.py', '--offset0', offset[0], '--offset1', offset[1],
+                        '--offset2', offset[2], '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots,
+                        '--back_subtract', self.background_subtraction, '--tiff_src', tiff_file_path,  '--norm', self.normalization,
+                        '--channels', self.decoding_individual, '--chromatic', self.chromatic_aberration,
+                        '--rand', rand_dir, '--gaussian', self.gaussian_fitting, '--radial_center', self.radial_center,
+                        '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,'--z_slices', z_slice,
+                        '--nbins', self.nbins, '--threshold', self.threshold, '--stack_z_s', self.stack_z_dots,
+                        '--back_blob_removal', self.background_blob_removal, '--rolling_ball', self.rolling_ball,
+                        '--tophat', self.tophat, '--blur', self.blur, '--blur_kernel_size', self.blur_kernel_size,
+                        '--rolling_ball_kernel_size', self.rolling_ball_kernel_size, '--tophat_kernel_size', self.tophat_kernel_size
+                    ]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
@@ -485,13 +494,15 @@ class Dot_Detection:
                     
                 elif self.dot_detection == "adcg 2d":
                     
-                    list_cmd = ['python', dot_detection_dir+ '/adcg_2d.py', '--offset0', offset[0], '--offset1', offset[1], '--offset2', offset[2], \
-                    '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
-                            '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
-                            '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
-                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,
-                            '--z_slices', z_slice, '--min_weight_adcg', self.min_weight_adcg, '--final_loss_adcg', self.final_loss_adcg, 
-                            '--stack_z_s', self.stack_z_dots]
+                    list_cmd = [
+                        'python', dot_detection_dir+ '/adcg_2d.py', '--offset0', offset[0], '--offset1', offset[1], '--offset2', offset[2],
+                        '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction,
+                        '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual,
+                        '--chromatic', self.chromatic_aberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting,
+                        '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav,
+                        '--z_slices', z_slice, '--min_weight_adcg', self.min_weight_adcg, '--final_loss_adcg', self.final_loss_adcg,
+                        '--stack_z_s', self.stack_z_dots
+                    ]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
@@ -500,19 +511,22 @@ class Dot_Detection:
                 elif self.dot_detection == "biggest jump 3d":
                     
 
-                    list_cmd = ['python', dot_detection_dir+ '/hist_jump_3d.py', '--offset0', offset[0], '--offset1', offset[1], '--offset2', offset[2], \
-                    '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots, '--back_subtract', self.background_subtraction, \
-                            '--tiff_src', tiff_file_path,  '--norm', self.normalization, '--channels', self.decoding_individual, \
-                            '--chromatic', self.chromatic_abberration, '--rand', rand_dir, '--gaussian', self.gaussian_fitting, \
-                            '--radial_center', self.radial_center, '--strictness', self.strictness_dot_detection, '--num_wav',  \
-                            self.num_wav, '--z_slices', z_slice, '--num_z', self.num_z, '--nbins', self.nbins, \
-                            '--threshold', self.threshold, '--radius_step', self.radius_step, '--num_radii', self.num_radii,
-                            '--stack_z_s', self.stack_z_dots, '--back_blob_removal', self.background_blob_removal, 
-                            '--rolling_ball', self.rolling_ball, '--tophat', self.tophat, '--blur', self.blur, '--blur_kernel_size', self.blur_kernel_size,
-                            '--rolling_ball_kernel_size', self.rolling_ball_kernel_size, '--tophat_kernel_size', self.tophat_kernel_size, 
-                            '--min_sigma', self.min_sigma, '--max_sigma', self.max_sigma, '--num_sigma', self.num_sigma, 
-                            '--bool_remove_bright_dots', self.bool_remove_bright_dots, '--tophat_raw_data', self.tophat_raw_data, 
-                            '--tophat_raw_data_kernel', self.tophat_raw_data_kernel_size, '--dilate_background_kernel', self.dilate_background_kernel_size] 
+                    list_cmd = [
+                        'python', dot_detection_dir+ '/hist_jump_3d.py', '--offset0', offset[0], '--offset1', offset[1],
+                        '--offset2', offset[2], '--analysis_name', self.analysis_name,  '--vis_dots', self.visualize_dots,
+                        '--back_subtract', self.background_subtraction, '--tiff_src', tiff_file_path,
+                        '--norm', self.normalization, '--channels', self.decoding_individual, '--chromatic', self.chromatic_aberration,
+                        '--rand', rand_dir, '--gaussian', self.gaussian_fitting, '--radial_center', self.radial_center,
+                        '--strictness', self.strictness_dot_detection, '--num_wav', self.num_wav, '--z_slices', z_slice,
+                        '--num_z', self.num_z, '--nbins', self.nbins, '--threshold', self.threshold, '--radius_step', self.radius_step,
+                        '--num_radii', self.num_radii, '--stack_z_s', self.stack_z_dots, '--back_blob_removal', self.background_blob_removal,
+                        '--rolling_ball', self.rolling_ball, '--tophat', self.tophat, '--blur', self.blur,
+                        '--blur_kernel_size', self.blur_kernel_size, '--rolling_ball_kernel_size', self.rolling_ball_kernel_size,
+                        '--tophat_kernel_size', self.tophat_kernel_size, '--min_sigma', self.min_sigma,
+                        '--max_sigma', self.max_sigma, '--num_sigma', self.num_sigma, '--bool_remove_bright_dots', self.bool_remove_bright_dots,
+                        '--tophat_raw_data', self.tophat_raw_data, '--tophat_raw_data_kernel', self.tophat_raw_data_kernel_size,
+                        '--dilate_background_kernel', self.dilate_background_kernel_size
+                    ]
                     
                     list_cmd = [str(i) for i in list_cmd]
                     
@@ -535,7 +549,10 @@ class Dot_Detection:
                 
                 #os.system(cmd)
                 out_path = os.path.join(rand_dir, 'slurm.out')
-                call_me = ['sbatch', '--job-name', rand_list[sub_dirs.index(sub_dir)], '--output', out_path, "--time", time_for_slurm, "--mem-per-cpu", "10G", '--ntasks', '2', script_name]
+                call_me = [
+                    'sbatch', '--job-name', rand_list[sub_dirs.index(sub_dir)], '--output', out_path,
+                    "--time", time_for_slurm, "--mem-per-cpu", "10G", '--ntasks', '2', script_name
+                ]
                 print(" ".join(call_me))
                 subprocess.call(call_me)
                 #------------------------------------------------
@@ -550,7 +567,7 @@ class Dot_Detection:
         
         #Delete the rand dirs
         #----------------------------------------------
-        if self.debug_dot_detection == True:
+        if self.debug_dot_detection:
             print('Did not delete dot detection directories')
             pass
         else:
