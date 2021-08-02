@@ -593,17 +593,19 @@ class Analysis:
     def run_dot_detection(self):
         
         #print(f'{Dot_Detection=}')
-        dot_detector = Dot_Detection(self.experiment_name, self.personal, self.position, self.locations_dir, 
-                                               self.analysis_name, self.visualize_dots, self.normalization, self.background_subtraction, 
-                                               self.decoding_individual, self.chromatic_aberration, self.dot_detection, self.gaussian_fitting,
-                                               self.strictness_dot_detection, self.dimensions, self.radial_center, self.num_zslices, 
-                                               self.nbins, self.threshold, self.num_wav, self.num_z, 
-                                               self.radius_step, self.num_radii, self.debug_dot_detection,
-                                               self.min_weight_adcg, self.final_loss_adcg, self.stack_z_dots, self.background_blob_removal,
-                                               self.tophat, self.rolling_ball, self.blur_dot_detection, self.blur_kernel_size, 
-                                               self.rolling_ball_kernel_size, self.tophat_kernel_size, self.min_sigma_dot_detection,
-                                               self.max_sigma_dot_detection, self.num_sigma_dot_detection, self.bool_remove_bright_dots,
-                                               self.tophat_raw_data, self.tophat_raw_data_kernel_size, self.dilate_background_kernel)
+        dot_detector = Dot_Detection(
+            self.experiment_name, self.personal, self.position, self.locations_dir,
+            self.analysis_name, self.visualize_dots, self.normalization, self.background_subtraction,
+            self.decoding_individual, self.chromatic_aberration, self.dot_detection, self.gaussian_fitting,
+            self.strictness_dot_detection, self.dimensions, self.radial_center, self.num_zslices,
+            self.nbins, self.threshold, self.num_wav, self.num_z,
+            self.radius_step, self.num_radii, self.debug_dot_detection,
+            self.min_weight_adcg, self.final_loss_adcg, self.stack_z_dots, self.background_blob_removal,
+            self.tophat, self.rolling_ball, self.blur_dot_detection, self.blur_kernel_size,
+            self.rolling_ball_kernel_size, self.tophat_kernel_size, self.min_sigma_dot_detection,
+            self.max_sigma_dot_detection, self.num_sigma_dot_detection, self.bool_remove_bright_dots,
+            self.tophat_raw_data, self.tophat_raw_data_kernel_size, self.dilate_background_kernel
+        )
                                               
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 
@@ -685,7 +687,7 @@ class Analysis:
         
         #Combine all dots
         #--------------------------------------------------------------------------------
-        if self.dot_detection != False:
+        if self.dot_detection:
             combine_locs_csv_s(self.analysis_dir)
         
         #Combine all decoded genes
@@ -742,7 +744,12 @@ class Analysis:
     #Runs the Parameters and functions
     #--------------------------------------------------------------------------------
     def write_results(self, path):
+        """
+        write_results
 
+        Master function for running the pipeline after setting up the Analysis object.
+        Called from json_analysis.py at the end of function run_analysis
+        """
 
         #Start Logging
         #--------------------------------------------------------------------------------
@@ -761,7 +768,7 @@ class Analysis:
 
         #Declare Segmentation
         #--------------------------------------------------------------------------------
-        if self.segmentation != False:
+        if self.segmentation:
             
             
             #Get Number of Z slices
@@ -776,11 +783,15 @@ class Analysis:
             #--------------------------------------------------------------------------------
             
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Segmentation')
-            segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
-                        self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, num_zslices, \
-                        self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
-                        self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold,
-                        self.nuclei_channel_num, self.cyto_flow_threshold, self.cyto_cell_prob_threshold, self.cyto_radius)
+            segmenter = Segmentation(
+                self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir,
+                self.barcode_dst, self.barcode_key_src, self.fake_barcodes, self.decoding_individual,
+                self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, num_zslices,
+                self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match,
+                self.area_tol, self.cyto_channel_num, self.get_nuclei_seg, self.get_cyto_seg,
+                self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold,
+                self.nuclei_channel_num, self.cyto_flow_threshold, self.cyto_cell_prob_threshold, self.cyto_radius
+            )
         
             self.labeled_img = segmenter.retrieve_labeled_img()
             print('Shape after Seg in Analysis Class: ' +  str(self.labeled_img.shape))
@@ -813,7 +824,7 @@ class Analysis:
         print(f'{self.align=}')
         #Alignment
         #--------------------------------------------------------------------------------
-        if self.align !=None or self.dot_detection != False or self.decoding_across == True or \
+        if self.align is not None or self.dot_detection or self.decoding_across or \
             self.decoding_individual != 'all':
                 
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Alignment')
@@ -821,15 +832,21 @@ class Analysis:
                     
               
                     timer_tools.logg_elapsed_time(self.start_time, 'Starting Alignment')    
-                    if self.align == None or self.align == 'fiducial_markers':
+                    if self.align is None or self.align == 'fiducial_markers':
                         
      
                                            
-                        offset = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, 'no_align', self.num_wav, self.start_time)
+                        offset = run_alignment.run_alignment(
+                            self.experiment_name, self.personal, self.position,
+                            'no_align', self.num_wav, self.start_time
+                        )
                     
                     else:
                         
-                        offset, align_errors_dict = run_alignment.run_alignment(self.experiment_name, self.personal, self.position, self.align, self.num_wav, self.start_time)
+                        offset, align_errors_dict = run_alignment.run_alignment(
+                            self.experiment_name, self.personal, self.position,
+                            self.align, self.num_wav, self.start_time
+                        )
                         offsets_path = os.path.join(path, 'offsets.json')
                         print("        Saving to", offsets_path, flush=True)
                         
@@ -855,7 +872,7 @@ class Analysis:
                         json.dump(offset, jsonfile)
                     #-----------------------------------------------------
                     
-                    if self.align != None:
+                    if self.align is not None:
                         #Get Visual Check for DAPI 
                         #-------------------------------------------------
                         dapi_check_dir = os.path.join(self.position_dir, 'Alignment_Checks')
@@ -871,7 +888,7 @@ class Analysis:
 
         #Get Errors for Alignment
         #--------------------------------------------------------------------------------
-        if self.get_align_errors == True:
+        if self.get_align_errors:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Alignment Errors')
             self.run_alignment_errors()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Alignment Errors')
@@ -880,7 +897,7 @@ class Analysis:
         
         #Get Chromatic Aberration
         #--------------------------------------------------------------------------------
-        if self.chromatic_aberration == True:
+        if self.chromatic_aberration:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Chromatic Aberration')
             self.run_chromatic_aberration()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Chromatic Aberration')
@@ -888,7 +905,7 @@ class Analysis:
         
         #Run Dot Detection
         #--------------------------------------------------------------------------------
-        if self.dot_detection != False:
+        if self.dot_detection:
             self.locs_src = self.run_dot_detection()
         #--------------------------------------------------------------------------------
         
@@ -906,23 +923,31 @@ class Analysis:
             
         #Declare Decoding Class if needed
         #--------------------------------------------------------------------------------
-        if self.decoding_across == True or self.decoding_individual != 'all' \
-        or self.decoding_with_previous_dots == True or self.decoding_with_previous_locations == True or self.decoding_non_barcoded == True \
-        or self.lampfish_decoding:
+        if (self.decoding_across
+            or (self.decoding_individual != 'all')
+            or self.decoding_with_previous_dots
+            or self.decoding_with_previous_locations
+            or self.decoding_non_barcoded
+            or self.lampfish_decoding
+        ):
             
             self.move_directory_contents(self.barcode_key_src, self.barcode_dst)
             
             self.barcode_key_src = self.barcode_dst
             
-            decoder = Decoding(self.data_dir, self.position, self.decoded_dir, self.locations_dir, self.position_dir, self.barcode_dst, \
-                self.barcode_key_src, self.decoding_with_previous_dots, self.decoding_with_previous_locations, self.fake_barcodes, \
-                self.decoding_individual, self.min_seeds, self.allowed_diff, self.dimensions, self.num_zslices, self.segmentation, \
-                self.decode_only_cells, self.labeled_img, self.num_wav, self.synd_decoding, self.lampfish_pixel, self.start_time)
+            decoder = Decoding(
+                self.data_dir, self.position, self.decoded_dir, self.locations_dir,
+                self.position_dir, self.barcode_dst, self.barcode_key_src, self.decoding_with_previous_dots,
+                self.decoding_with_previous_locations, self.fake_barcodes, self.decoding_individual,
+                self.min_seeds, self.allowed_diff, self.dimensions, self.num_zslices, self.segmentation,
+                self.decode_only_cells, self.labeled_img, self.num_wav, self.synd_decoding,
+                self.lampfish_pixel, self.start_time
+            )
         #--------------------------------------------------------------------------------
         
         
-        if self.lampfish_decoding == True:
-            if self.dot_detection == False:
+        if self.lampfish_decoding:
+            if not self.dot_detection:
                 timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                 self.run_dot_detection()
                 timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
@@ -931,11 +956,11 @@ class Analysis:
             decoder.run_lampfish_decoding()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending LampFISH Decoding')  
             
-        if self.synd_decoding == True:
+        if self.synd_decoding:
             #Run Decoding Individual
             #--------------------------------------------------------------------------------
             if not self.decoding_individual == 'all':
-                if self.dot_detection == False:
+                if not self.dot_detection:
                     timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                     self.run_dot_detection()
                     timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
@@ -947,7 +972,7 @@ class Analysis:
         else:
             #Run Decoding with previous dots
             #--------------------------------------------------------------------------------
-            if self.decoding_with_previous_dots == True:
+            if self.decoding_with_previous_dots:
                 timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding With Previous Points')
                 decoder.run_decoding_with_previous_dots()        
                 timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding With Previous Points')
@@ -955,7 +980,7 @@ class Analysis:
             
             #Run Decoding with previous locations
             #--------------------------------------------------------------------------------
-            if self.decoding_with_previous_locations == True:
+            if self.decoding_with_previous_locations:
                 
                 timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding With Previous Locations')
                 decoder.run_decoding_with_previous_locations()     
@@ -966,7 +991,7 @@ class Analysis:
             #Run Decoding Individual
             #--------------------------------------------------------------------------------
             if not self.decoding_individual == 'all':
-                if self.dot_detection == False:
+                if not self.dot_detection:
                     timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                     self.run_dot_detection()
                     timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
@@ -978,8 +1003,8 @@ class Analysis:
     
             #Run Decoding Across
             #--------------------------------------------------------------------------------
-            if self.decoding_across == True:
-                if self.dot_detection == False:
+            if self.decoding_across:
+                if not self.dot_detection:
                     timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                     self.run_dot_detection()
                     timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
@@ -991,8 +1016,8 @@ class Analysis:
                 
             #Run Decoding non barcoded
             #--------------------------------------------------------------------------------
-            if self.decoding_non_barcoded== True:
-                if self.dot_detection == False:
+            if self.decoding_non_barcoded:
+                if not self.dot_detection:
                     timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                     self.run_dot_detection()
                     timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
@@ -1006,13 +1031,17 @@ class Analysis:
         
         #Declare Segmentation
         #--------------------------------------------------------------------------------
-        if self.segmentation != False:
+        if self.segmentation:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Segmentation')
-            segmenter = Segmentation(self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir, self.barcode_dst, self.barcode_key_src, \
-                self.fake_barcodes, self.decoding_individual, self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices, \
-                self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match, self.area_tol, self.cyto_channel_num, \
-                self.get_nuclei_seg, self.get_cyto_seg, self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold, 
-                self.nuclei_channel_num, self.cyto_flow_threshold, self.cyto_cell_prob_threshold, self.cyto_radius)
+            segmenter = Segmentation(
+                self.data_dir, self.position, self.seg_dir, self.decoded_dir, self.locations_dir,
+                self.barcode_dst, self.barcode_key_src, self.fake_barcodes, self.decoding_individual,
+                self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices,
+                self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match,
+                self.area_tol, self.cyto_channel_num, self.get_nuclei_seg, self.get_cyto_seg,
+                self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold, self.nuclei_channel_num,
+                self.cyto_flow_threshold, self.cyto_cell_prob_threshold, self.cyto_radius
+            )
                 
             print(f'{self.labeled_img.shape=}')
             if self.decoding_across == True or \
@@ -1027,7 +1056,7 @@ class Analysis:
                 print('Running Segmentation Individual')
                 segmenter.run_segmentation_individually()
             
-            elif self.decoding_non_barcoded == True:
+            elif self.decoding_non_barcoded:
                 
                 segmenter.run_segmentation_non_barcoded()
             
@@ -1037,9 +1066,12 @@ class Analysis:
         
         #Make Post Analysis
         #--------------------------------------------------------------------------------
-        if self.segmentation != False and (self.on_off_barcode_analysis == True or self.false_positive_rate_analysis == True or self.hamming_analysis == True): 
-            post_analysis = Post_Analyses(self.position_dir, self.false_pos_dir, self.seg_dir, self.hamming_dir, self.fake_barcodes, self.barcode_key_src, \
-                                self.num_zslices, self.segmentation, self.decoding_individual)
+        if self.segmentation != False and (self.on_off_barcode_analysis or self.false_positive_rate_analysis or self.hamming_analysis):
+            post_analysis = Post_Analyses(
+                self.position_dir, self.false_pos_dir, self.seg_dir,
+                self.hamming_dir, self.fake_barcodes, self.barcode_key_src,
+                self.num_zslices, self.segmentation, self.decoding_individual
+            )
         #--------------------------------------------------------------------------------
         
         
@@ -1047,7 +1079,7 @@ class Analysis:
         #--------------------------------------------------------------------------------
         if self.segmentation != False and self.on_off_barcode_analysis == True:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting On Off Barcode Plot Analysis')
-            if self.decoding_across == True:
+            if self.decoding_across:
                 post_analysis.run_on_off_barcode_analysis_across()
             elif self.decoding_individual!='all':
                 post_analysis.run_on_off_barcode_analysis_indiv()
@@ -1059,7 +1091,7 @@ class Analysis:
         #--------------------------------------------------------------------------------
         if self.segmentation != False and self.false_positive_rate_analysis == True:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting False Positive Rate')
-            if self.decoding_across ==True:
+            if self.decoding_across:
                 post_analysis.run_false_positive_rate_analysis_across()
             elif self.decoding_individual!='all':
                 post_analysis.run_false_positive_rate_analysis_indiv()
