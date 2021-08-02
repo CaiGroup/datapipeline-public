@@ -8,6 +8,9 @@ cd
 mkdir -p test_analyses
 mkdir -p json_analyses
 mkdir -p /central/scratch/$USER
+mkdir -p bin
+cp /home/lombelet/bin/gmic bin/
+
 
 ACTCMD="source /groups/CaiLab/personal/python_env/bin/activate"
 echo "Make sure to activate the environment with:"
