@@ -29,7 +29,7 @@ def run_beads(beads_dir, t_forms_dest):
     
     #Creating Matlab Command
     #------------------------------------------------------------------
-    cmd = """  matlab -r "addpath('/home/nrezaee/test_cronjob/chromatic_abberation/scripts'); beadtformglobal( '{0}' , {1}, {2}, '{3}'); quit"; """ 
+    cmd = """  matlab -r "addpath('/home/nrezaee/test_cronjob/chromatic_aberration/scripts'); beadtformglobal( '{0}' , {1}, {2}, '{3}'); quit"; """
 
     cmd = cmd.format(beads_dir, num_channels, pos_array, t_forms_dest)
     #------------------------------------------------------------------
@@ -37,7 +37,7 @@ def run_beads(beads_dir, t_forms_dest):
     
     #Running Matlab Command
     #------------------------------------------------------------------
-    print("Running Matlab Command for Chromatic Abberation:", cmd, flush=True)
+    print("Running Matlab Command for Chromatic Aberration:", cmd, flush=True)
 
     os.system(cmd)
     #------------------------------------------------------------------
@@ -79,7 +79,7 @@ def run_beads(beads_dir, t_forms_dest):
 #------------------------------------------------------------------
 # beads_dir= '/groups/CaiLab/personal/nrezaee/raw/test1-beads/beads/'
 
-# t_forms_dest = '/home/nrezaee/test_cronjob/chromatic_abberation/'
+# t_forms_dest = '/home/nrezaee/test_cronjob/chromatic_aberration/'
 
 # run_beads(beads_dir, t_forms_dest)
     

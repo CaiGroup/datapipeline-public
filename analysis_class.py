@@ -70,10 +70,10 @@ from segmentation.seg_class import Segmentation
 from colocalization import colocalize
 #----------------------------
 
-#Chromatic Abberation Scripts
+#Chromatic Aberration Scripts
 #----------------------------
-import chromatic_abberation
-from chromatic_abberation import run
+import chromatic_aberration
+from chromatic_aberration import run
 #----------------------------
 
 #Post Analyses
@@ -663,17 +663,17 @@ class Analysis:
         colocalize.colocalize(locations_path, coloc_dir)
         #--------------------------------------------------------------------
         
-    def run_chromatic_abberation(self):
+    def run_chromatic_aberration(self):
         
         beads_src = os.path.join(self.data_dir, 'beads')
         
         t_form_dest = os.path.join(self.analysis_dir, \
-                        'Chromatic_Abberation_Correction')
+                        'Chromatic_Aberration_Correction')
         
         if not os.path.exists(t_form_dest):
             os.makedirs(t_form_dest)
             
-        chromatic_abberation.run.run_beads(beads_src, t_form_dest)
+        chromatic_aberration.run.run_beads(beads_src, t_form_dest)
         
     def run_algorithms_for_all_pos(self):
     
@@ -878,12 +878,12 @@ class Analysis:
         #--------------------------------------------------------------------------------
         
         
-        #Get Chromatic Abberation
+        #Get Chromatic Aberration
         #--------------------------------------------------------------------------------
         if self.chromatic_abberration == True:
-            timer_tools.logg_elapsed_time(self.start_time, 'Starting Chromatic Abberation')
-            self.run_chromatic_abberation()
-            timer_tools.logg_elapsed_time(self.start_time, 'Ending Chromatic Abberation')
+            timer_tools.logg_elapsed_time(self.start_time, 'Starting Chromatic Aberration')
+            self.run_chromatic_aberration()
+            timer_tools.logg_elapsed_time(self.start_time, 'Ending Chromatic Aberration')
         #--------------------------------------------------------------------------------
         
         #Run Dot Detection

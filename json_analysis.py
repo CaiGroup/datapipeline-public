@@ -87,7 +87,7 @@ def run_analysis(json_name, position):
         #----------------------------------------------------------
         orig_stdout = sys.stdout
         
-        output_dir = os.path.join(main_dir, 'analyses', data['personal'], data['experiment_name'], \
+        output_dir = os.path.join(main_dir, 'analyses', data['personal'], data['experiment_name'],
                                    analysis_name, position.split('.ome')[0], 'Output')
 
         if not os.path.exists(output_dir):
@@ -106,9 +106,9 @@ def run_analysis(json_name, position):
 
     #Declare Analysis Class
     #---------------------------------------------------------
-    analysis = Analysis(experiment_name=data['experiment_name'], \
-                analysis_name=json_name.split('.json')[0], \
-                personal = data['personal'], \
+    analysis = Analysis(experiment_name=data['experiment_name'],
+                analysis_name=json_name.split('.json')[0],
+                personal = data['personal'],
                 position = args.position, 
                 email = args.email)
     #----------------------------------------------------------
@@ -621,17 +621,6 @@ def run_analysis(json_name, position):
         
     return None
 #=========================================================================    
-    
-    
-run_analysis(args.json, args.position)
-    
-        
-    
-    
-    
-        
-        
-    
-        
-        
-    
+
+if __name__ == '__main__':
+    run_analysis(args.json, args.position)
