@@ -1,20 +1,12 @@
 import os 
-#import tempfile
 import numpy as np
 from scipy.io import loadmat, savemat
 import tempfile
-import tempfile
-
-temp_dir = tempfile.TemporaryDirectory()
-print(temp_dir.name)
-# use temp_dir, and when done:
-temp_dir.cleanup()
-
 
 
 def get_gaussian_fitted_dots(tiff_src, channel,points):
     
-    
+    breakpoint()
     #Save Points to path
     #-------------------------------------------------------------------
     temp_dir = tempfile.TemporaryDirectory()

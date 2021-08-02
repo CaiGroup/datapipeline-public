@@ -161,7 +161,7 @@ def get_segmentation_dict_dots(locations_src, labeled_img, fig_dest):
     return all_seg_dict
 
 if len(sys.argv) > 1:
-    
+
     if sys.argv[1] == 'debug_seg_dict':
         roi_src = '/groups/CaiLab/personal/nrezaee/raw/intron_pos0/segmentation/RoiSet.zip'
         labeled_img  = get_labeled_img(roi_src)
