@@ -35,6 +35,7 @@ function [gaussPoints, gaussInt] = getgaussian(points, image, varargin)
         zSlice = points(dotID, 3);
         dataRangeX = round((-pixelRadius:pixelRadius) + points(dotID,1)); % parenthesis are necessary
         dataRangeY = round((-pixelRadius:pixelRadius) + points(dotID,2)); % Need to round before inserting into image
+
         data = double(image(dataRangeY, dataRangeX, zSlice)); % select region in a 3x3 pixel radius % error NOT IN the IMAGE
         x0 = [min(min(data)) max(max(data))-min(min(data)) pixelRadius+1 pixelRadius+1 1 1 45]; % x0  = [min max-min(range) 4 4 1 1 45] is the starting point
         dataSize = size(data); % 7 x 7 array

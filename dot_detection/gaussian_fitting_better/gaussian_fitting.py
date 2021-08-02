@@ -1,12 +1,84 @@
 import os 
 import numpy as np
 from scipy.io import loadmat, savemat
+from scipy.optimize import least_squares
+from webfish_tools.util import pil_imread
 import tempfile
+
+
+def get_region_around(im, center, size, normalize=True, edge='raise'):
+    lower_bounds = np.array(center) - size // 2
+    upper_bounds = np.array(center) + size // 2 + 1
+
+    if any(lower_bounds < 0) or any(upper_bounds > im.shape[-1]):
+        if edge == 'raise':
+            raise IndexError(f'Center {center} too close to edge to extract size {size} region')
+        elif edge == 'return':
+            lower_bounds = np.maximum(lower_bounds, 0)
+            upper_bounds = np.minimum(upper_bounds, im.shape[-1])
+
+    region = im[lower_bounds[0]:upper_bounds[0], lower_bounds[1]:upper_bounds[1]]
+
+    if normalize:
+        return region / region.max()
+    else:
+        return region
+
+def get_gaussian_fitted_dots_python(tiff_src, channel, points, region_size=7):
+
+    if region_size % 2 == 0:
+        region_size += 1
+
+    image = pil_imread(tiff_src)[channel]
+
+    def _gaussian_fit(params, grid, imdata, sigmas, mag):
+        """
+        Evaluate a gaussian with parameters params (center, sigma, magnitude)
+        on grid and return pixelwise residuals with imdata
+        """
+
+        center_x, center_y = params
+        sigma_x, sigma_y = sigmas
+
+        X, Y = grid
+        exp = (X - center_x) ** 2 / (2 * sigma_x ** 2) + (Y - center_y) ** 2 / (2 * sigma_y ** 2)
+
+        return np.ravel((mag * np.exp(-exp)) - imdata)
+
+    grid = np.mgrid[0:region_size, 0:region_size]
+    opts = []
+    mags = []
+
+    for cand in points:
+        z, x, y = cand
+        zint = int(z)
+        xint, yint = int(x), int(y)
+
+        mags.append(image[zint-1, xint, yint])
+
+        try:
+            im_data = get_region_around(image[zint-1], [xint, yint], region_size, )
+        except IndexError:
+            opts.append(cand)
+            continue
+
+        loc_2d = least_squares(
+            _gaussian_fit,
+            x0=(5, 5),
+            x_scale=(1, 1),
+            xtol=1e-2,
+            args=(grid, im_data, (2, 2), 1),
+            method='lm'
+        ).x[:2] + [x, y] - region_size // 2
+
+        loc_3d = np.array([z] + list(loc_2d))
+        opts.append(loc_3d)
+
+    return [np.array(opts), np.array(mags)]
 
 
 def get_gaussian_fitted_dots(tiff_src, channel,points):
     
-    breakpoint()
     #Save Points to path
     #-------------------------------------------------------------------
     temp_dir = tempfile.TemporaryDirectory()

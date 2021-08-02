@@ -15,7 +15,7 @@ from dot_detection.helpers.visualize_dots import get_visuals_3d
 from dot_detection.helpers.shift_locations import shift_locations
 from dot_detection.helpers.background_subtraction import get_background, get_back_sub_check, get_shifted_background, remove_blobs_with_masks_3d
 from dot_detection.dot_detectors_3d.hist_jump_helpers.jump_helpers import hist_jump_threshed_3d
-from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
+from dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots_python
 from dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
 from dot_detection.preprocessing.preprocess import preprocess_img, get_preprocess_check
 from dot_detection.preprocessing.get_before_dot_detection_plots import side_by_side_preprocess_checks
@@ -182,7 +182,7 @@ def get_dots_for_tiff(tiff_src, offset = [0,0,0], analysis_name = None, bool_vis
         #Gaussian Fit the dots
         #---------------------------------------------------------------------
         if bool_gaussian_fitting == True:
-            dot_analysis = get_gaussian_fitted_dots(tiff_src, channel, dot_analysis[0])
+            dot_analysis = get_gaussian_fitted_dots_python(tiff_src, channel, dot_analysis[0])
         #---------------------------------------------------------------------
         
         #Center the dots
