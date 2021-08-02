@@ -5,7 +5,7 @@ from skimage.draw import polygon
 from skimage.measure import regionprops_table
 import matplotlib.pyplot as plt
 import sys
-
+import tifffile as tf
 import numpy as np
 import pandas as pd
 from read_roi import read_roi_zip
@@ -70,11 +70,13 @@ def save_plotted_cell(labeled_img, seg_dict_channel, fig_dest):
     plt.xlim([0,labeled_img.shape[1]])
     plt.ylim([0,labeled_img.shape[2]])
 
-    for i in range(len(seg_dict_channel)):#len(seg_dict_channel)):
+    for i in range(len(seg_dict_channel)):
+
         print(f'{seg_dict_channel.keys()=}')
 
         if i in list(seg_dict_channel.keys()):
             points = seg_dict_channel[i][0]
+
             print(f'{points.shape=}')
             print(f'{points[:2]=}')
 
@@ -134,7 +136,7 @@ def get_segmentation_dict_dots(locations_src, labeled_img, fig_dest):
         seg_dict_channel = get_dot_analysis_for_channel(locs_ch, labeled_img)
         #----------------------------------------------
         #print(f'{np.unique(labeled_img)=}')
-        print(f'{len(seg_dict_channel[i])=}')
+    
         if i == 1:
             print('Plotting')
             #fig_dest = 'plotted_cells.png'
@@ -159,6 +161,24 @@ def get_segmentation_dict_dots(locations_src, labeled_img, fig_dest):
     return all_seg_dict
 
 
+<<<<<<< HEAD
+if sys.argv[1] == 'debug_seg_dict':
+    roi_src = '/groups/CaiLab/personal/nrezaee/raw/intron_pos0/segmentation/RoiSet.zip'
+    labeled_img  = get_labeled_img(roi_src)
+    
+    locations_src = '/groups/CaiLab/analyses/nrezaee/test1-big/cellpose/MMStack_Pos0/Dot_Locations/locations.csv'
+    fig_dst = '/tmp/fig.png'
+    seg_dict = get_segmentation_dict_dots(locations_src, labeled_img, fig_dst)
+    
+if sys.argv[1] == 'debug_seg_dict_michal':    
+    tiff_src = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_pool1/test_pos33_strict7_thresh50/MMStack_Pos33/Segmentation/labeled_img_post.tif'
+    labeled_img  = tf.imread(tiff_src)
+    
+    locations_src = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_pool1/test_pos33_strict7_thresh50/MMStack_Pos33/Dot_Locations/locations.csv'
+    fig_dst = '/tmp/fig.png'
+    seg_dict = get_segmentation_dict_dots(locations_src, labeled_img, fig_dst)
+
+=======
 if len(sys.argv) > 1:
     if sys.argv[1] == 'debug_seg_dict':
         #roi_src = '/groups/CaiLab/personal/nrezaee/raw/intron_pos0/segmentation/RoiSet.zip'
@@ -166,3 +186,4 @@ if len(sys.argv) > 1:
         locations_src = '/groups/CaiLab/analyses/nrezaee/test1-big/cellpose/MMStack_Pos0/Dot_Locations/locations.csv'
         fig_dst = '/tmp/fig.png'
         seg_dict = get_segmentation_dict_dots(locations_src, labeled_img, fig_dst)
+>>>>>>> 8fb2b9043ab5bbfbb46020179ba6256ac8989fa5

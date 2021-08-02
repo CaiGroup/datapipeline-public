@@ -121,7 +121,7 @@ def add_offset_to_locations(locations, offset, tiff_src, bool_chromatic):
             experiment_name= split_tiff_src[6]
             
             chromatic_offsets_src = os.path.join('/groups/CaiLab/analyses', personal, experiment_name, \
-                                    analysis_name, 'Chromatic_Abberation_Correction/chromatic_offsets.json')
+                                    analysis_name, 'Chromatic_Aberration_Correction/chromatic_offsets.json')
                                     
             with open(chromatic_offsets_src) as json_file: 
                 chromatic_offsets = np.array(json.load(json_file))
@@ -129,7 +129,7 @@ def add_offset_to_locations(locations, offset, tiff_src, bool_chromatic):
             #---------------------------------------------------------------------
             
             
-            #Shift for chromatic abberation
+            #Shift for chromatic aberration
             #---------------------------------------------------------------------
             key  = "Channel " +str(channel)
             
@@ -207,10 +207,10 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
     #---------------------------------------------------------------------
     
     
-    #Print RUnning Chromatic Abberation
+    #Print RUnning Chromatic aberration
     #---------------------------------------------------------------------
     if bool_chromatic ==True:
-        print("        Shifting image for Chromatic Abberation", flush=True)
+        print("        Shifting image for Chromatic Aberration", flush=True)
     #---------------------------------------------------------------------
     
     

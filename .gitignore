@@ -18,3 +18,5 @@ foo.*
 *.png
 *.tif
 *.pickle
+venv
+.idea

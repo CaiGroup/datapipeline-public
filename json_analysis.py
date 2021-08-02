@@ -87,7 +87,7 @@ def run_analysis(json_name, position):
         #----------------------------------------------------------
         orig_stdout = sys.stdout
         
-        output_dir = os.path.join(main_dir, 'analyses', data['personal'], data['experiment_name'], \
+        output_dir = os.path.join(main_dir, 'analyses', data['personal'], data['experiment_name'],
                                    analysis_name, position.split('.ome')[0], 'Output')
 
         if not os.path.exists(output_dir):
@@ -106,9 +106,9 @@ def run_analysis(json_name, position):
 
     #Declare Analysis Class
     #---------------------------------------------------------
-    analysis = Analysis(experiment_name=data['experiment_name'], \
-                analysis_name=json_name.split('.json')[0], \
-                personal = data['personal'], \
+    analysis = Analysis(experiment_name=data['experiment_name'],
+                analysis_name=json_name.split('.json')[0],
+                personal = data['personal'],
                 position = args.position, 
                 email = args.email)
     #----------------------------------------------------------
@@ -144,7 +144,7 @@ def run_analysis(json_name, position):
     #----------------------------------------------------------
     if 'chromatic aberration' in data.keys():
         if data['chromatic aberration'] == 'true':
-            analysis.set_chromatic_abberration_true()
+            analysis.set_chromatic_aberration_true()
     #----------------------------------------------------------
     
     
@@ -517,6 +517,13 @@ def run_analysis(json_name, position):
         if data['tophat preprocessing'] != 'none':
             analysis.set_tophat_true()
     #----------------------------------------------------------
+
+    #Tophat Preprocessing
+    #----------------------------------------------------------
+    if 'tophat raw data preprocessing' in data.keys():
+        if data['tophat raw data preprocessing'] != 'none':
+            analysis.set_tophat_raw_data_true()
+    #----------------------------------------------------------
     
     #Rolling ball background subtraction
     #----------------------------------------------------------
@@ -553,6 +560,13 @@ def run_analysis(json_name, position):
             analysis.set_tophat_kernel_size_arg(data['tophat kernel size'])
     #----------------------------------------------------------
 
+    #Tophat Ball size
+    #----------------------------------------------------------
+    if 'tophat raw data kernel size' in data.keys():
+        if data['tophat raw data kernel size'] != 'none':
+            analysis.set_tophat_raw_data_kernel_size_arg(data['tophat raw data kernel size'])
+    #----------------------------------------------------------
+    
     #Set Min Sigma
     #----------------------------------------------------
     if 'min sigma dot detection' in data.keys():
@@ -581,6 +595,13 @@ def run_analysis(json_name, position):
             analysis.set_remove_very_bright_dots_arg(data['remove very bright dots'])
     #----------------------------------------------------------
     
+    #Set Dilate Background Kernel
+    #----------------------------------------------------
+    if 'dilate background kernel' in data.keys():
+        if not data['dilate background kernel'] == 'none':
+            analysis.set_dilate_background_kernel_arg(data['dilate background kernel'])
+    #----------------------------------------------------------
+    
     #Writ
     #----------------------------------------------------------
     analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)
@@ -600,17 +621,6 @@ def run_analysis(json_name, position):
         
     return None
 #=========================================================================    
-    
-    
-run_analysis(args.json, args.position)
-    
-        
-    
-    
-    
-        
-        
-    
-        
-        
-    
+
+if __name__ == '__main__':
+    run_analysis(args.json, args.position)
