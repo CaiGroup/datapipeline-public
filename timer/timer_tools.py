@@ -92,12 +92,12 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # Set a single global log file name
-#GLOBAL_LOG_PATH = Path('/groups/CaiLab/analyses/new_pipeline_rotating_log.txt')
+GLOBAL_LOG_PATH = Path('/groups/CaiLab/analyses/pipeline_rotating_log_lincoln.txt')
 # Set up a Handler that maxes out at ~1 MB
-#global_handler = RotatingFileHandler(GLOBAL_LOG_PATH, maxBytes=2**20, backupCount=1)
-#global_handler.setLevel(logging.INFO)
+global_handler = RotatingFileHandler(GLOBAL_LOG_PATH, maxBytes=2**20, backupCount=1)
+global_handler.setLevel(logging.INFO)
 
-#logger.addHandler(global_handler)
+logger.addHandler(global_handler)
 
 
 #Set Functions for Logging
