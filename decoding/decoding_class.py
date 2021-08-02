@@ -37,10 +37,10 @@ from decoding.percentage_of_dots_used_check.percentage_of_dots_used import get_p
 #Decoding Class to set and run parameters for decoding
 #=====================================================================================
 class Decoding:
-    def __init__(self, data_dir, position, decoded_dir, locations_dir, position_dir, barcode_dst, barcode_src, \
-                    bool_decoding_with_previous_dots, bool_decoding_with_previous_locations, \
-                    bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions, \
-                    num_zslices, segmentation, decode_only_cells, labeled_img, num_wav, synd_decoding, \
+    def __init__(self, data_dir, position, decoded_dir, locations_dir, position_dir, barcode_dst, barcode_src,
+                    bool_decoding_with_previous_dots, bool_decoding_with_previous_locations,
+                    bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions,
+                    num_zslices, segmentation, decode_only_cells, labeled_img, num_wav, synd_decoding,
                     lampfish_pixel, start_time):
         
         self.data_dir = data_dir
@@ -168,7 +168,7 @@ class Decoding:
         #--------------------------------------------------------------------
         print("Running Decoding Across Channels")
         
-        if self.seg == False:
+        if not self.seg:
             
             decoding.decoding(barcode_file_path, locations_path, self.decoded_dir, allowed_diff = self.allowed_diff, min_seeds = self.min_seeds)
             
@@ -272,13 +272,15 @@ class Decoding:
             #--------------------------------------------------------------------
             print("Running Decoding Across Channels")
             
-            if self.seg == False:
+            if not self.seg:
                 decoding.decoding(barcode_file_path, locations_path_z, decoding_dst_z, allowed_diff = self.allowed_diff, min_seeds = self.min_seeds)
             
             else:
                     
-                decoding_parallel.decoding(barcode_file_path, locations_path_z, self.labeled_img, decoding_dst_z, self.allowed_diff,  \
-                    self.min_seeds, decode_only_cells = self.decode_only_cells)
+                decoding_parallel.decoding(
+                    barcode_file_path, locations_path_z, self.labeled_img, decoding_dst_z, self.allowed_diff,
+                    self.min_seeds, decode_only_cells = self.decode_only_cells
+                )
             print("Finished Decoding Across Channels")
             #--------------------------------------------------------------------
             
@@ -334,15 +336,22 @@ class Decoding:
                 os.makedirs(decoding_dst_for_channel_z, exist_ok = True)
                 #--------------------------------------------------------------------
             
-                if self.seg == False:
+                if not self.seg:
                     #Run decoding for individual channel
                     #--------------------------------------------------------------------
-                    decoding.decoding(barcode_dst, locations_path_z, decoding_dst_for_channel_z, self.allowed_diff, self.min_seeds, self.decoding_individual.index(channel), \
-                                      len(self.decoding_individual))
+                    decoding.decoding(
+                        barcode_dst, locations_path_z, decoding_dst_for_channel_z,
+                        self.allowed_diff, self.min_seeds, self.decoding_individual.index(channel),
+                        len(self.decoding_individual)
+                    )
                     #--------------------------------------------------------------------
                 else:
-                    decoding_parallel.decoding(barcode_dst, locations_path_z, self.labeled_img, decoding_dst_for_channel_z, self.allowed_diff, self.min_seeds, \
-                        self.decoding_individual.index(channel), len(self.decoding_individual), decode_only_cells = self.decode_only_cells)
+                    decoding_parallel.decoding(
+                        barcode_dst, locations_path_z, self.labeled_img,
+                        decoding_dst_for_channel_z, self.allowed_diff, self.min_seeds,
+                        self.decoding_individual.index(channel), len(self.decoding_individual),
+                        decode_only_cells = self.decode_only_cells
+                    )
                 #--------------------------------------------------------------------
                 
             self.combine_decode_z_s(decoding_dst_for_channel)
@@ -392,26 +401,32 @@ class Decoding:
             if self.seg == False:
                 #Run decoding for individual channel
                 #--------------------------------------------------------------------
-                decoded_genes_path = decoding_non_parallel.decoding(barcode_dst, locations_path, decoding_dst_for_channel, self.allowed_diff, self.min_seeds, self.decoding_individual.index(channel), \
-                                  len(self.decoding_individual))
+                decoded_genes_path = decoding_non_parallel.decoding(
+                    barcode_dst, locations_path, decoding_dst_for_channel,
+                    self.allowed_diff, self.min_seeds, self.decoding_individual.index(channel),
+                    len(self.decoding_individual)
+                )
                 #--------------------------------------------------------------------
             else:
                 
                 #Run Decoding Across Channels
                 #--------------------------------------------------------------------
                 print('Shape in Decoding Class: ' +  str(self.labeled_img.shape))
-                decoded_genes_path = decoding_parallel.decoding(barcode_dst, locations_path, self.labeled_img, decoding_dst_for_channel, self.allowed_diff, self.min_seeds, \
-                    self.decoding_individual.index(channel), len(self.decoding_individual), decode_only_cells = self.decode_only_cells)
+                decoded_genes_path = decoding_parallel.decoding(
+                    barcode_dst, locations_path, self.labeled_img, decoding_dst_for_channel,
+                    self.allowed_diff, self.min_seeds, self.decoding_individual.index(channel),
+                    len(self.decoding_individual), decode_only_cells = self.decode_only_cells
+                )
                 
             print("Finished Decoding Across Channels")
             #--------------------------------------------------------------------
             
             #Get percentage of Dots used
             #--------------------------------------------------------------------
-            get_percentage_of_dots_used(locs_src = locations_path,
-                                        decoded_genes_src = decoded_genes_path,
-                                        channel = channel,
-                                        dst_dir = decoding_dst_for_channel)
+            get_percentage_of_dots_used(locs_src=locations_path,
+                                        decoded_genes_src=decoded_genes_path,
+                                        channel=channel,
+                                        dst_dir=decoding_dst_for_channel)
             #--------------------------------------------------------------------
             
     def run_decoding_with_previous_dots(self):
@@ -569,8 +584,10 @@ class Decoding:
         
         #Get first channel
         #--------------------------------------------------------------------
-        lampfish.get_ratio_of_channels(offsets_path, channel_offsets_dst, locations_path, self.data_dir, pos, \
-                                        ratio_locs_dst, self.num_wav, self.lampfish_pixel)
+        lampfish.get_ratio_of_channels(
+            offsets_path, channel_offsets_dst, locations_path, self.data_dir, pos,
+            ratio_locs_dst, self.num_wav, self.lampfish_pixel
+        )
         #--------------------------------------------------------------------
 
         #Get Analytics

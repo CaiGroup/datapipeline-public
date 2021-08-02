@@ -4,6 +4,7 @@ import sys
 import scipy.io as sio
 import numpy as np
 import glob
+import pandas as pd
 import tifffile as tf
 sys.path.insert(0, os.getcwd())
 
@@ -67,7 +68,7 @@ class Segmentation:
         self.cyto_cell_prob_threshold = cyto_cell_prob_threshold
         self.cyto_radius = cyto_radius
 
-    def combine_seg_z_s(seg_channel_dir):
+    def combine_seg_z_s(self, seg_channel_dir):
 
         #Get Csv's
         #-----------------------------------------------------
@@ -168,10 +169,7 @@ class Segmentation:
 
         run_cellpose.run_me(self.data_dir, self.seg_dir, decoded_genes_path, barcode_key_src, self.position, self.labeled_img)
 
-
-
     def run_segmentation_individually(self):
-
 
         # Get Segmentation Dirs
         #----------------------------------------------
@@ -244,10 +242,13 @@ class Segmentation:
             os.makedirs(self.seg_dir)
         #----------------------------------------------
 
-        label_img_path = save_labeled_img(self.data_dir, self.seg_dir, self.position, self.edge_dist, self.dist_between_nuclei,
-            self.bool_cyto_match, self.area_tol, self.cyto_channel_num, self.get_nuclei_img, self.get_cyto_img, self.num_wav,
-            self.nuclei_radius, self.num_zslices, self.flow_threshold, self.cell_prob_threshold, self.nuclei_channel_num,
-            self.cyto_flow_threshold, self.cyto_cell_prob_threshold, self.cyto_radius)
+        label_img_path = save_labeled_img(
+            self.data_dir, self.seg_dir, self.position, self.edge_dist, self.dist_between_nuclei,
+            self.bool_cyto_match, self.area_tol, self.cyto_channel_num, self.get_nuclei_img,
+            self.get_cyto_img, self.num_wav, self.nuclei_radius, self.num_zslices,
+            self.flow_threshold, self.cell_prob_threshold, self.nuclei_channel_num,
+            self.cyto_flow_threshold, self.cyto_cell_prob_threshold, self.cyto_radius
+        )
 
         print(f'{label_img_path=}')
         # get_label_img_visuals(label_img_path, self.data_dir, self.position, self.num_wav)
