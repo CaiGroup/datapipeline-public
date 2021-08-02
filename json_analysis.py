@@ -607,7 +607,8 @@ def run_analysis(json_name, position):
     analyses_dir = os.path.join(main_dir, 'analyses', args.personal, args.experiment_name, analysis_name)
     
     position_dir = os.path.join(analyses_dir, args.position.split('.ome')[0])
-    
+
+    # This call actually runs all of the steps given the parameters we've set up:
     analysis.write_results(position_dir)
     #----------------------------------------------------------
     
