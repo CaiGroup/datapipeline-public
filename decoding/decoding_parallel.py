@@ -111,7 +111,7 @@ def run_matlab_decoding(rand, barcode_src, locations_cell_path, dest, num_of_rou
 
     call_me = [
         'sbatch',
-        '--begin', 'now+60'
+        '--begin', 'now+120'
         '--job-name', rand,
         "--output", output_path,
         "--time", "0:50:00",
