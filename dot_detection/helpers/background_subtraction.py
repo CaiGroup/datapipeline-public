@@ -128,7 +128,7 @@ def get_shifted_background(back_3d, tiff_src, analysis_name):
     
     if len(back_offset) == 3:
         
-        raise ValueError('The background subtraction for 3d needs to be double checked to see if the offset is aligning stuff correctly.')
+        #raise ValueError('The background subtraction for 3d needs to be double checked to see if the offset is aligning stuff correctly.')
         shifted_back = shift(back_3d, offset_back_minus_hyb)
         
     elif len(back_offset) == 2:
