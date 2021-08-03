@@ -46,6 +46,7 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
         barcode_key_dir = os.path.dirname(barcode_src)
         
         print(f'{barcode_key_dir=}')
+
         if os.path.basename(barcode_src) == 'barcode.csv':
             fake_barcodes_path = os.path.join(barcode_key_dir, 'fake_barcode.csv')
         elif 'channel' in os.path.basename(barcode_src):

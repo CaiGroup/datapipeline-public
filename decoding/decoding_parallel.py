@@ -108,7 +108,17 @@ def run_matlab_decoding(rand, barcode_src, locations_cell_path, dest, num_of_rou
         f.write(cmd)
 
     output_path = os.path.join(dest, 'slurm_decoding.out')
-    call_me = ['sbatch','--job-name', rand, "--output", output_path, "--time", "0:50:00", "--mem-per-cpu", "8G",  '--ntasks', '1', script_name]
+
+    call_me = [
+        'sbatch',
+        '--begin', 'now+60'
+        '--job-name', rand,
+        "--output", output_path,
+        "--time", "0:50:00",
+        "--mem-per-cpu", "8G",
+        '--ntasks', '1', script_name
+    ]
+
     print(" ".join(call_me))
     subprocess.call(call_me)
 
