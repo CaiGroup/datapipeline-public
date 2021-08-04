@@ -1,0 +1,6 @@
+{
+    "SBATCH_DEFAULTS": "time=10:00:00",
+    "CLUSTER_NAME": "",
+    "CLUSTER_CONFIG": "",
+    "ADVANCED_ARGUMENT_CONVERSION": "no"
+}
