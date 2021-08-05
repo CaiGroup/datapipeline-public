@@ -1,119 +1,49 @@
-configfile: 'analysis.yaml'
+import pandas as pd
+import numpy as np
+from pathlib import Path
 
-# something that creates a file detailing every hyb and position
-# as well as extra information: barcode key, seg images,
-# experiment metadata
-rule gen_manifest:
+PIPE_ROOT = config.get('pipeline_root', '/home/lombelet/data-pipeline-lincoln')
+
+MAIN = config.get('main_dir', '/groups/CaiLab')
+USER = config.get('user', 'lincoln')
+DATASET = config.get('dataset', '2020-08-08-takei')
+
+RAW_DIR = Path(MAIN, 'personal', USER, 'raw', DATASET)
+
+OUT_DIR = Path(MAIN, 'personal', 'lincoln', 'snakemake_test', DATASET)
+
+EXP_TAB = OUT_DIR / 'exp_tab.csv'
+
+rule find_experiment_files:
     input:
-        # some config values
-    expand('HybCycle_{hyb}/MMStack_Pos{position}.ome.tif',
-        hyb=range(config['n_hybs']),
-        position=range(config['n_positions'])
-    )
+        RAW_DIR
     output:
-        'experiment_manifest'
+        exp_tab=EXP_TAB
+    run:
+        globbed = glob_wildcards(input[0] + '/HybCycle_{hyb, \d+}/MMStack_Pos{position, \d+}.ome.tif')
 
+        filenames = [f'{RAW_DIR}/HybCycle_{h}/MMStack_Pos{p}.ome.tif' for p, h in zip(globbed.position, globbed.hyb)]
 
-####### BEGIN per hyb per position
+        df = pd.DataFrame({'position': globbed.position, 'hyb': globbed.hyb, 'filename': filenames})
+        df['position'] = df['position'].astype(int)
+        df['hyb'] = df['hyb'].astype(int)
 
-# can run per hyb per position, using hyb0 as input
-rule alignment:
+        df = df.set_index(['position', 'hyb']).sort_index()
+        df.to_csv(output.exp_tab)
+
+EXP_TAB_DF = pd.read_csv(EXP_TAB).set_index(['position', 'hyb'])
+
+rule align_matlab_dapi:
     input:
-        'experiment_manifest',
-        expand('HybCycle_0/MMStack_Pos{thispos}',
-            thispos=config['pos']),
-        expand('HybCycle_{thishyb}/MMStack_Pos{thispos}',
-               # some way of passing which hyb and pos each job is running
-               thishyb=config['hyb'],
-               thispos=config['pos'])
+       EXP_TAB,
+       expand('{rawdir}/HybCycle_0/MMStack_Pos{position}.ome.tif', rawdir=RAW_DIR, position=EXP_TAB_DF.index.levels[0]),
+       expand('{rawdir}/HybCycle_{hyb}/MMStack_Pos{position}.ome.tif', rawdir=RAW_DIR, position=EXP_TAB_DF.index.levels[0], hyb=EXP_TAB_DF.index.levels[1]) 
+    params:
+        fixed_src=str(RAW_DIR / 'HybCycle_0/MMStack_Pos{position}.ome.tif'),
+        moving_src=str(RAW_DIR / 'HybCycle_{hyb}/MMStack_Pos{position}.ome.tif'),
+        dest_dir=str(OUT_DIR / 'MMStack_Pos{position}/HybCycle_{hyb}/offset'),
+        script_loc=str(Path(PIPE_ROOT, 'align_scripts', 'matlab_dapi.py')),
     output:
-        'offsets.json',
-        expand('Hyb{thishyb}_Pos{thispos}_aligned.tif',
-           # some way of passing which hyb and pos each job is running
-           thishyb=config['hyb'],
-           thispos=config['pos'])
-    log:
-        # HybX_PosY_alignment.log
-
-
-# can run per hyb per position
-# run alignment first so that we segment aligned/shifted images
-rule segmentation:
-    input:
-        'experiment_manifest',
-        'offsets.json',
-        expand('HybCycle_{thishyb}/MMStack_Pos{thispos}',
-            # some way of passing which hyb and pos each job is running
-            thishyb=config['hyb'],
-            thispos=config['pos'])
-    output:
-        'labeled_img.tif'
-    log:
-        # HybX_PosY_segmentation.log
-
-# can run per hyb per position
-rule preprocessing:
-    input:
-        'experiment_manifest',
-        expand('Hyb{thishyb}_Pos{thispos}_aligned.tif',
-           # some way of passing which hyb and pos each job is running
-           thishyb=config['hyb'],
-           thispos=config['pos'])
-    output:
-        temp(expand('Hyb{thishyb}_Pos{thispos}_preprocessed.tif',
-               # some way of passing which hyb and pos each job is running
-               thishyb=config['hyb'],
-               thispos=config['pos']))
-    log:
-        # HybX_PosY_preprocessing.log
-
-# can run per hyb per position (per channel)
-rule dot_detection:
-    input:
-        'experiment_manifest',
-        temp(expand('Hyb{thishyb}_Pos{thispos}_preprocessed.tif',
-               # some way of passing which hyb and pos each job is running
-               thishyb=config['hyb'],
-               thispos=config['pos'])),
-        'offsets.json'
-    output:
-        'locations.csv'
-    log:
-        # HybX_PosY_dotdetection.log
-
-###### END per hyb per position
-
-
-rule combine_data:
-    input:
-        'experiment_manifest',
-        'locations.csv' # expand all hybs
-        'offsets.json' # expand all hybs
-    output:
-        'locations_combined_aligned.csv'
-
-
-# can run per position, not per hyb - needs all
-# possible per channel or not
-rule decoding:
-    input:
-        'experiment_manifest',
-        'preprocessed_images',
-        'labeled_img.tif',
-        'locations_combined_aligned.csv',
-        'barcodekey',
-        # various config options
-    output:
-        'pre_seg_diff_1_minseeds_3_filtered.csv',
-        'gene_locations_assigned_to_cell.csv',
-        'count_matrix.csv',
-        'count_matrix_all_channels.csv'
-
-rule stitch:
-    input:
-        'locations.csv',
-        'gene_locations_assigned_to_cell.csv',
-        'position.pos'
-    output:
-        'overview.tif',
-        'locations_stitched.csv'
+        '{params.dest_dir}.txt'
+    shell:
+        "python {params.script_loc} --fixed_src {params.fixed_src} --moving_src {params.moving_src} --dest_dir {params.dest_dir}"
