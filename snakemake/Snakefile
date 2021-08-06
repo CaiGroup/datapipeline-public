@@ -39,7 +39,7 @@ wildcard_constraints:
     hyb='\d+',
     position='\d+'
 
-rule align_matlab_dapi:
+checkpoint align_matlab_dapi:
     input:
        'data/HybCycle_0/MMStack_Pos{position}.ome.tif',
        'data/HybCycle_{hyb}/MMStack_Pos{position}.ome.tif' 
@@ -53,9 +53,8 @@ rule align_matlab_dapi:
     shell:
         "python {params.script_loc} --fixed_src {input[0]} --moving_src {input[1]} --dest_dir {params.dest_dir}"
 
-rule combine_offsets:
+checkpoint combine_offsets:
     input:
-        exp_tab=EXP_TAB,
         offsets=for_each_pos_each_hyb(Path('alignment', 'pos_{position}_hyb_{hyb}', 'offset.txt'))
     output:
         Path('alignment', 'offsets.json')
@@ -65,12 +64,14 @@ rule combine_offsets:
         for file in input['offsets']:
             try:
                 offsets = open(file, 'r').read()
+
+                key = Path(file).parts[1]
+                offsets = offsets.split(',')[:2]
+                offsets = [float(o) for o in offsets]
+
+                offsets_combined[key] = offsets
             except:
                 continue
 
-            key = Path(file).parts[1]
-            offsets = offsets.split(',')[:2]
-            offsets = [float(o) for o in offsets]
-            offsets_combined[key] = offsets
         import json
-        json.dump(offsets_combined, open('alignment/offsets.json', 'w'), indent=2)
+        json.dump(offsets_combined, open(output[0], 'w'), indent=2)
