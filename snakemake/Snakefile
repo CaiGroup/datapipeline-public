@@ -2,48 +2,75 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
+"""
+Run this directly in your experiment directory.
+e.g. snakemake -c1 -j100 --profile /home/lombelet/data-pipeline-lincoln/snakemake/slurm alignment/offsets.json
+"""
 PIPE_ROOT = config.get('pipeline_root', '/home/lombelet/data-pipeline-lincoln')
+EXP_TAB = 'exp_tab.csv'
 
-MAIN = config.get('main_dir', '/groups/CaiLab')
-USER = config.get('user', 'lincoln')
-DATASET = config.get('dataset', '2020-08-08-takei')
+# This generates EXP_TAB, so really should be in another file because we need to read
+# EXP_TAB in for the subsequent rules.
+globbed = glob_wildcards('data/HybCycle_{hyb, \d+}/MMStack_Pos{position, \d+}.ome.tif')
+filenames = [f'data/HybCycle_{h}/MMStack_Pos{p}.ome.tif' for p, h in zip(globbed.position, globbed.hyb)]
 
-RAW_DIR = Path(MAIN, 'personal', USER, 'raw', DATASET)
+df = pd.DataFrame({'position': globbed.position, 'hyb': globbed.hyb, 'filename': filenames})
+df['position'] = df['position'].astype(int)
+df['hyb'] = df['hyb'].astype(int)
 
-OUT_DIR = Path(MAIN, 'personal', 'lincoln', 'snakemake_test', DATASET)
+df = df.set_index(['position', 'hyb']).sort_index()
+df.to_csv(EXP_TAB)
 
-EXP_TAB = OUT_DIR / 'exp_tab.csv'
+def make_align_name(position, hyb):
+    return f'alignment/pos_{position}_hyb_{hyb}_offset'
 
-rule find_experiment_files:
-    input:
-        RAW_DIR
-    output:
-        exp_tab=EXP_TAB
-    run:
-        globbed = glob_wildcards(input[0] + '/HybCycle_{hyb, \d+}/MMStack_Pos{position, \d+}.ome.tif')
+def absolute(path):
+    return str(Path(path).absolute().resolve())
 
-        filenames = [f'{RAW_DIR}/HybCycle_{h}/MMStack_Pos{p}.ome.tif' for p, h in zip(globbed.position, globbed.hyb)]
+def for_each_pos_each_hyb(fmt_string):
+    df = pd.read_csv(EXP_TAB)
+    pos_hybs = df[['position', 'hyb']].values
 
-        df = pd.DataFrame({'position': globbed.position, 'hyb': globbed.hyb, 'filename': filenames})
-        df['position'] = df['position'].astype(int)
-        df['hyb'] = df['hyb'].astype(int)
+    fmt_string = str(fmt_string)
 
-        df = df.set_index(['position', 'hyb']).sort_index()
-        df.to_csv(output.exp_tab)
+    return [fmt_string.format(position=p, hyb=h) for p, h in pos_hybs]
 
-EXP_TAB_DF = pd.read_csv(EXP_TAB).set_index(['position', 'hyb'])
+wildcard_constraints:
+    hyb='\d+',
+    position='\d+'
 
 rule align_matlab_dapi:
     input:
-       EXP_TAB,
-       expand('{rawdir}/HybCycle_0/MMStack_Pos{position}.ome.tif', rawdir=RAW_DIR, position=EXP_TAB_DF.index.levels[0]),
-       expand('{rawdir}/HybCycle_{hyb}/MMStack_Pos{position}.ome.tif', rawdir=RAW_DIR, position=EXP_TAB_DF.index.levels[0], hyb=EXP_TAB_DF.index.levels[1]) 
+       'data/HybCycle_0/MMStack_Pos{position}.ome.tif',
+       'data/HybCycle_{hyb}/MMStack_Pos{position}.ome.tif' 
     params:
-        fixed_src=str(RAW_DIR / 'HybCycle_0/MMStack_Pos{position}.ome.tif'),
-        moving_src=str(RAW_DIR / 'HybCycle_{hyb}/MMStack_Pos{position}.ome.tif'),
-        dest_dir=str(OUT_DIR / 'MMStack_Pos{position}/HybCycle_{hyb}/offset'),
+        dest_dir='alignment/pos_{position}_hyb_{hyb}',
         script_loc=str(Path(PIPE_ROOT, 'align_scripts', 'matlab_dapi.py')),
     output:
-        '{params.dest_dir}.txt'
+        temp(Path('alignment', 'pos_{position}_hyb_{hyb}', 'offset.txt')),  
+        temp(Path('alignment', 'pos_{position}_hyb_{hyb}', 'dapi_s.mat'))
+    threads: 4
     shell:
-        "python {params.script_loc} --fixed_src {params.fixed_src} --moving_src {params.moving_src} --dest_dir {params.dest_dir}"
+        "python {params.script_loc} --fixed_src {input[0]} --moving_src {input[1]} --dest_dir {params.dest_dir}"
+
+rule combine_offsets:
+    input:
+        exp_tab=EXP_TAB,
+        offsets=for_each_pos_each_hyb(Path('alignment', 'pos_{position}_hyb_{hyb}', 'offset.txt'))
+    output:
+        Path('alignment', 'offsets.json')
+    run:
+        offsets_combined = {}
+
+        for file in input['offsets']:
+            try:
+                offsets = open(file, 'r').read()
+            except:
+                continue
+
+            key = Path(file).parts[1]
+            offsets = offsets.split(',')[:2]
+            offsets = [float(o) for o in offsets]
+            offsets_combined[key] = offsets
+        import json
+        json.dump(offsets_combined, open('alignment/offsets.json', 'w'), indent=2)
