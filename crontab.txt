@@ -1,19 +1,13 @@
-MAILTO="nrezaeegradschools@gmail.com"
+MAILTO="lombelets@caltech.edu"
 
-PATH="/central/slurm/install/current/bin:/central/slurm/install/current/bin:/central/software/rclone-v1.53.2-linux-amd64:/central/software/singularity/3.5.2/bin:/software/Matlab/R2019a/bin:/central/software/mosh/1.3.2/bin:/home/nrezaee/miniconda3/bin:/home/nrezaee/miniconda3/condabin:/central/slurm/install/current/bin:/usr/lib64/qt-3.3/bin:/usr/local/bin:/usr/bin:/usr/lpp/mmfs/bin:/opt/ibutils/bin:/opt/dell/srvadmin/bin:/home/nrezaee/.npm-packages/bin:/usr/local/sbin:/usr/sbin:/usr/lpp/mmfs/bin:/home/nrezaee/.npm-packages/bin:/home/nrezaee/.local/bin:/home/nrezaee/bin:/usr/lpp/mmfs/bin:/home/nrezaee/.npm-packages/bin:/home/nrezaee/.local/bin:/home/nrezaee/bin"
+DATA_PIPELINE_DIR="/home/lombelet/data-pipeline-1"
+JSON_ANALYSES_DIR="/groups/CaiLab/json_analyses_lincoln"
+PYTHON_BIN_DIR="/groups/CaiLab/personal/python_env/bin"
 
+#*/100 * * * * rclone sync /groups/CaiLab/analyses/ onedrive_caltech:Analyses/ > /dev/null
 
+*/5 * * * * srun -t 00:01:00 --mem=10G -N 1 ${DATA_PIPELINE_DIR}/run_cron.sh $DATA_PIPELINE_DIR $JSON_ANALYSES_DIR 2>&1 ${DATA_PIPELINE_DIR}/cron.log
 
-* * * * * /home/nrezaee/data-pipeline/sync_jsons_aws.sh
-
-*/100 * * * * rclone sync /groups/CaiLab/analyses/ onedrive_caltech:Analyses/ > /dev/null 
-
-#* * * * * sh /home/nrezaee/data-pipeline/sync_jsons.sh 2>&1 | tee  /home/nrezaee/data-pipeline/foo.txt
-
-*/5 * * * * srun -t 00:01:00 --mem=10G -N 1 sh /home/nrezaee/data-pipeline/for_cron.sh 
-
-* * * * * python /home/nrezaee/sandbox/aws_sync_dir_struct/sync_dir_structs.py > /dev/null
-
-* * * * * rm /groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/segmentation -r | tee  /home/nrezaee/data-pipeline/foo.txt
-
-00,30 * * * * pkill -f rclone
+#* * * * * python /home/lombelet/sandbox/aws_sync_dir_struct/sync_dir_structs.py > /dev/null
+#* * * * * rm /groups/CaiLab/personal/lombelet/raw/2020-08-08-takei/segmentation -r | tee  /home/lombelet/data-pipeline/foo.txt
+#00,30 * * * * pkill -f rclone

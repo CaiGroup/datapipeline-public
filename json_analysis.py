@@ -433,7 +433,35 @@ def run_analysis(json_name, position):
         if data['decoding method'] == 'syndrome':
             analysis.set_syndrome_decoding_true()
     #----------------------------------------------------------
-    
+
+    # Set Lateral Variance Factor For Syndrome Decoding
+    # ----------------------------------------------------
+    if 'lateral variance factor' in data.keys():
+        if data['lateral variance factor'] != 'none':
+            analysis.set_lateral_variance_factor(data['lateral variance factor'])
+    # ----------------------------------------------------------
+
+    # Set Z Variance Factor For Syndrome Decoding
+    # ----------------------------------------------------
+    if 'z variance factor' in data.keys():
+        if data['z variance factor'] != 'none':
+            analysis.set_z_variance_factor(data['z variance factor'])
+    # ----------------------------------------------------------
+
+    # Set Log Weight Variance Factor For Syndrome Decoding
+    # ----------------------------------------------------
+    if 'log weight variance factor' in data.keys():
+        if data['log weight variance factor'] != 'none':
+            analysis.set_log_weight_variance_factor(data['log weight variance factor'])
+    # ----------------------------------------------------------
+
+    # Set Hstr For Syndrome Decoding
+    # ----------------------------------------------------
+    if 'parity check path' in data.keys():
+        if data['parity check path'] != 'none':
+            analysis.set_parity_check_path(data['parity check path'])
+    # ----------------------------------------------------------
+
     #Cellpose Radius
     #----------------------------------------------------
     if 'nuclei radius' in data.keys():

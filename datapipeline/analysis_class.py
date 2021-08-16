@@ -164,6 +164,10 @@ class Analysis:
         self.radius_step = 1
         self.debug_dot_detection = False
         self.synd_decoding = False
+        self.lateral_variance_factor = 100.0
+        self.z_variance_factor = 0.0
+        self.log_weight_variance_factor = 0.0
+        self.parity_check_path = None
         self.lampfish_decoding = False
         self.lampfish_pixel = False
         self.nuclei_radius = 0
@@ -445,6 +449,23 @@ class Analysis:
     def set_syndrome_decoding_true(self):
         self.synd_decoding= True
         print("    Set Syndrome Decoding to True")
+
+    def set_lateral_variance_factor(self, lvf):
+        self.lateral_variance_factor = lvf
+        print("    Set Lateral Variance Factor to", str(self.lateral_variance_factor))
+
+    def set_z_variance_factor(self, zvf):
+        self.z_variance_factor = zvf
+        print("    Set Z Variance Factor to", str(self.z_variance_factor))
+
+    def set_log_weight_variance_factor(self, lwvf):
+        self.log_weight_variance_factor = lwvf
+        print("    Set Log Weight Variance Factor to", str(self.log_weight_variance_factor))
+
+    def set_parity_check_path(self, Hpath):
+        self.parity_check_path = Hpath
+        print("    Set Hstr to", str(self.parity_check_path))
+
 
     def set_lampfish_decoding_true(self):
         self.lampfish_decoding = True
@@ -938,8 +959,8 @@ class Analysis:
                 self.position_dir, self.barcode_dst, self.barcode_key_src, self.decoding_with_previous_dots,
                 self.decoding_with_previous_locations, self.fake_barcodes, self.decoding_individual,
                 self.min_seeds, self.allowed_diff, self.dimensions, self.num_zslices, self.segmentation,
-                self.decode_only_cells, self.labeled_img, self.num_wav, self.synd_decoding,
-                self.lampfish_pixel, self.start_time
+                self.decode_only_cells, self.labeled_img, self.num_wav, self.synd_decoding, self. lateral_variance_factor,
+                self.z_variance_factor, self. log_weight_variance_factor, self.parity_check_path, self.lampfish_pixel, self.start_time
             )
         #--------------------------------------------------------------------------------
 

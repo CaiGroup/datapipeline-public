@@ -71,8 +71,8 @@ json_analyses_dir = os.path.join('/home', username, 'json_analyses')
 shutil.copyfile(json_path, os.path.join(json_analyses_dir, json_name))
 #----------------------------------------------------------
 
-
+data_pipeline_dir = os.getcwd()
 #Run test
 #----------------------------------------------------------
-os.system('sh run_cron.sh ' + json_analyses_dir)
+os.system('sh run_cron.sh ' + data_pipeline_dir + ' ' + json_analyses_dir)
 #----------------------------------------------------------

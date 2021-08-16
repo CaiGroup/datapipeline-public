@@ -37,10 +37,10 @@ from .percentage_of_dots_used_check.percentage_of_dots_used import get_percentag
 #=====================================================================================
 class Decoding:
     def __init__(self, data_dir, position, decoded_dir, locations_dir, position_dir, barcode_dst, barcode_src,
-                    bool_decoding_with_previous_dots, bool_decoding_with_previous_locations,
-                    bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions,
-                    num_zslices, segmentation, decode_only_cells, labeled_img, num_wav, synd_decoding,
-                    lampfish_pixel, start_time):
+                 bool_decoding_with_previous_dots, bool_decoding_with_previous_locations,
+                 bool_fake_barcodes, bool_decoding_individual, min_seeds, allowed_diff, dimensions,
+                 num_zslices, segmentation, decode_only_cells, labeled_img, num_wav, synd_decoding, lvf, zvf, lwvf,
+                 Hpath, lampfish_pixel, start_time):
         
         self.data_dir = data_dir
         self.position = position
@@ -62,6 +62,10 @@ class Decoding:
         self.labeled_img = labeled_img
         self.num_wav = num_wav
         self.synd_decoding = synd_decoding
+        self.lateral_variance_factor = lvf
+        self.z_variance_factor = zvf
+        self.log_weight_variance_factor = lwvf
+        self.parity_check_path = Hpath
         self.lampfish_pixel = lampfish_pixel
         self.start_time = start_time
 
@@ -553,7 +557,10 @@ class Decoding:
             
             #Run Syndrome Decoding
             #--------------------------------------------------------------------
-            syndrome_decoding.run_syndrome_decoding(locations_path, barcode_src, decoding_dst_for_channel, self.fake_barcodes)
+            Hpath = os.path.join(self.data_dir, 'barcode_key/parity_check.csv')
+            syndrome_decoding.run_syndrome_decoding(locations_path, barcode_src, decoding_dst_for_channel, self.fake_barcodes,
+                                                    Hpath, lat_var_factor=self.lateral_variance_factor, z_var_factor=self.z_variance_factor,
+                                                    lw_var_factor=self.log_weight_variance_factor)
             #--------------------------------------------------------------------
 
     def run_lampfish_decoding(self):
