@@ -248,14 +248,15 @@ def get_align_errors(fixed_tiff, moving_tiff, offset):
     print("Align Error:", str(error))
     return error
 
-import sys
-if sys.argv[1] == 'debug_align_errors':
-    channel = 0
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_1/MMStack_Pos0.ome.tif'
-    tiff = tiffy.load(tiff_src, num_wav=4)
-    tiff_ch = tiff[:,channel]
+if __name__ == '__main__':
+    import sys
+    if sys.argv[1] == 'debug_align_errors':
+        channel = 0
+        tiff_src = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_1/MMStack_Pos0.ome.tif'
+        tiff = tiffy.load(tiff_src, num_wav=4)
+        tiff_ch = tiff[:,channel]
 
-    get_align_errors(tiff, tiff, [0,20])
+        get_align_errors(tiff, tiff, [0,20])
     
         
 

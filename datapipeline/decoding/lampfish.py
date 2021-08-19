@@ -134,48 +134,44 @@ def get_ratio_of_channels(offsets_src, channel_offset_src, locations_src, tiff_d
     df_new_locs['ratio'] = df_new_locs['sum_3x3_int_ch1'].astype(np.float64)/(df_new_locs['sum_3x3_int_ch2'] + df_new_locs['sum_3x3_int_ch1'])
     df_new_locs.to_csv(dst, index=False)
     #---------------------------------------------------------------
-    
-if sys.argv[1] == 'debug_lampfish_ch1':
-    pos = 0
-    offsets_src = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos/MMStack_Pos0/offsets.json'
-    locations_src = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos_strict_8/MMStack_Pos1/Dot_Locations/locations.csv'
-    tiff_dir = '/groups/CaiLab/personal/Linus/raw/5ratiometric_test'
-    get_ratio_first_channel(offsets_src, locations_src, tiff_dir, pos, dst='foo/lampfish_decoding_ch1.csv' + str(pos)+'.csv')
-    
-elif sys.argv[1] == 'debug_lampfish_ch1_test1':
-    pos = 0
-    offsets_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/offsets.json'
-    channel_offset_src = '/home/nrezaee/test_cronjob_multi_dot/foo/test_decoding_class/lampfish_test/channel_offsets.json'
-    locations_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/Dot_Locations/locations.csv'
-    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/test1'
-    lampfish_pixel = True
-    get_ratio_of_channels(offsets_src, channel_offset_src, locations_src, tiff_dir, \
-                            pos, 'foo/lampfish_decoding.csv', 4, \
-                            lampfish_pixel)   
-    
-elif sys.argv[1] == 'debug_lampfish_align':
-    get_channel_offsets(tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/5ratiometric_test_max_int', 
-                        position = 'MMStack_Pos0.ome.tif', 
-                        dst = 'foo/channel_offsets_test.csv', 
-                        num_wav = 3)
-    
-elif sys.argv[1] == 'debug_lampfish_max_int':
-    pos = 0
-    offsets_src = '/groups/CaiLab/analyses/nrezaee/5ratiometric_test_max_int/5ratio_all_pos_max_int_pos0/MMStack_Pos0/offsets.json'
-    channel_offset_src = '/groups/CaiLab/analyses/nrezaee/5ratiometric_test_max_int/5ratio_all_pos_max_int_pos0/MMStack_Pos0/Decoded/channel_offsets.json'
-    locations_src = '/groups/CaiLab/analyses/nrezaee/5ratiometric_test_max_int/5ratio_all_pos_max_int_pos0/MMStack_Pos0/Dot_Locations/locations.csv'
-    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/5ratiometric_test_max_int/'
-    lampfish_pixel = True
-    get_ratio_of_channels(offsets_src, 
-                        channel_offset_src, 
-                        locations_src, 
-                        tiff_dir, 
-                        pos, 
-                        'foo/lampfish_decoding.csv', 
-                        3, \
-                        lampfish_pixel)   
+if __name__ == '__main__':
 
+    if sys.argv[1] == 'debug_lampfish_ch1':
+        pos = 0
+        offsets_src = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos/MMStack_Pos0/offsets.json'
+        locations_src = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos_strict_8/MMStack_Pos1/Dot_Locations/locations.csv'
+        tiff_dir = '/groups/CaiLab/personal/Linus/raw/5ratiometric_test'
+        get_ratio_first_channel(offsets_src, locations_src, tiff_dir, pos, dst='foo/lampfish_decoding_ch1.csv' + str(pos)+'.csv')
 
-        
-        
+    elif sys.argv[1] == 'debug_lampfish_ch1_test1':
+        pos = 0
+        offsets_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/offsets.json'
+        channel_offset_src = '/home/nrezaee/test_cronjob_multi_dot/foo/test_decoding_class/lampfish_test/channel_offsets.json'
+        locations_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/Dot_Locations/locations.csv'
+        tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/test1'
+        lampfish_pixel = True
+        get_ratio_of_channels(offsets_src, channel_offset_src, locations_src, tiff_dir, \
+                                pos, 'foo/lampfish_decoding.csv', 4, \
+                                lampfish_pixel)
 
+    elif sys.argv[1] == 'debug_lampfish_align':
+        get_channel_offsets(tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/5ratiometric_test_max_int',
+                            position = 'MMStack_Pos0.ome.tif',
+                            dst = 'foo/channel_offsets_test.csv',
+                            num_wav = 3)
+
+    elif sys.argv[1] == 'debug_lampfish_max_int':
+        pos = 0
+        offsets_src = '/groups/CaiLab/analyses/nrezaee/5ratiometric_test_max_int/5ratio_all_pos_max_int_pos0/MMStack_Pos0/offsets.json'
+        channel_offset_src = '/groups/CaiLab/analyses/nrezaee/5ratiometric_test_max_int/5ratio_all_pos_max_int_pos0/MMStack_Pos0/Decoded/channel_offsets.json'
+        locations_src = '/groups/CaiLab/analyses/nrezaee/5ratiometric_test_max_int/5ratio_all_pos_max_int_pos0/MMStack_Pos0/Dot_Locations/locations.csv'
+        tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/5ratiometric_test_max_int/'
+        lampfish_pixel = True
+        get_ratio_of_channels(offsets_src,
+                            channel_offset_src,
+                            locations_src,
+                            tiff_dir,
+                            pos,
+                            'foo/lampfish_decoding.csv',
+                            3, \
+                            lampfish_pixel)

@@ -578,57 +578,50 @@ class Dot_Detection:
         #----------------------------------------------
         
         return df_locs
-        
-if sys.argv[1] == 'debug_dot_class':
-    print('hi')
-    experiment_name = 'arun_1'
-    personal='nrezaee'
-    position = 'MMStack_Pos0.ome.tif'
-    locations_dir=None
-    analysis_name = 'test_form2_______strict_6'
-    visualize_dots = True
-    normalization = False
-    background_subtraction = False
-    decoding_individual = True
-    chrom = False
-    dot_detection = 'matlab 3d'
-    gauss = False
-    strict = 10
-    dim = 3
-    rad = False
-    num_z = 7
-    nbins = 100
-    threshold = 300
-    num_wav = 4
-    z_slices = None
-    dot_radius = 1
-    radius_step = 2
-    num_radii = 2
-    debug_dot_detection = False
-    min_weight_adcg = 1000
-    final_loss_adcg = 1000
-    
-    dot_detection = Dot_Detection(experiment_name, personal, position, locations_dir, \
-                  analysis_name, visualize_dots, normalization, \
-                  background_subtraction, decoding_individual, chrom, \
-                  dot_detection, gauss, strict, dim, \
-                  rad, num_z, nbins, threshold, num_wav,
-                  z_slices, 
-                   dot_radius,
-                   radius_step, 
-                   num_radii, 
-                   debug_dot_detection,
-                   min_weight_adcg, 
-                   final_loss_adcg)
-                   
-    dot_detection.run_dot_detection()
-    print(f'{dot_detection=}')
-                   
-    
-                   
-    
-    
-        
-            
-            
-                
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_dot_class':
+        print('hi')
+        experiment_name = 'arun_1'
+        personal='nrezaee'
+        position = 'MMStack_Pos0.ome.tif'
+        locations_dir=None
+        analysis_name = 'test_form2_______strict_6'
+        visualize_dots = True
+        normalization = False
+        background_subtraction = False
+        decoding_individual = True
+        chrom = False
+        dot_detection = 'matlab 3d'
+        gauss = False
+        strict = 10
+        dim = 3
+        rad = False
+        num_z = 7
+        nbins = 100
+        threshold = 300
+        num_wav = 4
+        z_slices = None
+        dot_radius = 1
+        radius_step = 2
+        num_radii = 2
+        debug_dot_detection = False
+        min_weight_adcg = 1000
+        final_loss_adcg = 1000
+
+        dot_detection = Dot_Detection(experiment_name, personal, position, locations_dir, \
+                      analysis_name, visualize_dots, normalization, \
+                      background_subtraction, decoding_individual, chrom, \
+                      dot_detection, gauss, strict, dim, \
+                      rad, num_z, nbins, threshold, num_wav,
+                      z_slices,
+                       dot_radius,
+                       radius_step,
+                       num_radii,
+                       debug_dot_detection,
+                       min_weight_adcg,
+                       final_loss_adcg)
+
+        dot_detection.run_dot_detection()
+        print(f'{dot_detection=}')

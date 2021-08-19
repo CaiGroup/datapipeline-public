@@ -75,30 +75,33 @@ def get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav):
         dal.save_matches(os.path.join(dst_dir,  "matches_ch" + str(channel) + ".csv"))
         dal.save_loocv_errors(os.path.join(dst_dir, "loov_errors_ch" + str(channel) + ".csv"))
         #----------------------------------------------------------------------------
- 
-if sys.argv[1] == 'debug_fiducials':
-    sys.path.insert(0, os.getcwd())
-    data_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-10-19-takei/'
-    position = 'MMStack_Pos0.ome.tif'
-    locs_src = '/groups/CaiLab/analyses/nrezaee/2020-10-19-takei/takei_fid/MMStack_Pos0/Dot_Locations/locations.csv'
-    dst_dir = 'foo/test_fid_alignment2'
-    
-    os.makedirs(dst_dir, exist_ok = True)
-    
-    num_wav = 4
-    get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav)
 
-elif sys.argv[1] == 'debug_fiducials_linus':
-    sys.path.insert(0, os.getcwd())
-    data_dir = '/groups/CaiLab/personal/nrezaee/raw/linus_data/'
-    position = 'MMStack_Pos1.ome.tif'
-    locs_src = '/groups/CaiLab/analyses/nrezaee/linus_data/adcg/MMStack_Pos1/Dot_Locations/locations.csv'
-    dst_dir = 'foo/linus_fid_align'
-    
-    os.makedirs(dst_dir, exist_ok = True)
-    
-    num_wav = 4
-    get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav)
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_fiducials':
+        sys.path.insert(0, os.getcwd())
+        data_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-10-19-takei/'
+        position = 'MMStack_Pos0.ome.tif'
+        locs_src = '/groups/CaiLab/analyses/nrezaee/2020-10-19-takei/takei_fid/MMStack_Pos0/Dot_Locations/locations.csv'
+        dst_dir = 'foo/test_fid_alignment2'
+
+        os.makedirs(dst_dir, exist_ok = True)
+
+        num_wav = 4
+        get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav)
+
+    elif sys.argv[1] == 'debug_fiducials_linus':
+        sys.path.insert(0, os.getcwd())
+        data_dir = '/groups/CaiLab/personal/nrezaee/raw/linus_data/'
+        position = 'MMStack_Pos1.ome.tif'
+        locs_src = '/groups/CaiLab/analyses/nrezaee/linus_data/adcg/MMStack_Pos1/Dot_Locations/locations.csv'
+        dst_dir = 'foo/linus_fid_align'
+
+        os.makedirs(dst_dir, exist_ok = True)
+
+        num_wav = 4
+        get_fiducial_offset(data_dir, position, dst_dir, locs_src, num_wav)
 
 
 

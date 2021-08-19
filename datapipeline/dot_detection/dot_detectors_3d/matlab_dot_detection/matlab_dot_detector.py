@@ -72,12 +72,15 @@ def get_matlab_detected_dots(tiff_src, channel, strictness, nbins, threshold):
     print(f'{len(dot_analysis)=}')
     
     return dot_analysis
-    
-if sys.argv[1] == 'debug':
-    tiff_src = 'MMStack_Pos0.ome.tif'
-    channel = 0
-    threshold = 1000
-    nbins = 100
-    strictness = 3
-    
-    dot_analysis = get_matlab_detected_dots(tiff_src, channel, threshold, nbins, strictness)
+
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug':
+        tiff_src = 'MMStack_Pos0.ome.tif'
+        channel = 0
+        threshold = 1000
+        nbins = 100
+        strictness = 3
+
+        dot_analysis = get_matlab_detected_dots(tiff_src, channel, threshold, nbins, strictness)

@@ -168,78 +168,72 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, \
     df_tiff.to_csv(csv_path, index=False)
 
 
-if sys.argv[1] != 'debug_max_project':    
-    def str2bool(v):
-      return v.lower() == "true"
-    
-    import argparse
-    
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--tiff_src")
-    parser.add_argument("--offset0")
-    parser.add_argument("--offset1")
-    parser.add_argument("--offset2")
-    parser.add_argument("--analysis_name")
-    parser.add_argument("--vis_dots")
-    parser.add_argument("--back_subtract")
-    parser.add_argument("--channels", nargs = '+')
-    parser.add_argument("--chromatic")
-    parser.add_argument("--rand")
-    parser.add_argument("--gaussian")
-    parser.add_argument("--radial_center")
-    parser.add_argument("--strictness")
-    parser.add_argument("--z_slices")
-    parser.add_argument("--num_wav")
-    
-    
-    args, unknown = parser.parse_known_args()
-    
-    #print(f'{args.offset=}')
-    
-    print(f'{args=}')
-    
-    if args.offset2 == 'None':
-        offset = [float(args.offset0), float(args.offset1)]
-    else:    
-        offset = [float(args.offset0), float(args.offset1), float(args.offset2)]
-    
-    
-    if args.channels[0] == 'all':
-        channels = 'all'
+if __name__ == '__main__':
+
+    if sys.argv[1] != 'debug_max_project':
+        def str2bool(v):
+          return v.lower() == "true"
+
+        import argparse
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--tiff_src")
+        parser.add_argument("--offset0")
+        parser.add_argument("--offset1")
+        parser.add_argument("--offset2")
+        parser.add_argument("--analysis_name")
+        parser.add_argument("--vis_dots")
+        parser.add_argument("--back_subtract")
+        parser.add_argument("--channels", nargs = '+')
+        parser.add_argument("--chromatic")
+        parser.add_argument("--rand")
+        parser.add_argument("--gaussian")
+        parser.add_argument("--radial_center")
+        parser.add_argument("--strictness")
+        parser.add_argument("--z_slices")
+        parser.add_argument("--num_wav")
+
+
+        args, unknown = parser.parse_known_args()
+
+        #print(f'{args.offset=}')
+
+        print(f'{args=}')
+
+        if args.offset2 == 'None':
+            offset = [float(args.offset0), float(args.offset1)]
+        else:
+            offset = [float(args.offset0), float(args.offset1), float(args.offset2)]
+
+
+        if args.channels[0] == 'all':
+            channels = 'all'
+        else:
+            channels = [int(i.replace('[', '').replace(']','').replace(',','')) for i in args.channels]
+
+        if args.z_slices != 'all':
+            args.z_slices = int(args.z_slices)
+
+
+        get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
+                              args.back_subtract, channels, args.chromatic, str2bool(args.gaussian), int(args.strictness), \
+                              str2bool(args.radial_center), args.z_slices, args.num_wav, args.rand)
+
     else:
-        channels = [int(i.replace('[', '').replace(']','').replace(',','')) for i in args.channels]
-        
-    if args.z_slices != 'all':
-        args.z_slices = int(args.z_slices)
 
-    
-    get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), \
-                          args.back_subtract, channels, args.chromatic, str2bool(args.gaussian), int(args.strictness), \
-                          str2bool(args.radial_center), args.z_slices, args.num_wav, args.rand)
-
-else:
-    
-    print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_1/HybCycle_30/MMStack_Pos11.ome.tif'
-    offset = [0,0,0]
-    channels = [1]
-    analysis_name = 'michal_align'
-    rand_dir = '/home/nrezaee/temp'
-    vis_dots = True
-    back_sub = True
-    chromatic = False
-    gauss = False
-    rad = False
-    strictness = 4
-    z_slices = 'all'
-    num_wav = 3
-    get_dots_for_tiff(tiff_src, offset, analysis_name, vis_dots, back_sub, channels, chromatic, gauss, \
-        strictness, rad, z_slices, num_wav, rand_dir)
-    
-    
-    
-    
-    
-    
-    
-    
+        print('Debugging')
+        tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_1/HybCycle_30/MMStack_Pos11.ome.tif'
+        offset = [0,0,0]
+        channels = [1]
+        analysis_name = 'michal_align'
+        rand_dir = '/home/nrezaee/temp'
+        vis_dots = True
+        back_sub = True
+        chromatic = False
+        gauss = False
+        rad = False
+        strictness = 4
+        z_slices = 'all'
+        num_wav = 3
+        get_dots_for_tiff(tiff_src, offset, analysis_name, vis_dots, back_sub, channels, chromatic, gauss, \
+            strictness, rad, z_slices, num_wav, rand_dir)

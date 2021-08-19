@@ -3,10 +3,7 @@ import pandas as pd
 import tempfile
 import sys
 
-if sys.argv[1] == 'debug_add_fakes':
-    from make_off_barcodes import get_off_barcodes
-else:
-    from .make_off_barcodes import get_off_barcodes
+from .make_off_barcodes import get_off_barcodes
 
 def combine_barcodes(barcode_src1, barcode_src2):
     
@@ -111,13 +108,15 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
     return None
     
 
-if sys.argv[1] == 'debug_add_fakes':
-    
-    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_9/barcode_key/channel_2.csv'
-    barcode_dst = 'foo/channel_2.mat'
-    bool_fake_barcodes = True
-    
-    read_barcode(barcode_src, barcode_dst, bool_fake_barcodes)
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_add_fakes':
+
+        barcode_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_9/barcode_key/channel_2.csv'
+        barcode_dst = 'foo/channel_2.mat'
+        bool_fake_barcodes = True
+
+        read_barcode(barcode_src, barcode_dst, bool_fake_barcodes)
     
     
     

@@ -117,21 +117,24 @@ def get_genes_per_cell_for_all_pos_plot(analysis_dir, dst):
     get_plot_from_count_matrix_dict(all_pos_genes_per_cell, dst)
     print(f'{dst=}')
     #---------------------------------------------------------
- 
-if sys.argv[1] == 'debug_jina_pseudos_4_strict_0':
-    analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot'
-    dst = 'foo/jina_pseudos_4_strict_0.png'
-    
-    get_genes_per_cell_for_all_pos_plot(analysis_dir, dst)
-    
-if sys.argv[1] == 'debug_jina_pseudos_4_strict_1':
-    analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot_strict_1'
-    dst = 'jina_pseudos_4_strict_1.png'
-    
-    get_genes_per_cell_for_all_pos_plot(analysis_dir, dst)
 
-if sys.argv[1] == 'debug_jina_pseudos_4_strict_2':
-    analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot_strict_2'
-    dst = 'jina_pseudos_4_strict_2.png'
-    
-    get_genes_per_cell_for_all_pos_plot(analysis_dir, dst)
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_jina_pseudos_4_strict_0':
+        analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot'
+        dst = 'foo/jina_pseudos_4_strict_0.png'
+
+        get_genes_per_cell_for_all_pos_plot(analysis_dir, dst)
+
+    if sys.argv[1] == 'debug_jina_pseudos_4_strict_1':
+        analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot_strict_1'
+        dst = 'jina_pseudos_4_strict_1.png'
+
+        get_genes_per_cell_for_all_pos_plot(analysis_dir, dst)
+
+    if sys.argv[1] == 'debug_jina_pseudos_4_strict_2':
+        analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot_strict_2'
+        dst = 'jina_pseudos_4_strict_2.png'
+
+        get_genes_per_cell_for_all_pos_plot(analysis_dir, dst)

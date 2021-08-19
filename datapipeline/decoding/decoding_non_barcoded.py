@@ -46,29 +46,31 @@ def run_decoding_non_barcoded(sequential_csv, locations_csv, position, dst_dir):
     #--------------------------------------------------
     
     return df_decoded
-    
-if sys.argv[1] == 'debug_smfish_decoding':
-    dst_dir = 'foo/smfish_test'
-    os.makedirs(dst_dir, exist_ok=True)
-    df_decoded =run_decoding_non_barcoded(sequential_csv = '/groups/CaiLab/personal/nrezaee/raw/test1-big/non_barcoded_key/sequential_key.csv',
-                                 locations_csv = '/groups/CaiLab/analyses/nrezaee/test1-big/non_barcoded/MMStack_Pos0/Dot_Locations/locations.csv',
-                                 position = 0,
-                                 dst_dir = dst_dir)
-                                 
-if sys.argv[1] == 'debug_smfish_decoding_anthony':
-    dst_dir = 'foo/smfish_test_anthony'
-    os.makedirs(dst_dir, exist_ok=True)
-    df_decoded =run_decoding_non_barcoded(sequential_csv = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013/non_barcoded_key/sequential_key.csv',
-                                 locations_csv = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Dot_Locations/locations.csv',
-                                 position = 0,
-                                 dst_dir = dst_dir)
 
-if sys.argv[1] == 'debug_smfish_decoding_michal':
-    dst_dir = 'foo/smfish_test_michal'
-    os.makedirs(dst_dir, exist_ok=True)
-    df_decoded =run_decoding_non_barcoded(sequential_csv = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_cellMarkers/test_pos33_strict7_channel2_1/BarcodeKey/sequential_key.csv',
-                                 locations_csv = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_cellMarkers/test_pos33_strict7_channel2_1/MMStack_Pos33/Dot_Locations/locations.csv',
-                                 position = 0,
-                                 dst_dir = dst_dir)
-                                 
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_smfish_decoding':
+        dst_dir = 'foo/smfish_test'
+        os.makedirs(dst_dir, exist_ok=True)
+        df_decoded =run_decoding_non_barcoded(sequential_csv = '/groups/CaiLab/personal/nrezaee/raw/test1-big/non_barcoded_key/sequential_key.csv',
+                                     locations_csv = '/groups/CaiLab/analyses/nrezaee/test1-big/non_barcoded/MMStack_Pos0/Dot_Locations/locations.csv',
+                                     position = 0,
+                                     dst_dir = dst_dir)
+
+    if sys.argv[1] == 'debug_smfish_decoding_anthony':
+        dst_dir = 'foo/smfish_test_anthony'
+        os.makedirs(dst_dir, exist_ok=True)
+        df_decoded =run_decoding_non_barcoded(sequential_csv = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013/non_barcoded_key/sequential_key.csv',
+                                     locations_csv = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Dot_Locations/locations.csv',
+                                     position = 0,
+                                     dst_dir = dst_dir)
+
+    if sys.argv[1] == 'debug_smfish_decoding_michal':
+        dst_dir = 'foo/smfish_test_michal'
+        os.makedirs(dst_dir, exist_ok=True)
+        df_decoded =run_decoding_non_barcoded(sequential_csv = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_cellMarkers/test_pos33_strict7_channel2_1/BarcodeKey/sequential_key.csv',
+                                     locations_csv = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_cellMarkers/test_pos33_strict7_channel2_1/MMStack_Pos33/Dot_Locations/locations.csv',
+                                     position = 0,
+                                     dst_dir = dst_dir)
+
                                        

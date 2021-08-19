@@ -72,26 +72,28 @@ def get_opening_tiff_check(data_dir, position, num_wav, dest):
     get_plots_of_tiff_check(tiff_for_check_src, num_wav, dest)
     #--------------------------------------------
     
-    
-if sys.argv[1] == 'debug_plot_from_tiff_src':
-    tiff_src = '/groups/CaiLab/personal/Yodai/raw/2021-03-30-E14-100k-DNAfull-rep2-laminB1-H3K27me3-DAPI-H4K20me3/HybCycle_0/MMStack_Pos0.ome.tif'
-    dest = 'foo2.png'
-    num_wav = 4
-    
-    get_plots_of_tiff_check(tiff_src, num_wav, dest)
 
-if sys.argv[1] == 'debug_tiff_check':
-    
-    data_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei'
-    position = 'MMStack_Pos0.ome.tif'
-    dest = 'foo/foo.png'
-    
-    get_opening_tiff_check(data_dir, position, dest)
-    
-if sys.argv[1] == 'debug_tiff_check_1z':
-    
-    data_dir = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_cellMarkers'
-    position = 'MMStack_Pos0.ome.tif'
-    dest = 'foo/foo_1z.png'
-    
-    get_opening_tiff_check(data_dir, position, dest)
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_plot_from_tiff_src':
+        tiff_src = '/groups/CaiLab/personal/Yodai/raw/2021-03-30-E14-100k-DNAfull-rep2-laminB1-H3K27me3-DAPI-H4K20me3/HybCycle_0/MMStack_Pos0.ome.tif'
+        dest = 'foo2.png'
+        num_wav = 4
+
+        get_plots_of_tiff_check(tiff_src, num_wav, dest)
+
+    if sys.argv[1] == 'debug_tiff_check':
+
+        data_dir = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei'
+        position = 'MMStack_Pos0.ome.tif'
+        dest = 'foo/foo.png'
+
+        get_opening_tiff_check(data_dir, position, dest)
+
+    if sys.argv[1] == 'debug_tiff_check_1z':
+
+        data_dir = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_cellMarkers'
+        position = 'MMStack_Pos0.ome.tif'
+        dest = 'foo/foo_1z.png'
+
+        get_opening_tiff_check(data_dir, position, dest)

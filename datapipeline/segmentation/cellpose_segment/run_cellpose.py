@@ -81,76 +81,63 @@ def run_me(tiff_dir, segment_results_path, decoded_genes_src, barcode_key_src, p
     print(f'{df_cell_info_path=}')    
     df_cell_info.to_csv(df_cell_info_path)
     #-------------------------------------------    
-    
-if sys.argv[1] == 'debug_run_cellpose':
-    
-    tiff_dir = '/central/groups/CaiLab/personal/real_arun/raw/06212021_Automation_Testes_NoHydrogel/'
-    segmented_dst_dir = '/home/nrezaee/test_cronjob_multi_dot/foo/cellpose_test'
-    os.makedirs(segmented_dst_dir, exist_ok=True)
-    decoded_genes_src = '/groups/CaiLab/analyses/real_arun/06212021_Automation_Testes_NoHydrogel/Testes_Strictness8/MMStack_Pos1/Decoded/Channel_1/pre_seg_diff_1_minseeds_3_filtered.csv'
-    position = 'MMStack_Pos0.ome.tif'
-    barcode_key_src = '/central/groups/CaiLab/personal/real_arun/raw/06212021_Automation_Testes_NoHydrogel/barcode_key/channel_1.csv'
-    
-    labeled_img_src = '/groups/CaiLab/analyses/real_arun/06212021_Automation_Testes_NoHydrogel/Testes_Strictness8/MMStack_Pos1/Segmentation/labeled_img_post.tif'
-    labeled_img = tifffile.imread(labeled_img_src)
-    
-    run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)
-    
-if sys.argv[1] == 'debug_run_cellpose_takei':
-    
-    tiff_dir = '/central/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/'
-    segmented_dst_dir = '/home/nrezaee/test_cronjob_multi_dot/foo/cellpose_test'
-    os.makedirs(segmented_dst_dir, exist_ok=True)
-    decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Decoded/Channel_1/pre_seg_diff_1_minseeds_3_filtered.csv'
-    position = 'MMStack_Pos0.ome.tif'
-    barcode_key_src = '/central/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/barcode_key/channel_1.csv'
-    
-    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Segmentation/labeled_img_post.tif'
-    labeled_img = tifffile.imread(labeled_img_src)
-    
-    run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)
-    
-if sys.argv[1] == 'debug_run_cellpose_lex':
-    
-    tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/'
-    segmented_dst_dir = '/home/nrezaee/test_cronjob_multi_dot/foo/cellpose_test'
-    os.makedirs(segmented_dst_dir, exist_ok=True)
-    
-    decoded_genes_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug4/MMStack_Pos0/Segmentation/gene_locations_assigned_to_cell.csv'
-    position = 'MMStack_Pos0.ome.tif'
-    barcode_key_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug4/BarcodeKey/barcode.csv'
-    
-    labeled_img_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug4/MMStack_Pos0/Segmentation/labeled_img_post.tif'
-    labeled_img = tifffile.imread(labeled_img_src)
-    
-    run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)
-    
-    
-if sys.argv[1] == 'debug_run_cellpose_non_barcoded':
-    
-    tiff_dir = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013'
-    segmented_dst_dir = '/home/nrezaee/test_cronjob_multi_dot/foo/cellpose_test_non_barcoded'
-    os.makedirs(segmented_dst_dir, exist_ok=True)
-    decoded_genes_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Decoded/sequential_decoding_results.csv'
-    position = 'MMStack_Pos1.ome.tif'
-    barcode_key_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/BarcodeKey/sequential_key.csv'
-    
-    labeled_img_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Segmentation/labeled_img_post.tif'
-    labeled_img = tifffile.imread(labeled_img_src)
-    
-    run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)
-    
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_run_cellpose':
+
+        tiff_dir = '/central/groups/CaiLab/personal/real_arun/raw/06212021_Automation_Testes_NoHydrogel/'
+        segmented_dst_dir = '/home/nrezaee/test_cronjob_multi_dot/foo/cellpose_test'
+        os.makedirs(segmented_dst_dir, exist_ok=True)
+        decoded_genes_src = '/groups/CaiLab/analyses/real_arun/06212021_Automation_Testes_NoHydrogel/Testes_Strictness8/MMStack_Pos1/Decoded/Channel_1/pre_seg_diff_1_minseeds_3_filtered.csv'
+        position = 'MMStack_Pos0.ome.tif'
+        barcode_key_src = '/central/groups/CaiLab/personal/real_arun/raw/06212021_Automation_Testes_NoHydrogel/barcode_key/channel_1.csv'
+
+        labeled_img_src = '/groups/CaiLab/analyses/real_arun/06212021_Automation_Testes_NoHydrogel/Testes_Strictness8/MMStack_Pos1/Segmentation/labeled_img_post.tif'
+        labeled_img = tifffile.imread(labeled_img_src)
+
+        run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)
+
+    if sys.argv[1] == 'debug_run_cellpose_takei':
+
+        tiff_dir = '/central/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/'
+        segmented_dst_dir = '/home/nrezaee/test_cronjob_multi_dot/foo/cellpose_test'
+        os.makedirs(segmented_dst_dir, exist_ok=True)
+        decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Decoded/Channel_1/pre_seg_diff_1_minseeds_3_filtered.csv'
+        position = 'MMStack_Pos0.ome.tif'
+        barcode_key_src = '/central/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/barcode_key/channel_1.csv'
+
+        labeled_img_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Segmentation/labeled_img_post.tif'
+        labeled_img = tifffile.imread(labeled_img_src)
+
+        run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)
+
+    if sys.argv[1] == 'debug_run_cellpose_lex':
+
+        tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/'
+        segmented_dst_dir = '/home/nrezaee/test_cronjob_multi_dot/foo/cellpose_test'
+        os.makedirs(segmented_dst_dir, exist_ok=True)
+
+        decoded_genes_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug4/MMStack_Pos0/Segmentation/gene_locations_assigned_to_cell.csv'
+        position = 'MMStack_Pos0.ome.tif'
+        barcode_key_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug4/BarcodeKey/barcode.csv'
+
+        labeled_img_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug4/MMStack_Pos0/Segmentation/labeled_img_post.tif'
+        labeled_img = tifffile.imread(labeled_img_src)
+
+        run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)
 
 
+    if sys.argv[1] == 'debug_run_cellpose_non_barcoded':
 
+        tiff_dir = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013'
+        segmented_dst_dir = '/home/nrezaee/test_cronjob_multi_dot/foo/cellpose_test_non_barcoded'
+        os.makedirs(segmented_dst_dir, exist_ok=True)
+        decoded_genes_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Decoded/sequential_decoding_results.csv'
+        position = 'MMStack_Pos1.ome.tif'
+        barcode_key_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/BarcodeKey/sequential_key.csv'
 
+        labeled_img_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Segmentation/labeled_img_post.tif'
+        labeled_img = tifffile.imread(labeled_img_src)
 
-
-
-
-
-
-
-
-
-
+        run_me(tiff_dir, segmented_dst_dir, decoded_genes_src, barcode_key_src, position, labeled_img)

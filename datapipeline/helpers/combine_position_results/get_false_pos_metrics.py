@@ -139,24 +139,26 @@ def show_norm_false_pos_metrics(analysis_dir, dst_dir):
     print(f'{false_pos_mean_and_var_dst=}')
     #------------------------------------------------
     
-    
-if sys.argv[1] == 'debug_false_pos_all_pos':
-    analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot/'
-    dst = 'foo/jina_pseudo_4_strict_0'
-    
-    show_norm_false_pos_metrics(analysis_dir, dst)
-    
-if sys.argv[1] == 'debug_false_pos_all_pos_strict_1':
-    analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot_strict_1/'
-    dst = 'foo/jina_pseudo_4_strict_1'
-    
-    show_norm_false_pos_metrics(analysis_dir, dst)
-    
-if sys.argv[1] == 'debug_false_pos_all_pos_strict_2':
-    analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot_strict_2/'
-    dst = 'foo/jina_pseudo_4_strict_2'
-    
-    show_norm_false_pos_metrics(analysis_dir, dst)
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_false_pos_all_pos':
+        analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot/'
+        dst = 'foo/jina_pseudo_4_strict_0'
+
+        show_norm_false_pos_metrics(analysis_dir, dst)
+
+    if sys.argv[1] == 'debug_false_pos_all_pos_strict_1':
+        analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot_strict_1/'
+        dst = 'foo/jina_pseudo_4_strict_1'
+
+        show_norm_false_pos_metrics(analysis_dir, dst)
+
+    if sys.argv[1] == 'debug_false_pos_all_pos_strict_2':
+        analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot_strict_2/'
+        dst = 'foo/jina_pseudo_4_strict_2'
+
+        show_norm_false_pos_metrics(analysis_dir, dst)
     
     
     

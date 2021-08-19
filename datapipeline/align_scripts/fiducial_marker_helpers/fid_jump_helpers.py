@@ -141,21 +141,22 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, dot_radius):
     points_threshed, intensities_threshed = apply_thresh(list(dot_analysis), thresh)
     points_threshed, intensities_threshed = apply_reverse_thresh([points_threshed, intensities_threshed], reverse_threshold)
     return points_threshed, intensities_threshed
-    
-import sys
-if sys.argv[1] == 'debug_jump_helper':
-    print(f'{np.version.version=}')
-    import tifffile as tf
-    
-    tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_1/HybCycle_10/MMStack_Pos20.ome.tif'
-    tiff_3d = tiffy.load(tiff_src, num_wav=3)[:,0]
-    strictness= 5
-    analysis_name = 'michal_decoding_top'
-    print(f'{tiff_3d.shape=}')
-    dot_radius = 2
-    dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, dot_radius))
-    print(f'{dot_analysis[0].shape=}')
-    
-    
-    
-    
+
+if __name__ == '__main__':
+
+    import sys
+    if sys.argv[1] == 'debug_jump_helper':
+        print(f'{np.version.version=}')
+        import tifffile as tf
+
+        tiff_src = '/groups/CaiLab/personal/michalp/raw/michal_1/HybCycle_10/MMStack_Pos20.ome.tif'
+        tiff_3d = tiffy.load(tiff_src, num_wav=3)[:,0]
+        strictness= 5
+        analysis_name = 'michal_decoding_top'
+        print(f'{tiff_3d.shape=}')
+        dot_radius = 2
+        dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, dot_radius))
+        print(f'{dot_analysis[0].shape=}')
+
+
+

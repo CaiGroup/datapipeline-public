@@ -192,85 +192,66 @@ def get_dots_for_tiff(tiff_src, offset, analysis_name, bool_visualize_dots, bool
     df_tiff.to_csv(csv_path, index=False)
     #----------------------------------------------------------
 
-  
-print(f'{sys.argv[1]=}')
-if sys.argv[1] != 'debug_top_dots':
-    print('Running')
-    def str2bool(v):
-      return v.lower() == "true"
-      
-    import argparse
-    
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--tiff_src")
-    parser.add_argument("--offset0")
-    parser.add_argument("--offset1")
-    parser.add_argument("--offset2")
-    parser.add_argument("--analysis_name")
-    parser.add_argument("--vis_dots")
-    parser.add_argument("--norm")
-    parser.add_argument("--back_subtract")
-    parser.add_argument("--channels", nargs = '+')
-    parser.add_argument("--chromatic")
-    parser.add_argument("--n_dots")
-    parser.add_argument("--rand")
-    parser.add_argument("--num_wav")
-    parser.add_argument("--num_z")
-    parser.add_argument("--stack_z_s")
-    
-    
-    args, unknown = parser.parse_known_args()
-    
-    
-    if args.offset2 == 'None':
-        offset = [float(args.offset0), float(args.offset1)]
-    else:    
-        offset = [float(args.offset0), float(args.offset1), float(args.offset2)]
-    
-    
-    if args.channels[0] == 'all':
-        channels = 'all'
-    else:
-        channels = [int(i.replace('[', '').replace(']','').replace(',','')) for i in args.channels]
-    
-    print(f'{args.stack_z_s=}')
-    
-    get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), args.norm, \
-                          str2bool(args.back_subtract), channels, args.chromatic, int(args.n_dots), args.num_wav, \
-                          args.rand, args.num_z, str2bool(args.stack_z_s))
-                          
-else:                        
-    print('Debugging')
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/simone_all/HybCycle_10/MMStack_Pos35.ome.tif'
-    offset = [0,0,0]
-    channels = 'all' #[1]
-    analysis_name = 'back_sub'
-    n_dots = 10
-    rand_dir = '/home/nrezaee/temp'
-    num_z = None
-    back_sub = True
-    num_dots = 10
-    num_wav = 4
-    visualize_dots = True
-    get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, False, back_sub, channels, False, num_dots, num_wav, rand_dir, num_z)
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+if __name__ == '__main__':
+
+    print(f'{sys.argv[1]=}')
+    if sys.argv[1] != 'debug_top_dots':
+        print('Running')
+        def str2bool(v):
+          return v.lower() == "true"
+
+        import argparse
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--tiff_src")
+        parser.add_argument("--offset0")
+        parser.add_argument("--offset1")
+        parser.add_argument("--offset2")
+        parser.add_argument("--analysis_name")
+        parser.add_argument("--vis_dots")
+        parser.add_argument("--norm")
+        parser.add_argument("--back_subtract")
+        parser.add_argument("--channels", nargs = '+')
+        parser.add_argument("--chromatic")
+        parser.add_argument("--n_dots")
+        parser.add_argument("--rand")
+        parser.add_argument("--num_wav")
+        parser.add_argument("--num_z")
+        parser.add_argument("--stack_z_s")
+
+
+        args, unknown = parser.parse_known_args()
+
+
+        if args.offset2 == 'None':
+            offset = [float(args.offset0), float(args.offset1)]
+        else:
+            offset = [float(args.offset0), float(args.offset1), float(args.offset2)]
+
+
+        if args.channels[0] == 'all':
+            channels = 'all'
+        else:
+            channels = [int(i.replace('[', '').replace(']','').replace(',','')) for i in args.channels]
+
+        print(f'{args.stack_z_s=}')
+
+        get_dots_for_tiff(args.tiff_src, offset, args.analysis_name, str2bool(args.vis_dots), args.norm, \
+                              str2bool(args.back_subtract), channels, args.chromatic, int(args.n_dots), args.num_wav, \
+                              args.rand, args.num_z, str2bool(args.stack_z_s))
+
+    else:
+        print('Debugging')
+        tiff_src = '/groups/CaiLab/personal/nrezaee/raw/simone_all/HybCycle_10/MMStack_Pos35.ome.tif'
+        offset = [0,0,0]
+        channels = 'all' #[1]
+        analysis_name = 'back_sub'
+        n_dots = 10
+        rand_dir = '/home/nrezaee/temp'
+        num_z = None
+        back_sub = True
+        num_dots = 10
+        num_wav = 4
+        visualize_dots = True
+        get_dots_for_tiff(tiff_src, offset, analysis_name, visualize_dots, False, back_sub, channels, False, num_dots, num_wav, rand_dir, num_z)

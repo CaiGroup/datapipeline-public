@@ -78,11 +78,12 @@ def write_bad_false_pos_s_to_file(warnings_src, analysis_dir):
     print(f'{warnings_src=}')
     
     
-    
-if sys.argv[1] == 'debug_warnings_false_pos_rate':
-    analysis_dir = '/groups/CaiLab/analyses/michalp/michal_2/michal_2_decoding_test_ch3/'
-    warnings_dst = 'foo.txt'
-    write_bad_false_pos_s_to_file(warnings_dst, analysis_dir)
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_warnings_false_pos_rate':
+        analysis_dir = '/groups/CaiLab/analyses/michalp/michal_2/michal_2_decoding_test_ch3/'
+        warnings_dst = 'foo.txt'
+        write_bad_false_pos_s_to_file(warnings_dst, analysis_dir)
 
 
 

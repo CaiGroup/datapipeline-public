@@ -121,11 +121,13 @@ def comb_percentage_of_dots_used_and_get_plot(analysis_dir, dst):
     get_percent_of_dots_used_plot(percent_used_dict, dst)
     #------------------------------------------------     
 
-if sys.argv[1] == 'debug_get_percent_of_dots':
-    analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot'
-    dst = 'foo/foo.png'
+if __name__ == '__main__':
 
-    comb_percentage_of_dots_used_and_get_plot(analysis_dir, dst)
+    if sys.argv[1] == 'debug_get_percent_of_dots':
+        analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot'
+        dst = 'foo/foo.png'
+
+        comb_percentage_of_dots_used_and_get_plot(analysis_dir, dst)
 
 
 

@@ -75,13 +75,15 @@ def get_stacked_dapi_s_align_check(offset_path, dst, num_wav=4, num_dapi_stacked
     tf.imwrite(dst, stacked_dapi_s,imagej=True)
     #--------------------------------------------------------
 
-if sys.argv[1] == 'debug_align_visual_check':
-    offset_path = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_debug_2_strict_8/MMStack_Pos0/offsets.json'
-    dst = 'foo.tif'
-    get_stacked_dapi_s_align_check(offset_path, dst)
+if __name__ == '__main__':
 
-elif sys.argv[1] == 'debug_align_visual_check_small':
-    offset_path = '/groups/CaiLab/analyses/nrezaee/test1/align_test2/MMStack_Pos0/offsets.json'
-    dst = 'foo.tif'
-    get_stacked_dapi_s_align_check(offset_path, dst)
+    if sys.argv[1] == 'debug_align_visual_check':
+        offset_path = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_debug_2_strict_8/MMStack_Pos0/offsets.json'
+        dst = 'foo.tif'
+        get_stacked_dapi_s_align_check(offset_path, dst)
+
+    elif sys.argv[1] == 'debug_align_visual_check_small':
+        offset_path = '/groups/CaiLab/analyses/nrezaee/test1/align_test2/MMStack_Pos0/offsets.json'
+        dst = 'foo.tif'
+        get_stacked_dapi_s_align_check(offset_path, dst)
 

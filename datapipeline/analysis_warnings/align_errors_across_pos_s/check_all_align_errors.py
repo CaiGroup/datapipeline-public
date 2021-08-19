@@ -54,9 +54,10 @@ def write_bad_alignment_errors(warnings_src, analysis_dir):
     warnings_file.close()
     #--------------------------------------------
     
+if __name__ == '__main__':
 
-if sys.argv[1] == 'debug_warnings_align_errors':
-    analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot/'
-    warnings_src = 'foo.txt'
-    bad_alignment_errors = write_bad_alignment_errors(warnings_src, analysis_dir)
-    print(f'{bad_alignment_errors=}')
+    if sys.argv[1] == 'debug_warnings_align_errors':
+        analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_mat_dapi_mat_dot/'
+        warnings_src = 'foo.txt'
+        bad_alignment_errors = write_bad_alignment_errors(warnings_src, analysis_dir)
+        print(f'{bad_alignment_errors=}')

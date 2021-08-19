@@ -23,10 +23,12 @@ def plot_hyb_locs_on_fids(locs_src, final_fids_src, initial_fids_src, dst):
     #----------------------------------------------------
     plt.savefig(dst)
     #----------------------------------------------------
-    
-if sys.argv[1] ==  'debug_hyb_locs_on_fids':
-    plot_hyb_locs_on_fids(locs_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_fid/MMStack_Pos0/Dot_Locations/locations.csv', 
-                         final_fids_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_fid/MMStack_Pos0/Alignment/final_fids/locs.csv',
-                         initial_fids_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_fid/MMStack_Pos0/Alignment/initial_fids/locs.csv', 
-                         dst = 'foo/hyb_locs_on_fids_check.png')
-    print('Finished Plotting')
+
+if __name__ == '__main__':
+
+    if sys.argv[1] ==  'debug_hyb_locs_on_fids':
+        plot_hyb_locs_on_fids(locs_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_fid/MMStack_Pos0/Dot_Locations/locations.csv',
+                             final_fids_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_fid/MMStack_Pos0/Alignment/final_fids/locs.csv',
+                             initial_fids_src = '/groups/CaiLab/analyses/nrezaee/linus_data/linus_fid/MMStack_Pos0/Alignment/initial_fids/locs.csv',
+                             dst = 'foo/hyb_locs_on_fids_check.png')
+        print('Finished Plotting')

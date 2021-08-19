@@ -237,22 +237,23 @@ def get_labeled_img_cellpose(tiff_path, num_wav, nuclei_channel_num, dst=None, n
 
     return labeled_img
 
-if sys.argv[1] == 'debug_cellpose_low_z':
-    labeled_img = get_labeled_img_cellpose(tiff_path = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/segmentation/MMStack_Pos1.ome.tif',
-                                            num_wav = 3,
-                                            dst = '/home/nrezaee/temp/labeled_img_thresh_3.tif',
-                                            nuclei_radius=20,
-                                            nuclei_channel_num= -1,
-                                            num_z = 1)
-    print(f'{labeled_img.shape=}')
 
-elif sys.argv[1] == 'debug_cellpose_michal':
-    labeled_img = get_labeled_img_cellpose(tiff_path = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_pool1/HybCycle_9/MMStack_Pos1.ome.tif',
-                                            num_wav = 4,
-                                            dst = '/home/nrezaee/temp/labeled_img_thresh_4.tif',
-                                            nuclei_radius=20,
-                                            nuclei_channel_num= -1,
-                                            num_z = 1)
-    print(f'{labeled_img.shape=}')
+if __name__ == '__main__':
 
+    if sys.argv[1] == 'debug_cellpose_low_z':
+        labeled_img = get_labeled_img_cellpose(tiff_path = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/segmentation/MMStack_Pos1.ome.tif',
+                                                num_wav = 3,
+                                                dst = '/home/nrezaee/temp/labeled_img_thresh_3.tif',
+                                                nuclei_radius=20,
+                                                nuclei_channel_num= -1,
+                                                num_z = 1)
+        print(f'{labeled_img.shape=}')
 
+    elif sys.argv[1] == 'debug_cellpose_michal':
+        labeled_img = get_labeled_img_cellpose(tiff_path = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_pool1/HybCycle_9/MMStack_Pos1.ome.tif',
+                                                num_wav = 4,
+                                                dst = '/home/nrezaee/temp/labeled_img_thresh_4.tif',
+                                                nuclei_radius=20,
+                                                nuclei_channel_num= -1,
+                                                num_z = 1)
+        print(f'{labeled_img.shape=}')

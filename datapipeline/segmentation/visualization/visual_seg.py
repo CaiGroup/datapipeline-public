@@ -83,13 +83,15 @@ def get_label_img_visuals(label_src, tiff_dir, position, num_wav):
     #-----------------------------------------------------------------
     
     
-        
-if sys.argv[1] == 'debug_show_visuals':
-    label_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/2021-05-20_Neuro_pool1_analysis/MMStack_Pos11/Segmentation/labeled_img_post.tif'
-    tiff_dir = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5'
-    position = 'MMStack_Pos0.ome.tif'
-    num_wav = 4
-    get_label_img_visuals(label_src, tiff_dir, position, num_wav)
-    
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_show_visuals':
+        label_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/2021-05-20_Neuro_pool1_analysis/MMStack_Pos11/Segmentation/labeled_img_post.tif'
+        tiff_dir = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5'
+        position = 'MMStack_Pos0.ome.tif'
+        num_wav = 4
+        get_label_img_visuals(label_src, tiff_dir, position, num_wav)
+
     
     

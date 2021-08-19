@@ -92,21 +92,23 @@ def get_ratio_second_channel(offset_src, channel_offset_src, locations_src, tiff
     df_new_locs.to_csv(dst, index=False)
     #---------------------------------------------------------------
 
-if sys.argv[1] == 'debug_lampfish_ch2':
-    pos=0
-    offsets_src = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos/MMStack_Pos0/offsets.json'
-    channel_offsets_src = 'foo/channel_offsets.json'
-    locations_src = 'foo/lampfish_decoding_ch1.csv' + str(pos)+'.csv'
-    tiff_dir = '/groups/CaiLab/personal/Linus/raw/5ratiometric_test'
-    get_ratio_second_channel(offset_src, channel_offset_src, locations_src, tiff_dir, pos)
+if __name__ == '__main__':
 
-elif sys.argv[1] == 'debug_lampfish_ch2_test1':
-    pos = 0
-    offsets_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/offsets.json'
-    channel_offset_src = '/home/nrezaee/test_cronjob_multi_dot/foo/test_decoding_class/lampfish_test/channel_offsets.json'
-    #locations_src = '/home/nrezaee/test_cronjob_multi_dot/foo/test_decoding_class/lampfish_test/lampfish_ratio_results_just_ch1.csv'
-    locations_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/Dot_Locations/locations.csv'
-    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/test1'
-    get_ratio_second_channel(offsets_src, channel_offset_src, locations_src, tiff_dir, pos, dst='foo/lampfish_decoding_test_ch2.csv', num_wav=4)   
-        
+    if sys.argv[1] == 'debug_lampfish_ch2':
+        pos=0
+        offsets_src = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos/MMStack_Pos0/offsets.json'
+        channel_offsets_src = 'foo/channel_offsets.json'
+        locations_src = 'foo/lampfish_decoding_ch1.csv' + str(pos)+'.csv'
+        tiff_dir = '/groups/CaiLab/personal/Linus/raw/5ratiometric_test'
+        get_ratio_second_channel(offset_src, channel_offset_src, locations_src, tiff_dir, pos)
+
+    elif sys.argv[1] == 'debug_lampfish_ch2_test1':
+        pos = 0
+        offsets_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/offsets.json'
+        channel_offset_src = '/home/nrezaee/test_cronjob_multi_dot/foo/test_decoding_class/lampfish_test/channel_offsets.json'
+        #locations_src = '/home/nrezaee/test_cronjob_multi_dot/foo/test_decoding_class/lampfish_test/lampfish_ratio_results_just_ch1.csv'
+        locations_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/Dot_Locations/locations.csv'
+        tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/test1'
+        get_ratio_second_channel(offsets_src, channel_offset_src, locations_src, tiff_dir, pos, dst='foo/lampfish_decoding_test_ch2.csv', num_wav=4)
+
 

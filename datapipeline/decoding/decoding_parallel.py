@@ -196,22 +196,21 @@ def decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_se
     return dest_unfilt
 
 
+if __name__ == '__main__':
 
-if sys.argv[1] == 'debug_parallel':
-    import tifffile
+    if sys.argv[1] == 'debug_parallel':
+        import tifffile
 
-    labeled_img_src = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_pool1/test_strict7_pos33_channel1/MMStack_Pos33/Segmentation/labeled_img.tif'
-    barcode_src = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_pool1/test_strict7_pos33_channel1/BarcodeKey/channel_1.mat'
-    locations_src = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_pool1/test_strict7_pos33_channel1/MMStack_Pos33/Dot_Locations/locations.csv'
+        labeled_img_src = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_pool1/test_strict7_pos33_channel1/MMStack_Pos33/Segmentation/labeled_img.tif'
+        barcode_src = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_pool1/test_strict7_pos33_channel1/BarcodeKey/channel_1.mat'
+        locations_src = '/groups/CaiLab/analyses/Michal/2021-06-21_Neuro4181_5_noGel_pool1/test_strict7_pos33_channel1/MMStack_Pos33/Dot_Locations/locations.csv'
 
-    dest = '/home/lombelet/test_cronjob_multi_dot/foo/test'
-    if not os.path.exists(dest):
-        os.makedirs(dest)
-    allowed_diff = 1
-    min_seeds = 3
+        dest = '/home/lombelet/test_cronjob_multi_dot/foo/test'
+        if not os.path.exists(dest):
+            os.makedirs(dest)
+        allowed_diff = 1
+        min_seeds = 3
 
-    labeled_img = tifffile.imread(labeled_img_src)
-    decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_seeds, channel_index=0, \
-        number_of_individual_channels_for_decoding=1)
-
-
+        labeled_img = tifffile.imread(labeled_img_src)
+        decoding(barcode_src ,locations_src, labeled_img, dest, allowed_diff, min_seeds, channel_index=0, \
+            number_of_individual_channels_for_decoding=1)

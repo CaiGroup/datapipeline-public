@@ -76,22 +76,19 @@ def decoding(barcode_src ,locations_src, dest, allowed_diff, min_seeds, channel_
         min_seeds = num_of_rounds - 1
         
     return os.path.join(dest, 'pre_seg_diff_' + str(allowed_diff) + '_minseeds_' + str(min_seeds) + '_unfiltered.csv')
-    
-import sys
-if sys.argv[1] == 'debug_no_parallel':
-    dest = 'foo/multi_channels_decoding_test'
-    if not os.path.exists(dest):
-        os.makedirs(dest)
-    decoding(barcode_src = '/groups/CaiLab/analyses/nrezaee/test1-indiv/3d_indiv_all_2_ch/BarcodeKey/channel_2.mat', 
-            locations_src = '/groups/CaiLab/analyses/nrezaee/test1-indiv/3d_indiv_all_2_ch/MMStack_Pos0/Dot_Locations/locations.csv', 
-            dest = dest, 
-            allowed_diff = 1, 
-            min_seeds = 3,
-            channel_index = 1, 
-            number_of_individual_channels_for_decoding = 2)
-    
 
+if __name__ == '__main__':
 
-
-
+    import sys
+    if sys.argv[1] == 'debug_no_parallel':
+        dest = 'foo/multi_channels_decoding_test'
+        if not os.path.exists(dest):
+            os.makedirs(dest)
+        decoding(barcode_src = '/groups/CaiLab/analyses/nrezaee/test1-indiv/3d_indiv_all_2_ch/BarcodeKey/channel_2.mat',
+                locations_src = '/groups/CaiLab/analyses/nrezaee/test1-indiv/3d_indiv_all_2_ch/MMStack_Pos0/Dot_Locations/locations.csv',
+                dest = dest,
+                allowed_diff = 1,
+                min_seeds = 3,
+                channel_index = 1,
+                number_of_individual_channels_for_decoding = 2)
 

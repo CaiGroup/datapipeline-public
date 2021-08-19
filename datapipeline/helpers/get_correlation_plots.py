@@ -85,10 +85,13 @@ def get_correlated_positions(analysis_dir):
         #----------------------------------------------------------
         
         figure.savefig('correlation_channel_' + str(channel_num) + '.png')
-        
-if sys.argv[1] == 'debug_corr_positions':
-    analysis_dir = '/groups/CaiLab/analyses/michalp/michal_2/michal_2_decoding_test_ch2/'
-    get_correlated_positions(analysis_dir)
+
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_corr_positions':
+        analysis_dir = '/groups/CaiLab/analyses/michalp/michal_2/michal_2_decoding_test_ch2/'
+        get_correlated_positions(analysis_dir)
     
         
         

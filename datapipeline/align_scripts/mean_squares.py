@@ -65,24 +65,25 @@ def mean_squares(fixed_image_src, moving_image_src, rand_dir, num_wav):
     
     save_align_errors(moving_image_src, align_error, rand_dir)
     
-    
-  
-if sys.argv[1] != 'debug_mean_align':
-    import argparse
-    
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--fixed_src")
-    parser.add_argument("--moving_src")
-    parser.add_argument("--rand_dir")
-    parser.add_argument("--num_wav")
-    
-    args, unknown = parser.parse_known_args()
-    
-    mean_squares(args.fixed_src, args.moving_src, args.rand_dir, float(args.num_wav))
-    
-else:
-    fixed_src = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_1/MMStack_Pos0.ome.tif'
-    moving_src = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_2/MMStack_Pos0.ome.tif'
-    rand_dir = '/home/nrezaee/temp'
-    num_wav =4 
-    mean_squares(fixed_src, moving_src, rand_dir, num_wav)
+
+if __name__ == '__main__':
+
+    if sys.argv[1] != 'debug_mean_align':
+        import argparse
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--fixed_src")
+        parser.add_argument("--moving_src")
+        parser.add_argument("--rand_dir")
+        parser.add_argument("--num_wav")
+
+        args, unknown = parser.parse_known_args()
+
+        mean_squares(args.fixed_src, args.moving_src, args.rand_dir, float(args.num_wav))
+
+    else:
+        fixed_src = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_1/MMStack_Pos0.ome.tif'
+        moving_src = '/groups/CaiLab/personal/nrezaee/raw/test1/HybCycle_2/MMStack_Pos0.ome.tif'
+        rand_dir = '/home/nrezaee/temp'
+        num_wav =4
+        mean_squares(fixed_src, moving_src, rand_dir, num_wav)

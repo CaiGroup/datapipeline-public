@@ -75,35 +75,21 @@ def get_count_matrix_for_pos(segment_dir, dst):
     #--------------------------------------------------
     
     df_combined_count.to_csv(dst, index=False)
- 
-if sys.argv[1] == 'debug_comb_count_matrix_channels':
-    count_matrix_src1 = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos10/Segmentation/Channel_2/count_matrix.csv'
-    count_matrix_src2 = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos10/Segmentation/Channel_1/count_matrix.csv'
-    
-    count_matrix_dst = 'foo.csv'
-    
-    combine_count_matrix_channels_in_position(count_matrix_src1, count_matrix_src2, count_matrix_dst)
-    print(f'{count_matrix_dst=}')
-    
-if sys.argv[1] == 'debug_comb_all_count_matrix_channels':
-    
-    pos_analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos2/Segmentation'
-    dst = 'foo2.csv'
-    get_count_matrix_for_pos(pos_analysis_dir, dst)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
 
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_comb_count_matrix_channels':
+        count_matrix_src1 = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos10/Segmentation/Channel_2/count_matrix.csv'
+        count_matrix_src2 = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos10/Segmentation/Channel_1/count_matrix.csv'
+
+        count_matrix_dst = 'foo.csv'
+
+        combine_count_matrix_channels_in_position(count_matrix_src1, count_matrix_src2, count_matrix_dst)
+        print(f'{count_matrix_dst=}')
+
+    if sys.argv[1] == 'debug_comb_all_count_matrix_channels':
+
+        pos_analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos2/Segmentation'
+        dst = 'foo2.csv'
+        get_count_matrix_for_pos(pos_analysis_dir, dst)

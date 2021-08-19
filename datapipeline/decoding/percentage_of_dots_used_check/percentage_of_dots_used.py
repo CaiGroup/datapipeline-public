@@ -25,9 +25,11 @@ def get_percentage_of_dots_used(locs_src, decoded_genes_src, channel, dst_dir):
     file1.write(line_to_write)
     file1.close() 
     #----------------------------------------------------
-    
-if sys.argv[1] == 'debug_percent_of_dots_used':
-    get_percentage_of_dots_used(locs_src ='/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Dot_Locations/locations.csv',
-                                decoded_genes_src ='/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Decoded/Channel_1/pre_seg_diff_1_minseeds_3_unfiltered.csv',\
-                                channel = 1,
-                                dst_dir = os.path.dirname('/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Decoded/Channel_1/pre_seg_diff_1_minseeds_3_unfiltered.csv'))
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_percent_of_dots_used':
+        get_percentage_of_dots_used(locs_src ='/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Dot_Locations/locations.csv',
+                                    decoded_genes_src ='/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Decoded/Channel_1/pre_seg_diff_1_minseeds_3_unfiltered.csv',\
+                                    channel = 1,
+                                    dst_dir = os.path.dirname('/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Decoded/Channel_1/pre_seg_diff_1_minseeds_3_unfiltered.csv'))

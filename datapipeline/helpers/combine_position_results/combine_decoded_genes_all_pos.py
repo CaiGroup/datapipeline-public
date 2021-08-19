@@ -37,10 +37,12 @@ def combine_pos_genes(analysis_dir, channel=None):
     
     
 
-if sys.argv[1] == 'debug_comb_genes':
-    analysis_dir = '/groups/CaiLab/analyses/michalp/michal_2/michal_2_decoding_test/'
-    channel = 1
-    combine_pos_genes(analysis_dir, channel)
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_comb_genes':
+        analysis_dir = '/groups/CaiLab/analyses/michalp/michal_2/michal_2_decoding_test/'
+        channel = 1
+        combine_pos_genes(analysis_dir, channel)
     
     
     

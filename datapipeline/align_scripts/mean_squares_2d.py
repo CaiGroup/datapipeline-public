@@ -74,30 +74,32 @@ def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir, num_wav, start_
     align_error = get_align_errors(fixed_np, moving_np, offset_neg)
     save_align_errors(moving_image_src, align_error, rand_dir)
     #---------------------------------------------------
-    
-if 'debug' not in sys.argv[1]:
-    import argparse
-    
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--fixed_src")
-    parser.add_argument("--moving_src")
-    parser.add_argument("--rand_dir")
-    parser.add_argument("--num_wav")
-    parser.add_argument("--start_time")
-    
-    args, unknown = parser.parse_known_args()
-    
-    mean_squares_2d(args.fixed_src, args.moving_src, args.rand_dir, float(args.num_wav), args.start_time)
 
-elif sys.argv[1] == 'debug_mean_squares_2d':
-    
-    fixed_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_3/MMStack_Pos0.ome.tif'
-    moving_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_20/MMStack_Pos0.ome.tif'
-    
-    rand_dir = 'foo/mean_squares_2d'
-    os.makedirs(rand_dir, exist_ok=True)
-    num_wav = 4
-    start_time = None
-    
-    mean_squares_2d(fixed_src, moving_src, rand_dir, num_wav, start_time)
+if __name__ == '__main__':
+
+    if 'debug' not in sys.argv[1]:
+        import argparse
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--fixed_src")
+        parser.add_argument("--moving_src")
+        parser.add_argument("--rand_dir")
+        parser.add_argument("--num_wav")
+        parser.add_argument("--start_time")
+
+        args, unknown = parser.parse_known_args()
+
+        mean_squares_2d(args.fixed_src, args.moving_src, args.rand_dir, float(args.num_wav), args.start_time)
+
+    elif sys.argv[1] == 'debug_mean_squares_2d':
+
+        fixed_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_3/MMStack_Pos0.ome.tif'
+        moving_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_20/MMStack_Pos0.ome.tif'
+
+        rand_dir = 'foo/mean_squares_2d'
+        os.makedirs(rand_dir, exist_ok=True)
+        num_wav = 4
+        start_time = None
+
+        mean_squares_2d(fixed_src, moving_src, rand_dir, num_wav, start_time)
     

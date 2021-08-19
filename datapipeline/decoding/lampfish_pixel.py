@@ -124,21 +124,23 @@ def get_ratio_first_channel(offsets_src, locations_src, tiff_dir, pos, dst, num_
     #---------------------------------------------------------------
     df_new_locs.to_csv(dst, index=False)
     #---------------------------------------------------------------
-    
-if sys.argv[1] == 'debug_lampfish_ch1':
-    pos = 0
-    offsets_src = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos/MMStack_Pos0/offsets.json'
-    locations_src = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos_strict_8/MMStack_Pos1/Dot_Locations/locations.csv'
-    tiff_dir = '/groups/CaiLab/personal/Linus/raw/5ratiometric_test'
-    get_ratio_first_channel(offsets_src, locations_src, tiff_dir, pos, dst='foo/lampfish_decoding_ch1.csv' + str(pos)+'.csv')
-    
-elif sys.argv[1] == 'debug_lampfish_ch1_test1':
-    pos = 0
-    offsets_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/offsets.json'
-    locations_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/Dot_Locations/locations.csv'
-    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/test1'
-    get_ratio_first_channel(offsets_src, locations_src, tiff_dir, pos, dst='foo/lampfish_decoding__test_ch1.csv', num_wav=4)   
-    
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_lampfish_ch1':
+        pos = 0
+        offsets_src = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos/MMStack_Pos0/offsets.json'
+        locations_src = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos_strict_8/MMStack_Pos1/Dot_Locations/locations.csv'
+        tiff_dir = '/groups/CaiLab/personal/Linus/raw/5ratiometric_test'
+        get_ratio_first_channel(offsets_src, locations_src, tiff_dir, pos, dst='foo/lampfish_decoding_ch1.csv' + str(pos)+'.csv')
+
+    elif sys.argv[1] == 'debug_lampfish_ch1_test1':
+        pos = 0
+        offsets_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/offsets.json'
+        locations_src = '/groups/CaiLab/analyses/nrezaee/test1/dot/MMStack_Pos0/Dot_Locations/locations.csv'
+        tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/test1'
+        get_ratio_first_channel(offsets_src, locations_src, tiff_dir, pos, dst='foo/lampfish_decoding__test_ch1.csv', num_wav=4)
+
 
 
         

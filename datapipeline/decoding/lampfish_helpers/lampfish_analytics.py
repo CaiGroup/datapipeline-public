@@ -25,7 +25,9 @@ def get_ratio_visualization(locs_src, dst):
     sns.histplot(data=df_locs, x="ratio", hue="hyb",bins=300).set_title('Ratio')
     plt.savefig(dst)
     #--------------------------------------------------
-    
-if sys.argv[1] == 'debug_ratio_vis':
-    get_ratio_visualization(locs_src = 'foo/lampfish_decoding.csv',
-                            dst= 'foo/ratio_visual.png')
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_ratio_vis':
+        get_ratio_visualization(locs_src = 'foo/lampfish_decoding.csv',
+                                dst= 'foo/ratio_visual.png')

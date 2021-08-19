@@ -129,13 +129,15 @@ def get_plotted_assigned_genes(assigned_genes_csv_src, dst, label_img):
     #-------------------------------------------------
     rotate_img(dst)
     #-------------------------------------------------
-    
-if sys.argv[1] == 'debug_plotted_assigned_genes':
-    genes_csv = 'foo/cellpose_test_non_barcoded/gene_locations_assigned_to_cell.csv'
-    dst = 'foo/assigned.png'
-    labeled_img_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Segmentation/labeled_img_post.tif'
-    labeled_img = tf.imread(labeled_img_src)
-    get_plotted_assigned_genes(genes_csv, dst, labeled_img)
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_plotted_assigned_genes':
+        genes_csv = 'foo/cellpose_test_non_barcoded/gene_locations_assigned_to_cell.csv'
+        dst = 'foo/assigned.png'
+        labeled_img_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Segmentation/labeled_img_post.tif'
+        labeled_img = tf.imread(labeled_img_src)
+        get_plotted_assigned_genes(genes_csv, dst, labeled_img)
 
 def assign_to_cells(df_gene_list, label_img):
     """
@@ -189,15 +191,17 @@ def assign_to_cells(df_gene_list, label_img):
 
     return df_gene_list
 
-if sys.argv[1] == 'debug_assign_to_cells':
-    import tifffile
-    decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/test1-big/non_barcoded/MMStack_Pos0/Decoded/sequential_decoding_results.csv'
-    df_gene_list = pd.read_csv(decoded_genes_src)
-    label_img_src = '/groups/CaiLab/analyses/nrezaee/test1-big/non_barcoded/MMStack_Pos0/Segmentation/labeled_img.tif'
-    label_img = tifffile.imread(label_img_src)
-    print(f'{label_img.shape=}')
-    df_gene_list = assign_to_cells(df_gene_list, label_img)
-    print(df_gene_list)
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_assign_to_cells':
+        import tifffile
+        decoded_genes_src = '/groups/CaiLab/analyses/nrezaee/test1-big/non_barcoded/MMStack_Pos0/Decoded/sequential_decoding_results.csv'
+        df_gene_list = pd.read_csv(decoded_genes_src)
+        label_img_src = '/groups/CaiLab/analyses/nrezaee/test1-big/non_barcoded/MMStack_Pos0/Segmentation/labeled_img.tif'
+        label_img = tifffile.imread(label_img_src)
+        print(f'{label_img.shape=}')
+        df_gene_list = assign_to_cells(df_gene_list, label_img)
+        print(df_gene_list)
     
 
 def get_cell_info(label_img):
@@ -335,23 +339,24 @@ def get_gene_cell_matrix(df_gene_list, labeled_img):
     # ---------------------------------------------------------------------
     
     return df_gene_cell_all
-    
-if sys.argv[1] == 'debug_gene_cell_matrix':
-    
-    df_gene_list = pd.read_csv('/groups/CaiLab/analyses/real_arun/06212021_Automation_Testes_NoHydrogel/Testes_Strictness8/MMStack_Pos1/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv')
-    labeled_img_src = '/groups/CaiLab/analyses/real_arun/06212021_Automation_Testes_NoHydrogel/Testes_Strictness8/MMStack_Pos1/Segmentation/labeled_img_post.tif'
-    labeled_img = tf.imread(labeled_img_src)
-    df_gene_cell = get_gene_cell_matrix(df_gene_list, labeled_img)
-    print(f'{df_gene_cell.shape=}')
-    df_gene_cell.to_csv('foo/gene_cell.csv', index=False)
 
-elif sys.argv[1] == 'debug_gene_cell_matrix_non_barcoded':
-    
-    df_gene_list = pd.read_csv('foo/cellpose_test_non_barcoded/gene_locations_assigned_to_cell.csv')
-    barcode_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/BarcodeKey/sequential_key.csv'
-    labeled_img_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Segmentation/labeled_img_post.tif'
-    labeled_img = tf.imread(labeled_img_src)
-    df_gene_cell = get_gene_cell_matrix(df_gene_list, labeled_img)
-    print(f'{df_gene_cell.shape=}')
-    df_gene_cell.to_csv('foo/gene_cell_non_barcoded.csv', index=False)
+if __name__ == '__main__':
 
+    if sys.argv[1] == 'debug_gene_cell_matrix':
+
+        df_gene_list = pd.read_csv('/groups/CaiLab/analyses/real_arun/06212021_Automation_Testes_NoHydrogel/Testes_Strictness8/MMStack_Pos1/Segmentation/Channel_1/gene_locations_assigned_to_cell.csv')
+        labeled_img_src = '/groups/CaiLab/analyses/real_arun/06212021_Automation_Testes_NoHydrogel/Testes_Strictness8/MMStack_Pos1/Segmentation/labeled_img_post.tif'
+        labeled_img = tf.imread(labeled_img_src)
+        df_gene_cell = get_gene_cell_matrix(df_gene_list, labeled_img)
+        print(f'{df_gene_cell.shape=}')
+        df_gene_cell.to_csv('foo/gene_cell.csv', index=False)
+
+    elif sys.argv[1] == 'debug_gene_cell_matrix_non_barcoded':
+
+        df_gene_list = pd.read_csv('foo/cellpose_test_non_barcoded/gene_locations_assigned_to_cell.csv')
+        barcode_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/BarcodeKey/sequential_key.csv'
+        labeled_img_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Segmentation/labeled_img_post.tif'
+        labeled_img = tf.imread(labeled_img_src)
+        df_gene_cell = get_gene_cell_matrix(df_gene_list, labeled_img)
+        print(f'{df_gene_cell.shape=}')
+        df_gene_cell.to_csv('foo/gene_cell_non_barcoded.csv', index=False)

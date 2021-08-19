@@ -84,11 +84,13 @@ def get_colocs(final_src, init_src):
     print('Shape of Colocalized Initial Fiducials:', str(df_init_coloced.shape))
     return df_final_coloced, df_init_coloced
 
-if sys.argv[1] == 'debug_coloc':
-    final_src = 'foo/test_fid_alignment2/final_fids/locs.csv'
-    init_src = 'foo/test_fid_alignment2/initial_fids/locs.csv'
-    
-    get_colocs(final_src, init_src)
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_coloc':
+        final_src = 'foo/test_fid_alignment2/final_fids/locs.csv'
+        init_src = 'foo/test_fid_alignment2/initial_fids/locs.csv'
+
+        get_colocs(final_src, init_src)
     
     
     

@@ -30,6 +30,8 @@ def send_analysis_to_onedrive(analysis_dir):
         os.system(cmd)
         
 
-if sys.argv[1] == 'debug_rclone':
-    analysis_dir = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/form_takei'
-    send_analysis_to_onedrive(analysis_dir)
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_rclone':
+        analysis_dir = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/form_takei'
+        send_analysis_to_onedrive(analysis_dir)

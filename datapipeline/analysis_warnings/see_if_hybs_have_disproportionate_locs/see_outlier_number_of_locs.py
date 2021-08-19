@@ -69,12 +69,13 @@ def write_disproporionate_number_of_dots_to_file_for_one_pos(warnings_src, locat
     warnings_file.close()
     #--------------------------------------------
     
+if __name__ == '__main__':
 
-if sys.argv[1] == 'debug_warnings_outlier_number_of_dots':
-    locs_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_debug3_pos8_strict15_ch2/MMStack_Pos13/Dot_Locations/locations.csv'
-    warnings_src = 'foo.txt'
-    
-    write_disproporionate_number_of_dots_to_file_for_one_pos(warnings_src, locs_src)
+    if sys.argv[1] == 'debug_warnings_outlier_number_of_dots':
+        locs_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_debug3_pos8_strict15_ch2/MMStack_Pos13/Dot_Locations/locations.csv'
+        warnings_src = 'foo.txt'
+
+        write_disproporionate_number_of_dots_to_file_for_one_pos(warnings_src, locs_src)
     
     
     
@@ -115,13 +116,14 @@ def write_disproporionate_number_of_dots_to_file_for_all_pos(warnings_src, analy
     #--------------------------------------------
     
     
-    
-if sys.argv[1] == 'debug_warnings_outlier_number_of_dots_all_pos':
-    
-    analysis_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_debug3_pos8_strict15_ch2/'
-    warnings_src = 'foo.txt'
-    
-    write_disproporionate_number_of_dots_to_file_for_all_pos(warnings_src, analysis_dir)
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_warnings_outlier_number_of_dots_all_pos':
+
+        analysis_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_debug3_pos8_strict15_ch2/'
+        warnings_src = 'foo.txt'
+
+        write_disproporionate_number_of_dots_to_file_for_all_pos(warnings_src, analysis_dir)
     
     
     

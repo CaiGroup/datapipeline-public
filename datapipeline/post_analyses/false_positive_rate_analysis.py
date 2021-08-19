@@ -144,12 +144,14 @@ def get_false_pos_intensities_hist(genes_csv_src, dest):
     plt.savefig(dest)
     print(f'{dest=}')
     #------------------------------------------------------
-    
-if sys.argv[1] == 'debug_false_pos_intensity_chart':
-    results_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation/Channel_2/gene_locations_assigned_to_cell.csv'
-    dest = 'foo/on_off_intensity_plot.png'
-    
-    get_false_pos_intensities_hist(results_src, dest)
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_false_pos_intensity_chart':
+        results_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation/Channel_2/gene_locations_assigned_to_cell.csv'
+        dest = 'foo/on_off_intensity_plot.png'
+
+        get_false_pos_intensities_hist(results_src, dest)
     
     
 def save_to_file_z(num_reals, num_fakes, ratio, z, dst):
@@ -281,18 +283,18 @@ def get_false_pos_rate_post_seg(gene_locations_assigned_to_cell_src, on_barcode_
     return num_reals, num_fakes, ratio
     
     
-import sys
-if sys.argv[1] == 'debug_false_pos':
-    results_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation/Channel_2/gene_locations_assigned_to_cell.csv'
-    dst = '/home/nrezaee/temp/false_pos.txt'
-    on_barcode_src = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5/barcode_key/channel_1.csv'
-    off_barcode_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/BarcodeKey/channel_1_fake.csv'
-    get_false_pos_rate_post_seg(results_src, on_barcode_src, off_barcode_src, dst)
+if __name__ == '__main__':
+
+    import sys
+    if sys.argv[1] == 'debug_false_pos':
+        results_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation/Channel_2/gene_locations_assigned_to_cell.csv'
+        dst = '/home/nrezaee/temp/false_pos.txt'
+        on_barcode_src = '/groups/CaiLab/personal/Michal/raw/2021-05-20_P4P5P7_282plex_Neuro4196_5/barcode_key/channel_1.csv'
+        off_barcode_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/BarcodeKey/channel_1_fake.csv'
+        get_false_pos_rate_post_seg(results_src, on_barcode_src, off_barcode_src, dst)
+
     
-    
-    
-    
-    
+
 def get_false_pos_rate_pre_seg(csv_src, barcode_src, dst):
     #Get False Positive
     #--------------------------------------------------

@@ -1123,21 +1123,21 @@ class Analysis:
 
     #--------------------------------------------------------------------------------
     #End of running the parameters
-            
-        
-if sys.argv[1] == 'debug_analysis_class_all_pos':
-    
-    analysis = Analysis(experiment_name = 'jina_1_pseudos_4_corrected',
-                        analysis_name = 'jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60', 
-                        personal ='nrezaee', 
-                        position = 'MMStack_Pos0.ome.tif', 
-                        email = None)
-    
-    analysis.set_segmentation_arg("cellpose")
-    analysis.set_decoding_individual([1,2])
-    
-    analysis.run_algorithms_for_all_pos()
-    
+
+if __name__ == '__main__':
+    if sys.argv[1] == 'debug_analysis_class_all_pos':
+
+        analysis = Analysis(experiment_name = 'jina_1_pseudos_4_corrected',
+                            analysis_name = 'jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60',
+                            personal ='nrezaee',
+                            position = 'MMStack_Pos0.ome.tif',
+                            email = None)
+
+        analysis.set_segmentation_arg("cellpose")
+        analysis.set_decoding_individual([1,2])
+
+        analysis.run_algorithms_for_all_pos()
+
     
     
     

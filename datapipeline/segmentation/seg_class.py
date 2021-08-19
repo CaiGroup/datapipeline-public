@@ -257,157 +257,157 @@ class Segmentation:
 
         return labeled_img
 
-if sys.argv[1] == 'debug_seg_class_indiv':
-    labeled_img_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation/labeled_img_post.tif'
+if __name__ == '__main__':
 
-    labeled_img = tf.imread(labeled_img_src)
-    segmenter = Segmentation(data_dir = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/',
-                            position = 'MMStack_Pos.ome.tif',
-                            seg_dir = 'foo/seg_test',
-                            decoded_dir = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Decoded',
-                            locations_dir ='/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Dot_Locations',
-                            barcode_dst = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/BarcodeKey',
-                            barcode_src = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/barcode_key',
-                            bool_fake_barcodes = True,
-                            bool_decoding_individual = [1],
-                            num_z_slices = None,
-                            seg_type = 'cellpose',
-                            seg_data_dir = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/segmentation',
-                            dimensions = 3,
-                            num_zslices = 3,
-                            labeled_img = labeled_img,
-                            edge_dist = 0,
-                            dist_between_nuclei = 0,
-                            bool_cyto_match= False,
-                            area_tol = False,
-                            cyto_channel_num = False,
-                            get_nuclei_img = True,
-                            get_cyto_img = False,
-                            num_wav = 4,
-                            nuclei_radius = 0,
-                            flow_threshold = .4,
-                            cell_prob_threshold = 0,
-                            nuclei_channel_num = -1,
-                            cyto_flow_threshold = 0,
-                            cyto_cell_prob_threshold =0,
-                            cyto_radius =0)
-    print("Created Segmentation Class")
+    if sys.argv[1] == 'debug_seg_class_indiv':
+        labeled_img_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation/labeled_img_post.tif'
 
-    segmenter.run_segmentation_individually()
+        labeled_img = tf.imread(labeled_img_src)
+        segmenter = Segmentation(data_dir = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/',
+                                position = 'MMStack_Pos.ome.tif',
+                                seg_dir = 'foo/seg_test',
+                                decoded_dir = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Decoded',
+                                locations_dir ='/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/MMStack_Pos1/Dot_Locations',
+                                barcode_dst = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6/BarcodeKey',
+                                barcode_src = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/barcode_key',
+                                bool_fake_barcodes = True,
+                                bool_decoding_individual = [1],
+                                num_z_slices = None,
+                                seg_type = 'cellpose',
+                                seg_data_dir = '/central/groups/CaiLab/personal/nrezaee/raw/arun_auto_testes_1/segmentation',
+                                dimensions = 3,
+                                num_zslices = 3,
+                                labeled_img = labeled_img,
+                                edge_dist = 0,
+                                dist_between_nuclei = 0,
+                                bool_cyto_match= False,
+                                area_tol = False,
+                                cyto_channel_num = False,
+                                get_nuclei_img = True,
+                                get_cyto_img = False,
+                                num_wav = 4,
+                                nuclei_radius = 0,
+                                flow_threshold = .4,
+                                cell_prob_threshold = 0,
+                                nuclei_channel_num = -1,
+                                cyto_flow_threshold = 0,
+                                cyto_cell_prob_threshold =0,
+                                cyto_radius =0)
+        print("Created Segmentation Class")
 
-if sys.argv[1] == 'debug_seg_class_multiple_indiv':
-    labeled_img_src = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos1/Segmentation/labeled_img_post.tif'
+        segmenter.run_segmentation_individually()
 
-    labeled_img = tf.imread(labeled_img_src)
-    segmenter = Segmentation(data_dir = '/central/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/',
-                            position = 'MMStack_Pos.ome.tif',
-                            seg_dir = 'foo/seg_test',
-                            decoded_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos1/Decoded',
-                            locations_dir ='/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos1/Dot_Locations',
-                            barcode_dst = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/BarcodeKey',
-                            barcode_src = '/central/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/barcode_key',
-                            bool_fake_barcodes = True,
-                            bool_decoding_individual = [1,2,3],
-                            num_z_slices = None,
-                            seg_type = 'cellpose',
-                            seg_data_dir = '/central/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/segmentation',
-                            dimensions = 3,
-                            num_zslices = 3,
-                            labeled_img = labeled_img,
-                            edge_dist = 0,
-                            dist_between_nuclei = 0,
-                            bool_cyto_match= False,
-                            area_tol = False,
-                            cyto_channel_num = False,
-                            get_nuclei_img = True,
-                            get_cyto_img = False,
-                            num_wav = 4,
-                            nuclei_radius = 0,
-                            flow_threshold = .4,
-                            cell_prob_threshold = 0,
-                            nuclei_channel_num = -1,
-                            cyto_flow_threshold = 0,
-                            cyto_cell_prob_threshold =0,
-                            cyto_radius =0)
-    print("Created Segmentation Class")
+    if sys.argv[1] == 'debug_seg_class_multiple_indiv':
+        labeled_img_src = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos1/Segmentation/labeled_img_post.tif'
 
-    segmenter.run_segmentation_individually()
+        labeled_img = tf.imread(labeled_img_src)
+        segmenter = Segmentation(data_dir = '/central/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/',
+                                position = 'MMStack_Pos.ome.tif',
+                                seg_dir = 'foo/seg_test',
+                                decoded_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos1/Decoded',
+                                locations_dir ='/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/MMStack_Pos1/Dot_Locations',
+                                barcode_dst = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60/BarcodeKey',
+                                barcode_src = '/central/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/barcode_key',
+                                bool_fake_barcodes = True,
+                                bool_decoding_individual = [1,2,3],
+                                num_z_slices = None,
+                                seg_type = 'cellpose',
+                                seg_data_dir = '/central/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/segmentation',
+                                dimensions = 3,
+                                num_zslices = 3,
+                                labeled_img = labeled_img,
+                                edge_dist = 0,
+                                dist_between_nuclei = 0,
+                                bool_cyto_match= False,
+                                area_tol = False,
+                                cyto_channel_num = False,
+                                get_nuclei_img = True,
+                                get_cyto_img = False,
+                                num_wav = 4,
+                                nuclei_radius = 0,
+                                flow_threshold = .4,
+                                cell_prob_threshold = 0,
+                                nuclei_channel_num = -1,
+                                cyto_flow_threshold = 0,
+                                cyto_cell_prob_threshold =0,
+                                cyto_radius =0)
+        print("Created Segmentation Class")
 
-if sys.argv[1] == 'debug_seg_class_non_barcoded':
-    labeled_img_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation/labeled_img_post.tif'
+        segmenter.run_segmentation_individually()
 
-    labeled_img = tf.imread(labeled_img_src)
-    segmenter = Segmentation(data_dir = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013',
-                            position = 'MMStack_Pos1.ome.tif',
-                            seg_dir = 'foo/seg_test_non_barcoded',
-                            decoded_dir = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Decoded',
-                            locations_dir ='/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Dot_Locations',
-                            barcode_dst = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/BarcodeKey',
-                            barcode_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/barcode_key',
-                            bool_fake_barcodes = True,
-                            bool_decoding_individual = [1],
-                            num_z_slices = None,
-                            seg_type = 'cellpose',
-                            seg_data_dir = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013/segmentation',
-                            dimensions = 3,
-                            num_zslices = 3,
-                            labeled_img = labeled_img,
-                            edge_dist = 0,
-                            dist_between_nuclei = 0,
-                            bool_cyto_match= False,
-                            area_tol = False,
-                            cyto_channel_num = False,
-                            get_nuclei_img = True,
-                            get_cyto_img = False,
-                            num_wav = 4,
-                            nuclei_radius = 0,
-                            flow_threshold = .4,
-                            cell_prob_threshold = 0,
-                            nuclei_channel_num = -1,
-                            cyto_flow_threshold = 0,
-                            cyto_cell_prob_threshold =0,
-                            cyto_radius =0)
-    print("Created Segmentation Class")
+    if sys.argv[1] == 'debug_seg_class_non_barcoded':
+        labeled_img_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult_ch/MMStack_Pos0/Segmentation/labeled_img_post.tif'
 
-    segmenter.run_segmentation_non_barcoded()
+        labeled_img = tf.imread(labeled_img_src)
+        segmenter = Segmentation(data_dir = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013',
+                                position = 'MMStack_Pos1.ome.tif',
+                                seg_dir = 'foo/seg_test_non_barcoded',
+                                decoded_dir = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Decoded',
+                                locations_dir ='/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/MMStack_Pos1/Dot_Locations',
+                                barcode_dst = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/BarcodeKey',
+                                barcode_src = '/groups/CaiLab/analyses/alinares/2021_0607_control_20207013/smfish_test/barcode_key',
+                                bool_fake_barcodes = True,
+                                bool_decoding_individual = [1],
+                                num_z_slices = None,
+                                seg_type = 'cellpose',
+                                seg_data_dir = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013/segmentation',
+                                dimensions = 3,
+                                num_zslices = 3,
+                                labeled_img = labeled_img,
+                                edge_dist = 0,
+                                dist_between_nuclei = 0,
+                                bool_cyto_match= False,
+                                area_tol = False,
+                                cyto_channel_num = False,
+                                get_nuclei_img = True,
+                                get_cyto_img = False,
+                                num_wav = 4,
+                                nuclei_radius = 0,
+                                flow_threshold = .4,
+                                cell_prob_threshold = 0,
+                                nuclei_channel_num = -1,
+                                cyto_flow_threshold = 0,
+                                cyto_cell_prob_threshold =0,
+                                cyto_radius =0)
+        print("Created Segmentation Class")
+
+        segmenter.run_segmentation_non_barcoded()
 
 
-if sys.argv[1] == 'debug_seg_class_across':
-    labeled_img_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug3/MMStack_Pos0/Segmentation/labeled_img_post.tif'
-    
-    labeled_img = tf.imread(labeled_img_src)
-    segmenter = Segmentation(data_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/', 
-                            position = 'MMStack_Pos0.ome.tif', 
-                            seg_dir = 'foo/seg_test_across', 
-                            decoded_dir = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug3/MMStack_Pos0/Decoded', 
-                            locations_dir ='//groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug3/MMStack_Pos0/Dot_Locations', 
-                            barcode_dst = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug3/BarcodeKey', 
-                            barcode_src = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/barcode_key/barcode_key', 
-                            bool_fake_barcodes = True,
-                            bool_decoding_individual = [1], 
-                            num_z_slices = None,
-                            seg_type = 'cellpose', 
-                            seg_data_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/segmentation/', 
-                            dimensions = 3, 
-                            num_zslices = 3, 
-                            labeled_img = labeled_img, 
-                            edge_dist = 0, 
-                            dist_between_nuclei = 0, 
-                            bool_cyto_match= False, 
-                            area_tol = False, 
-                            cyto_channel_num = False, 
-                            get_nuclei_img = True, 
-                            get_cyto_img = False, 
-                            num_wav = 4, 
-                            nuclei_radius = 0, 
-                            flow_threshold = .4, 
-                            cell_prob_threshold = 0,
-                            nuclei_channel_num = -1, 
-                            cyto_flow_threshold = 0, 
-                            cyto_cell_prob_threshold =0, 
-                            cyto_radius =0)
-    print("Created Segmentation Class")
-    
-    segmenter.run_segmentation_across()
+    if sys.argv[1] == 'debug_seg_class_across':
+        labeled_img_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug3/MMStack_Pos0/Segmentation/labeled_img_post.tif'
 
-                
+        labeled_img = tf.imread(labeled_img_src)
+        segmenter = Segmentation(data_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/',
+                                position = 'MMStack_Pos0.ome.tif',
+                                seg_dir = 'foo/seg_test_across',
+                                decoded_dir = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug3/MMStack_Pos0/Decoded',
+                                locations_dir ='//groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug3/MMStack_Pos0/Dot_Locations',
+                                barcode_dst = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/lex_bug3/BarcodeKey',
+                                barcode_src = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/barcode_key/barcode_key',
+                                bool_fake_barcodes = True,
+                                bool_decoding_individual = [1],
+                                num_z_slices = None,
+                                seg_type = 'cellpose',
+                                seg_data_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/segmentation/',
+                                dimensions = 3,
+                                num_zslices = 3,
+                                labeled_img = labeled_img,
+                                edge_dist = 0,
+                                dist_between_nuclei = 0,
+                                bool_cyto_match= False,
+                                area_tol = False,
+                                cyto_channel_num = False,
+                                get_nuclei_img = True,
+                                get_cyto_img = False,
+                                num_wav = 4,
+                                nuclei_radius = 0,
+                                flow_threshold = .4,
+                                cell_prob_threshold = 0,
+                                nuclei_channel_num = -1,
+                                cyto_flow_threshold = 0,
+                                cyto_cell_prob_threshold =0,
+                                cyto_radius =0)
+        print("Created Segmentation Class")
+
+        segmenter.run_segmentation_across()

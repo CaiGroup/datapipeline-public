@@ -33,6 +33,9 @@ def combine_locs_csv_s(analysis_dir):
     print(f'{df_all_pos_dst=}')
     df_all_pos.to_csv(df_all_pos_dst, index=False)
 
-if sys.argv[1] == 'debug_comb_pos_locs':
-    analysis_dir = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos/'
-    combine_locs_csv_s(analysis_dir)
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_comb_pos_locs':
+        analysis_dir = '/groups/CaiLab/analyses/Linus/5ratiometric_test/linus_5ratio_all_pos/'
+        combine_locs_csv_s(analysis_dir)

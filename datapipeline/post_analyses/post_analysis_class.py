@@ -180,36 +180,33 @@ class Post_Analyses:
                 
                 get_hamming_analysis(genes_assigned_to_cell_src, barcode_src, dest_file_path)
     #--------------------------------------------------------------------------------
-    
-if sys.argv[1] == 'debug_post_analyses_class':
-    print('Debugging')
-    post_analysis = Post_Analyses(position_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult__3_ch/MMStack_Pos0/', 
-                                false_pos_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult__3_ch/MMStack_Pos0/False_Positive_Rate_Analysis/', 
-                                seg_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult__3_ch/MMStack_Pos0/Segmentation/',
-                                hamming_dir = None,
-                                bool_fake_barcodes = True, 
-                                barcode_key_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult__3_ch/BarcodeKey/', 
-                                num_zslices= None, 
-                                segmentation = 'cellpose', 
-                                channels = [1,2,3])
-    
-    post_analysis.run_false_positive_rate_analysis_indiv()
-    
-if sys.argv[1] == 'debug_post_analyses_class_across':
-    print('Debugging')
-    post_analysis = Post_Analyses(position_dir = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/071621_matlabdotdetection/MMStack_Pos1/', 
-                                false_pos_dir = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/071621_matlabdotdetection/MMStack_Pos1/False_Positive_Rate_Analysis/', 
-                                seg_dir = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/071621_matlabdotdetection/MMStack_Pos1/Segmentation/',
-                                hamming_dir = None,
-                                bool_fake_barcodes = True, 
-                                barcode_key_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/071621_matlabdotdetection/BarcodeKey/', 
-                                num_zslices= None, 
-                                segmentation = 'cellpose', 
-                                channels = None)
-    
-    post_analysis.run_false_positive_rate_analysis_across()
-    
-    
-    
-    
-    
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_post_analyses_class':
+        print('Debugging')
+        post_analysis = Post_Analyses(position_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult__3_ch/MMStack_Pos0/',
+                                    false_pos_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult__3_ch/MMStack_Pos0/False_Positive_Rate_Analysis/',
+                                    seg_dir = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult__3_ch/MMStack_Pos0/Segmentation/',
+                                    hamming_dir = None,
+                                    bool_fake_barcodes = True,
+                                    barcode_key_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/michal_mult__3_ch/BarcodeKey/',
+                                    num_zslices= None,
+                                    segmentation = 'cellpose',
+                                    channels = [1,2,3])
+
+        post_analysis.run_false_positive_rate_analysis_indiv()
+
+    if sys.argv[1] == 'debug_post_analyses_class_across':
+        print('Debugging')
+        post_analysis = Post_Analyses(position_dir = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/071621_matlabdotdetection/MMStack_Pos1/',
+                                    false_pos_dir = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/071621_matlabdotdetection/MMStack_Pos1/False_Positive_Rate_Analysis/',
+                                    seg_dir = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/071621_matlabdotdetection/MMStack_Pos1/Segmentation/',
+                                    hamming_dir = None,
+                                    bool_fake_barcodes = True,
+                                    barcode_key_src = '/groups/CaiLab/analyses/Lex/20k_dash_063021_3t3/071621_matlabdotdetection/BarcodeKey/',
+                                    num_zslices= None,
+                                    segmentation = 'cellpose',
+                                    channels = None)
+
+        post_analysis.run_false_positive_rate_analysis_across()

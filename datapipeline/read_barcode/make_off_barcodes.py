@@ -109,10 +109,12 @@ def get_off_barcodes(barcode_src, off_barcode_dst):
     #-------------------------------------------------------
     
     return df_off
-  
-if sys.argv[1] == 'debug_get_off':
-    src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_9/barcode_key/channel_2.csv'
-    dst = 'foo/channel_2_fake.csv'
-    get_off_barcodes(src, dst)
-    print(f'{dst=}')
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_get_off':
+        src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_9/barcode_key/channel_2.csv'
+        dst = 'foo/channel_2_fake.csv'
+        get_off_barcodes(src, dst)
+        print(f'{dst=}')
     

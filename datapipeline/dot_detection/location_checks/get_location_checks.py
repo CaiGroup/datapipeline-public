@@ -129,13 +129,16 @@ def get_n_dots_for_each_channel_plot(locs_src, dst):
     #----------------------------------------------------------
     plt.savefig(dst)
     #----------------------------------------------------------
-    
-import sys
 
-if sys.argv[1] == 'debug_n_dots_check':
-    locs_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/test/MMStack_Pos8/Dot_Locations/locations.csv'
-    dst = 'foo.png'
-    get_n_dots_for_each_channel_plot(locs_src, dst)
+
+if __name__ == '__main__':
+
+    import sys
+
+    if sys.argv[1] == 'debug_n_dots_check':
+        locs_src = '/groups/CaiLab/analyses/Michal/2021-05-20_P4P5P7_282plex_Neuro4196_5/test/MMStack_Pos8/Dot_Locations/locations.csv'
+        dst = 'foo.png'
+        get_n_dots_for_each_channel_plot(locs_src, dst)
 
 
 

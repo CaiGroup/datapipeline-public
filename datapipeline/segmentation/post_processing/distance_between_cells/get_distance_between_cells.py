@@ -23,10 +23,12 @@ def make_distance_between_cells(label_img_src, dist_between_nuclei, post_process
     print(f'{label_img_src=}')
     return label_img_src
     #-------------------------------------------------------------
-    
-if sys.argv[1] == 'debug_distance_between_cells':
-    label_img_src = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_pos3_python_dot_strict_-2_rad_3/MMStack_Pos3/Segmentation/labeled_img.tif'
-    distance_between_cells = 2
-    post_process_dir = '/home/nrezaee/test_cronjob_multi_dot/segmentation/post_processing'
-    
-    make_distance_between_cells(label_img_src, distance_between_cells, post_process_dir)
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_distance_between_cells':
+        label_img_src = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_pos3_python_dot_strict_-2_rad_3/MMStack_Pos3/Segmentation/labeled_img.tif'
+        distance_between_cells = 2
+        post_process_dir = '/home/nrezaee/test_cronjob_multi_dot/segmentation/post_processing'
+
+        make_distance_between_cells(label_img_src, distance_between_cells, post_process_dir)

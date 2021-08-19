@@ -64,14 +64,16 @@ def get_back_sub_check(tiff_src, analysis_name, back_img_3d, channel):
         io.imwrite(back_sub_dst, logged_img)
         print('Saved Back Sub Check')
         #------------------------------------------------
-    
-if sys.argv[1] == 'debug_back_sub_check':
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_1/MMStack_Pos0.ome.tif'
-    analysis_name = 'linus_decoding'
-    channel = 0
-    back_img_3d = tf.imread(tiff_src)[:, 0]
-    
-    get_back_sub_check(tiff_src, analysis_name, back_img_3d, channel)
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_back_sub_check':
+        tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_1/MMStack_Pos0.ome.tif'
+        analysis_name = 'linus_decoding'
+        channel = 0
+        back_img_3d = tf.imread(tiff_src)[:, 0]
+
+        get_back_sub_check(tiff_src, analysis_name, back_img_3d, channel)
     
     
 def shift_each_2d_in_3d(back_3d, offset):
@@ -137,13 +139,16 @@ def get_shifted_background(back_3d, tiff_src, analysis_name):
     
     return shifted_back
 
-if sys.argv[1] == 'debug_shift_background':
-    tiff_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_10/MMStack_Pos0.ome.tif'
-    analysis_name = 'anthony_test_1'
-    tiff = tf.imread(tiff_src)
-    back_tiff = tiff[:,0]
-    shifted_back = get_shifted_background(back_tiff, tiff_src, analysis_name)
-    print(f'{shifted_back.shape=}')
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_shift_background':
+        tiff_src = '/groups/CaiLab/personal/alinares/raw/2021_0512_mouse_hydrogel/HybCycle_10/MMStack_Pos0.ome.tif'
+        analysis_name = 'anthony_test_1'
+        tiff = tf.imread(tiff_src)
+        back_tiff = tiff[:,0]
+        shifted_back = get_shifted_background(back_tiff, tiff_src, analysis_name)
+        print(f'{shifted_back.shape=}')
     
 
 def get_background_mask_2d(back_img_2d):
@@ -249,16 +254,18 @@ def remove_blobs_with_masks_3d(back_tiff_ch, tiff_ch, tiff_src, analysis_name, c
     
     return tiff_ch_blobs_removed
 
-if sys.argv[1] == 'debug_remove_back_blobs':
-    analysis_name = 'anthony_test_1'
-    tiff_src = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013/HybCycle_10/MMStack_Pos12.ome.tif'
-    back_tiff = tiffy.load('/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013/final_background/MMStack_Pos12.ome.tif')
-    tiff = tiffy.load(tiff_src)
-    print(f'{back_tiff.shape=}')
-    ch = 1
-    back_tiff_ch = back_tiff[:, ch]
-    tiff_ch = tiff[:, ch]
-    remove_blobs_with_masks_3d(back_tiff_ch, tiff_ch, tiff_src, analysis_name, ch)
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_remove_back_blobs':
+        analysis_name = 'anthony_test_1'
+        tiff_src = '/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013/HybCycle_10/MMStack_Pos12.ome.tif'
+        back_tiff = tiffy.load('/groups/CaiLab/personal/alinares/raw/2021_0607_control_20207013/final_background/MMStack_Pos12.ome.tif')
+        tiff = tiffy.load(tiff_src)
+        print(f'{back_tiff.shape=}')
+        ch = 1
+        back_tiff_ch = back_tiff[:, ch]
+        tiff_ch = tiff[:, ch]
+        remove_blobs_with_masks_3d(back_tiff_ch, tiff_ch, tiff_src, analysis_name, ch)
     
     
     

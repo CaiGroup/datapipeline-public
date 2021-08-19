@@ -87,9 +87,11 @@ def combine_align_errors(rand_list):
       
     return offsets
 
-import sys
-if sys.argv[1] == 'debug_combine_align':
-    rand_list = ['DnoWCMPA', 'kB9q7SuX', 'kgrbUmx9', 'wXBkepqw']
-    combine_offsets(rand_list)
+if __name__ == '__main__':
+
+    import sys
+    if sys.argv[1] == 'debug_combine_align':
+        rand_list = ['DnoWCMPA', 'kB9q7SuX', 'kgrbUmx9', 'wXBkepqw']
+        combine_offsets(rand_list)
     
     

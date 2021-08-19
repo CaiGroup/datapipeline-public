@@ -124,13 +124,15 @@ def side_by_side_preprocess_checks(tiff_src, analysis_name):
             fig.savefig(dst_of_check)
             #-----------------------------------------------------
             
-            
-if sys.argv[1] == 'debug_side_by_side_check':
-    
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_15/MMStack_Pos1.ome.tif'
-    analysis_name = 'jina_pseudos_4_corrected_2_pos_2_chs_pil_load_strict_2_only_blur_thresh_60'
-    side_by_side_preprocess_checks(tiff_src, analysis_name)
-                
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_side_by_side_check':
+
+        tiff_src = '/groups/CaiLab/personal/nrezaee/raw/jina_1_pseudos_4_corrected/HybCycle_15/MMStack_Pos1.ome.tif'
+        analysis_name = 'jina_pseudos_4_corrected_2_pos_2_chs_pil_load_strict_2_only_blur_thresh_60'
+        side_by_side_preprocess_checks(tiff_src, analysis_name)
+
             
         
         

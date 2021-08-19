@@ -125,15 +125,17 @@ def basic_clustering(count_matrix_src, cell_info_src, position, dst_dir):
     sc.pl.umap(adata[adata.obs['position'].isin(['P13'])], color=['clusters'],size=50, save='_of_clusters.png') 
     print("Saved UMAP Plots")
     #------------------------------------------------------------
-    
-import sys
 
-if sys.argv[1] == 'debug_initial_clustering':
-    analysis_dir = '/groups/CaiLab/analyses/michalp/michal_1/michal_decoding_top_10000_mat_dapi_all_pos_correct_barcodes/'
-    position = 'MMStack_Pos13'
-    count_matrix_src = os.path.join(analysis_dir, position, 'Segmentation/Channel_1/count_matrix.csv')
-    cell_info_src = os.path.join(analysis_dir, position, 'Segmentation/Channel_1/cell_info.csv')
-    dst_dir = 'foo/clustering'
-    os.makedirs(dst_dir, exist_ok=True)
-    
-    basic_clustering(count_matrix_src, cell_info_src, position, dst_dir)
+if __name__ == '__main__':
+
+    import sys
+
+    if sys.argv[1] == 'debug_initial_clustering':
+        analysis_dir = '/groups/CaiLab/analyses/michalp/michal_1/michal_decoding_top_10000_mat_dapi_all_pos_correct_barcodes/'
+        position = 'MMStack_Pos13'
+        count_matrix_src = os.path.join(analysis_dir, position, 'Segmentation/Channel_1/count_matrix.csv')
+        cell_info_src = os.path.join(analysis_dir, position, 'Segmentation/Channel_1/cell_info.csv')
+        dst_dir = 'foo/clustering'
+        os.makedirs(dst_dir, exist_ok=True)
+
+        basic_clustering(count_matrix_src, cell_info_src, position, dst_dir)

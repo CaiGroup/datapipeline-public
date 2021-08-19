@@ -120,11 +120,12 @@ def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, d
     return labeled_img
 
 
-if sys.argv[1] == 'debug_cellpose_cyto':
+if __name__ == '__main__':
 
-    labeled_img = get_labeled_cyto_cellpose(tiff_path='/groups/CaiLab/personal/nrezaee/raw/intron_pos0/HybCycle_0/MMStack_Pos0.ome.tif',
-                                            num_wav = 4,
-                                            dst = 'foo.tif',
-                                            debug = True, 
-                                            cyto_radius = 10)
+    if sys.argv[1] == 'debug_cellpose_cyto':
 
+        labeled_img = get_labeled_cyto_cellpose(tiff_path='/groups/CaiLab/personal/nrezaee/raw/intron_pos0/HybCycle_0/MMStack_Pos0.ome.tif',
+                                                num_wav = 4,
+                                                dst = 'foo.tif',
+                                                debug = True,
+                                                cyto_radius = 10)

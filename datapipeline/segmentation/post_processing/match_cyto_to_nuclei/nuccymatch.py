@@ -133,17 +133,20 @@ def get_matched_3d_img(nuclei_3d_src, cyto_2d_src, area_tol, post_process_dir, s
 import sys
 print('hello')
 print(sys.argv)
-if sys.argv[1] == 'debug_nuccy':
-    print('hi')
-    nuclei_3d_src = '/groups/CaiLab/analyses/nrezaee/test1-seg/post_seg_match/MMStack_Pos0/Segmentation/labeled_img.tif'
-    cyto_2d_src = '/groups/CaiLab/analyses/nrezaee/test1-seg/post_seg_match/MMStack_Pos0/Segmentation/labeled_cyto_img.tif'
-    
-    area_tol = 1
-    
-    post_process_dir = '/home/nrezaee/sandbox/gmic_testing/nuccy_results/'
-    
-    nuclei_dst = 'nuclei_matched.tif'
-    cyto_dst = 'cyto_matched.png'
-    
-    get_matched_3d_img(nuclei_3d_src, cyto_2d_src, area_tol, \
-            post_process_dir, nuclei_dst = nuclei_dst, cyto_dst = cyto_dst)
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_nuccy':
+        print('hi')
+        nuclei_3d_src = '/groups/CaiLab/analyses/nrezaee/test1-seg/post_seg_match/MMStack_Pos0/Segmentation/labeled_img.tif'
+        cyto_2d_src = '/groups/CaiLab/analyses/nrezaee/test1-seg/post_seg_match/MMStack_Pos0/Segmentation/labeled_cyto_img.tif'
+
+        area_tol = 1
+
+        post_process_dir = '/home/nrezaee/sandbox/gmic_testing/nuccy_results/'
+
+        nuclei_dst = 'nuclei_matched.tif'
+        cyto_dst = 'cyto_matched.png'
+
+        get_matched_3d_img(nuclei_3d_src, cyto_2d_src, area_tol, \
+                post_process_dir, nuclei_dst = nuclei_dst, cyto_dst = cyto_dst)

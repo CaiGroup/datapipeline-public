@@ -167,28 +167,30 @@ def get_dots_for_tiff_top(tiff_src,num_wav, dst, dot_radius, n_dots=200):
     
 #Debug
 #-----------------------------------------------------------------
-import sys
-if sys.argv[1] == 'debug_fid_dot_detect_takei':
-    df_tiff = get_dots_for_tiff_top(tiff_src='/groups/CaiLab/personal/nrezaee/raw/2020-10-19-takei/initial_fiducials/MMStack_Pos0.ome.tif',
-                                strictness=15, 
-                                num_wav=4,
-                                dot_radius=2,
-                                dst='foo/final')
-                                
-    print(f'{type(df_tiff)=}')
-    print(f'{df_tiff=}')
+if __name__ == '__main__':
+
+    import sys
+    if sys.argv[1] == 'debug_fid_dot_detect_takei':
+        df_tiff = get_dots_for_tiff_top(tiff_src='/groups/CaiLab/personal/nrezaee/raw/2020-10-19-takei/initial_fiducials/MMStack_Pos0.ome.tif',
+                                    strictness=15,
+                                    num_wav=4,
+                                    dot_radius=2,
+                                    dst='foo/final')
+
+        print(f'{type(df_tiff)=}')
+        print(f'{df_tiff=}')
 
 
-if sys.argv[1] == 'debug_fid_dot_detect_linus':
-    df_tiff = get_dots_for_tiff_top(tiff_src='/groups/CaiLab/personal/nrezaee/raw/linus_data/initial_fiducials/MMStack_Pos0.ome.tif',
-                                n_dots=200, 
-                                num_wav=4,
-                                dot_radius=2,
-                                dst='foo/linus_fid')
-                                
-    print(f'{type(df_tiff)=}')
-    print(f'{df_tiff=}')
+    if sys.argv[1] == 'debug_fid_dot_detect_linus':
+        df_tiff = get_dots_for_tiff_top(tiff_src='/groups/CaiLab/personal/nrezaee/raw/linus_data/initial_fiducials/MMStack_Pos0.ome.tif',
+                                    n_dots=200,
+                                    num_wav=4,
+                                    dot_radius=2,
+                                    dst='foo/linus_fid')
 
-    
-    
+        print(f'{type(df_tiff)=}')
+        print(f'{df_tiff=}')
+
+
+
      

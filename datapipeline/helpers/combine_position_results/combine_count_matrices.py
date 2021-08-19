@@ -129,11 +129,14 @@ def get_combined_count_matrix(analysis_dir, dst):
     comb_count_matrices.to_csv(dst, index=False)
     #----------------------------------------
 
-if sys.argv[1] == 'debug_comb_count_matrices':
-    analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_2_pos_2_chs_pil_load_strict_2_only_blur_thresh_60'
-    dst = 'foo/foo.csv'
-    
-    get_combined_count_matrix(analysis_dir, dst)
+
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_comb_count_matrices':
+        analysis_dir = '/groups/CaiLab/analyses/nrezaee/jina_1_pseudos_4_corrected/jina_pseudos_4_corrected_2_pos_2_chs_pil_load_strict_2_only_blur_thresh_60'
+        dst = 'foo/foo.csv'
+
+        get_combined_count_matrix(analysis_dir, dst)
 
 
 

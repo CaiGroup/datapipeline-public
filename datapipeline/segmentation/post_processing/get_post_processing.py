@@ -378,121 +378,113 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     #-------------------------------------------------------------
 
 
-if sys.argv[1] == 'debug_post_labeled_cyto':
-    print('=---------------------------------------')
-    tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/test1-big'
-    segment_results_path = '/home/nrezaee/temp2'
-    position  = 'MMStack_Pos0.ome.tif'
-    edge = 0
-    dist = 0
-    bool_cyto_match = False
-    area_tol = 1
-    debug = False
-    cyto_channel_num = 1
-    get_nuc = True
-    get_cyto = True
-    num_z=2
-    num_wav=4
-    nuclei_radius = 0
-    cell_prob_threshold= .5
-    flow_threshold = .5
-    nuclei_channel_num = -1
-    cyto_flow_threshold = 0
-    cyto_cell_prob_threshold = 0
-    cyto_radius = 10
-    save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol, 
-                cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold, 
-                cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold, 
-                cyto_radius = 10, debug=debug)
-                
-if sys.argv[1] == 'debug_post_labeled_cyto_lex':
-    print('=---------------------------------------')
-    tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3'
-    segment_results_path = '/home/nrezaee/temp2'
-    position  = 'MMStack_Pos0.ome.tif'
-    edge = 0
-    dist = 0
-    bool_cyto_match = False
-    area_tol = 1
-    debug = False
-    cyto_channel_num = 1
-    get_nuc = True
-    get_cyto = True
-    num_z=2
-    num_wav=4
-    nuclei_radius = 0
-    cell_prob_threshold= .5
-    flow_threshold = .5
-    nuclei_channel_num = -1
-    cyto_flow_threshold = 0
-    cyto_cell_prob_threshold = 0
-    cyto_radius = 10
-    save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol, 
-                cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold, 
-                cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold, 
-                cyto_radius = 10, debug=debug)
+if __name__ == '__main__':
+
+    if sys.argv[1] == 'debug_post_labeled_cyto':
+        print('=---------------------------------------')
+        tiff_dir = '/groups/CaiLab/personal/nrezaee/raw/test1-big'
+        segment_results_path = '/home/nrezaee/temp2'
+        position  = 'MMStack_Pos0.ome.tif'
+        edge = 0
+        dist = 0
+        bool_cyto_match = False
+        area_tol = 1
+        debug = False
+        cyto_channel_num = 1
+        get_nuc = True
+        get_cyto = True
+        num_z=2
+        num_wav=4
+        nuclei_radius = 0
+        cell_prob_threshold= .5
+        flow_threshold = .5
+        nuclei_channel_num = -1
+        cyto_flow_threshold = 0
+        cyto_cell_prob_threshold = 0
+        cyto_radius = 10
+        save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol,
+                    cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold,
+                    cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold,
+                    cyto_radius = 10, debug=debug)
+
+    if sys.argv[1] == 'debug_post_labeled_cyto_lex':
+        print('=---------------------------------------')
+        tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3'
+        segment_results_path = '/home/nrezaee/temp2'
+        position  = 'MMStack_Pos0.ome.tif'
+        edge = 0
+        dist = 0
+        bool_cyto_match = False
+        area_tol = 1
+        debug = False
+        cyto_channel_num = 1
+        get_nuc = True
+        get_cyto = True
+        num_z=2
+        num_wav=4
+        nuclei_radius = 0
+        cell_prob_threshold= .5
+        flow_threshold = .5
+        nuclei_channel_num = -1
+        cyto_flow_threshold = 0
+        cyto_cell_prob_threshold = 0
+        cyto_radius = 10
+        save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol,
+                    cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold,
+                    cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold,
+                    cyto_radius = 10, debug=debug)
 
 
-if sys.argv[1] == 'debug_post':
-    print('=---------------------------------------')
-    tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/'
-    segment_results_path = '/home/nrezaee/temp2'
-    position  = 'MMStack_Pos1.ome.tif'
-    edge = 8
-    dist = 2
-    bool_cyto_match = True
-    area_tol = 1
-    debug = False
-    cyto_channel_num = 1
-    get_nuc = True
-    get_cyto = False
-    num_z=1
-    num_wav=2
-    nuclei_radius = 0
-    cell_prob_threshold= .5
-    flow_threshold = .5
-    nuclei_channel_num = -1
-    cyto_flow_threshold = 0
-    cyto_cell_prob_threshold = 0
-    cyto_radius = 10
-    save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol, 
-                cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold, 
-                cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold, 
-                cyto_radius = 10, debug=debug)
+    if sys.argv[1] == 'debug_post':
+        print('=---------------------------------------')
+        tiff_dir = '/groups/CaiLab/personal/Lex/raw/20k_dash_063021_3t3/'
+        segment_results_path = '/home/nrezaee/temp2'
+        position  = 'MMStack_Pos1.ome.tif'
+        edge = 8
+        dist = 2
+        bool_cyto_match = True
+        area_tol = 1
+        debug = False
+        cyto_channel_num = 1
+        get_nuc = True
+        get_cyto = False
+        num_z=1
+        num_wav=2
+        nuclei_radius = 0
+        cell_prob_threshold= .5
+        flow_threshold = .5
+        nuclei_channel_num = -1
+        cyto_flow_threshold = 0
+        cyto_cell_prob_threshold = 0
+        cyto_radius = 10
+        save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol,
+                    cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold,
+                    cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold,
+                    cyto_radius = 10, debug=debug)
 
-if sys.argv[1] == 'debug_post_michal':
-    print('=---------------------------------------')
-    tiff_dir = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_pool1/'
-    segment_results_path = '/home/nrezaee/temp2'
-    position  = 'MMStack_Pos1.ome.tif'
-    edge = 8
-    dist = 2
-    bool_cyto_match = False
-    area_tol = 1
-    debug = False
-    cyto_channel_num = 1
-    get_nuc = True
-    get_cyto = False
-    num_z=1
-    num_wav=2
-    nuclei_radius = 0
-    cell_prob_threshold= .5
-    flow_threshold = .5
-    nuclei_channel_num = -1
-    cyto_flow_threshold = 0
-    cyto_cell_prob_threshold = 0
-    cyto_radius = 10
-    save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol, 
-                cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold, 
-                cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold, 
-                cyto_radius = 10, debug=debug)
-
-
-    
-    
-    
-    
-    
-    
-    
-        
+    if sys.argv[1] == 'debug_post_michal':
+        print('=---------------------------------------')
+        tiff_dir = '/groups/CaiLab/personal/Michal/raw/2021-06-21_Neuro4181_5_noGel_pool1/'
+        segment_results_path = '/home/nrezaee/temp2'
+        position  = 'MMStack_Pos1.ome.tif'
+        edge = 8
+        dist = 2
+        bool_cyto_match = False
+        area_tol = 1
+        debug = False
+        cyto_channel_num = 1
+        get_nuc = True
+        get_cyto = False
+        num_z=1
+        num_wav=2
+        nuclei_radius = 0
+        cell_prob_threshold= .5
+        flow_threshold = .5
+        nuclei_channel_num = -1
+        cyto_flow_threshold = 0
+        cyto_cell_prob_threshold = 0
+        cyto_radius = 10
+        save_labeled_img(tiff_dir, segment_results_path, position, edge, dist, bool_cyto_match, area_tol,
+                    cyto_channel_num, get_nuc, get_cyto, num_wav, nuclei_radius, num_z, flow_threshold,
+                    cell_prob_threshold, nuclei_channel_num, cyto_flow_threshold, cyto_cell_prob_threshold,
+                    cyto_radius = 10, debug=debug)

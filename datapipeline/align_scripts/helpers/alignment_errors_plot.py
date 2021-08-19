@@ -49,11 +49,13 @@ def get_alignment_errors_plot(align_errors_src, dst):
     #------------------------------------------------
     plt.savefig(dst)
     #------------------------------------------------
-    
-import sys
 
-if sys.argv[1] == 'debug_align_errors_plot':
-    align_errors_src = '/groups/CaiLab/analyses/nrezaee/test1/align_test2/MMStack_Pos0/align_errors.json'
-    dst = 'foo/align_errors.png'
-    get_alignment_errors_plot(align_errors_src, dst)
-    print(f'{dst=}')
+if __name__ == '__main__':
+
+    import sys
+
+    if sys.argv[1] == 'debug_align_errors_plot':
+        align_errors_src = '/groups/CaiLab/analyses/nrezaee/test1/align_test2/MMStack_Pos0/align_errors.json'
+        dst = 'foo/align_errors.png'
+        get_alignment_errors_plot(align_errors_src, dst)
+        print(f'{dst=}')

@@ -300,25 +300,23 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, t
     else:
         return points, intensities
     
-    
-import sys
-if sys.argv[1] == 'debug_jump_helper':
-    import tifffile as tf
-    
-    tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_9/MMStack_Pos0.ome.tif'
-    tiff_3d = tiffy.load(tiff_src, num_wav=4,num_z=None)[:,0]
-    strictness= 5
-    analysis_name = 'linus_decoding'
-    print(f'{tiff_3d.shape=}')
-    num_bins=100
-    dot_radius=1
-    radius_step=2
-    num_radii= 2
-    threshold = .001
-    dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, num_bins, dot_radius, threshold, radius_step, num_radii))
-    
-    print(f'{dot_analysis[0].shape=}')
-    
-    
-    
-    
+
+if __name__ == '__main__':
+
+    import sys
+    if sys.argv[1] == 'debug_jump_helper':
+        import tifffile as tf
+
+        tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_9/MMStack_Pos0.ome.tif'
+        tiff_3d = tiffy.load(tiff_src, num_wav=4,num_z=None)[:,0]
+        strictness= 5
+        analysis_name = 'linus_decoding'
+        print(f'{tiff_3d.shape=}')
+        num_bins=100
+        dot_radius=1
+        radius_step=2
+        num_radii= 2
+        threshold = .001
+        dot_analysis = list(hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, num_bins, dot_radius, threshold, radius_step, num_radii))
+
+        print(f'{dot_analysis[0].shape=}')

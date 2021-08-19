@@ -221,55 +221,45 @@ def run_syndrome_decoding(locations_src, barcode_src, dst_dir, bool_fake_barcode
     get_cost_with_on_off(processed_results_csv, dst_cost_analysis)
     #---------------------------------------------------------------
     
-    
-#Test
-if sys.argv[1] == 'debug_synd_decoding':
-    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/barcode_key/channel_1.csv'
-    locations_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Dot_Locations/locations.csv'
-    dst_dir = 'foo'
-    bool_fake_barcodes = True
-    if not os.path.exists(dst_dir):
-        os.mkdir(dst_dir)
-        
-    run_syndrome_decoding(locations_src, barcode_src, dst_dir, bool_fake_barcodes)
 
-elif sys.argv[1] == 'debug_fake_barcodes':
-    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/barcode_key/channel_1.csv'
-    temp_dir = 'foo/make_fake_barcodes'
-    if not os.path.exists(temp_dir):
-        os.mkdir(temp_dir)
-    combine_with_fake(barcode_src, temp_dir)
-        
-elif sys.argv[1] == 'debug_synd_anthony':
-    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/anthony_0512_2021/barcode_key/channel_2.csv'
-    locations_src = '/groups/CaiLab/analyses/nrezaee/anthony_0512_2021/anthony_strict_35_synd_pos0/MMStack_Pos10/Dot_Locations/locations.csv'
-    dst_dir = 'foo'
-    bool_fake_barcodes = True
-    if not os.path.exists(dst_dir):
-        os.mkdir(dst_dir)
-        
-    run_syndrome_decoding(locations_src, barcode_src, dst_dir, bool_fake_barcodes)
-    
-elif sys.argv[1] == 'debug_process_locs':
-    barcode_src = '/groups/CaiLab/personal/nrezaee/raw/anthony_0512_2021/barcode_key/channel_2.csv'
-    locations_src = '/groups/CaiLab/analyses/nrezaee/anthony_0512_2021/anthony_strict_35_synd_pos0/MMStack_Pos10/Dot_Locations/locations.csv'
-    locations_dst = 'foo/locs.csv'
-    process_locations_src(locations_src, barcode_src, locations_dst)
+if __name__ == '__main__':
 
-elif sys.argv[1] == 'debug_process_results':
-    results_src = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6_synd_pos0/MMStack_Pos0/Decoded/Channel_1/mpaths_decode_w_neg_ctrl_lvf112.0_lwvf4.0dr0.csv'
-    barcode_src = '/groups/CaiLab/personal/temp/temp_decode/3FSG69S11UXMR2EM/barcode.csv'
-    dst = 'foo/results.csv'
-    process_decoding_results(results_src, barcode_src, dst)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    #Test
+    if sys.argv[1] == 'debug_synd_decoding':
+        barcode_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/barcode_key/channel_1.csv'
+        locations_src = '/groups/CaiLab/analyses/nrezaee/2020-08-08-takei/takei_strict_8/MMStack_Pos0/Dot_Locations/locations.csv'
+        dst_dir = 'foo'
+        bool_fake_barcodes = True
+        if not os.path.exists(dst_dir):
+            os.mkdir(dst_dir)
+
+        run_syndrome_decoding(locations_src, barcode_src, dst_dir, bool_fake_barcodes)
+
+    elif sys.argv[1] == 'debug_fake_barcodes':
+        barcode_src = '/groups/CaiLab/personal/nrezaee/raw/2020-08-08-takei/barcode_key/channel_1.csv'
+        temp_dir = 'foo/make_fake_barcodes'
+        if not os.path.exists(temp_dir):
+            os.mkdir(temp_dir)
+        combine_with_fake(barcode_src, temp_dir)
+
+    elif sys.argv[1] == 'debug_synd_anthony':
+        barcode_src = '/groups/CaiLab/personal/nrezaee/raw/anthony_0512_2021/barcode_key/channel_2.csv'
+        locations_src = '/groups/CaiLab/analyses/nrezaee/anthony_0512_2021/anthony_strict_35_synd_pos0/MMStack_Pos10/Dot_Locations/locations.csv'
+        dst_dir = 'foo'
+        bool_fake_barcodes = True
+        if not os.path.exists(dst_dir):
+            os.mkdir(dst_dir)
+
+        run_syndrome_decoding(locations_src, barcode_src, dst_dir, bool_fake_barcodes)
+
+    elif sys.argv[1] == 'debug_process_locs':
+        barcode_src = '/groups/CaiLab/personal/nrezaee/raw/anthony_0512_2021/barcode_key/channel_2.csv'
+        locations_src = '/groups/CaiLab/analyses/nrezaee/anthony_0512_2021/anthony_strict_35_synd_pos0/MMStack_Pos10/Dot_Locations/locations.csv'
+        locations_dst = 'foo/locs.csv'
+        process_locations_src(locations_src, barcode_src, locations_dst)
+
+    elif sys.argv[1] == 'debug_process_results':
+        results_src = '/groups/CaiLab/analyses/nrezaee/arun_auto_testes_1/arun_testes_ch1_strict_6_synd_pos0/MMStack_Pos0/Decoded/Channel_1/mpaths_decode_w_neg_ctrl_lvf112.0_lwvf4.0dr0.csv'
+        barcode_src = '/groups/CaiLab/personal/temp/temp_decode/3FSG69S11UXMR2EM/barcode.csv'
+        dst = 'foo/results.csv'
+        process_decoding_results(results_src, barcode_src, dst)
