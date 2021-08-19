@@ -18,7 +18,7 @@ import cv2
 import warnings
 import json
 import warnings
-from load_tiff import tiffy
+from ...load_tiff import tiffy
 
 def plot_and_save_locations(img_array, locations_2d, dest):
     

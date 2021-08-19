@@ -9,7 +9,7 @@ import numpy as np
 from scipy.ndimage import shift
 import imageio as io
 sys.path.insert(0, os.getcwd())
-from load_tiff import tiffy
+from ...load_tiff import tiffy
 from matplotlib import cm
 
 def apply_background_subtraction(background, tiff_2d, z, channel):
