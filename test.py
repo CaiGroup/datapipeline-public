@@ -4,7 +4,7 @@ import argparse
 import sys
 import shutil
 import pandas as pd
-from helpers.excel2dict import get_dict_from_excel
+from datapipeline.helpers.excel2dict import get_dict_from_excel
 
 def remove_clusters(json_src):
     with open(json_src) as f:

@@ -20,7 +20,7 @@ import glob
 import numpy as np
 import pandas as pd
 import re
-from helpers.excel2dict import get_dict_from_excel
+from datapipeline.helpers.excel2dict import get_dict_from_excel
 import linecache
 import random
 

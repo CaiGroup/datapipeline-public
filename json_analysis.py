@@ -18,7 +18,7 @@ main_dir = '/groups/CaiLab'
 
 #Import Analysis Class
 #----------------------------------------------------------
-from analysis_class import Analysis
+from datapipeline.analysis_class import Analysis
 #----------------------------------------------------------
 
 #Set Arguments
