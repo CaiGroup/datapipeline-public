@@ -128,3 +128,4 @@ gmic -v -1 "${stack}" \
   fi \
 
 
+echo $outname

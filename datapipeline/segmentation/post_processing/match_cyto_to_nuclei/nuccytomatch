@@ -188,3 +188,4 @@ toc=$(date +%s%3N)
 elapsed=$(expr $toc - $tic)
 echo "done in $elapsed miliseconds. results saved in $outname.tif"
 
+echo $outname

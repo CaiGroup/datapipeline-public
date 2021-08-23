@@ -14,14 +14,16 @@ def make_distance_between_cells(label_img_src, dist_between_nuclei, post_process
     #-------------------------------------------------------------
     print("Making Distance Between Cells")
     print(f'{label_img_src=}')
-    subprocess.call(['sh', nuctouchresize_file_path, label_img_src, str(dist_between_nuclei)])
+    out_names = subprocess.check_output(
+        ['sh', nuctouchresize_file_path, label_img_src, str(dist_between_nuclei)],
+    )
+    out_names = out_names.decode().split('\n')
     #-------------------------------------------------------------
     
     #Return Labeled image location
     #-------------------------------------------------------------
-    label_img_src = os.path.join(label_img_dir, 'labeled_img_r' + str(dist_between_nuclei) + '.tif')
-    print(f'{label_img_src=}')
-    return label_img_src
+    print(f'{out_names=}')
+    return out_names[0]
     #-------------------------------------------------------------
 
 if __name__ == '__main__':

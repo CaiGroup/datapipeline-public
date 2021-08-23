@@ -13,14 +13,16 @@ def delete_edges(label_img_src, edge_delete_dist, post_process_dir):
     #Run the edge deleter
     #-------------------------------------------------------------
     print("Deleting Edges")
-    subprocess.call(['sh', nucboundzap_file_path, label_img_src, str(edge_delete_dist)])
+    out_names = subprocess.check_output(
+        ['sh', nucboundzap_file_path, label_img_src, str(edge_delete_dist)]
+    )
+    out_names = out_names.decode().split('\n')
     #-------------------------------------------------------------
     
     #Return dst of labeled image
     #-------------------------------------------------------------
-    label_img_src = os.path.join(label_img_dir, label_img_src.replace('.tif', '') + '_bzap_d' + str(edge_delete_dist) + '.tif')
-    print(f'{label_img_src=}')
-    return label_img_src
+    print(f'{out_names=}')
+    return out_names[0]
     #-------------------------------------------------------------
 
 if __name__ == '__main__':

@@ -118,4 +118,5 @@ gmic -v -1 "${stack}" \
   append c \
   output "${removed}",uchar,lzw
 
-
+echo $outname
+echo $removed

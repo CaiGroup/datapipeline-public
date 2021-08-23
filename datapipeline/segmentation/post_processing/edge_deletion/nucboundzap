@@ -104,3 +104,6 @@ gmic -v -1 "${labels}" \
   else \
     output[0] "${outname}",uchar,lzw \
   fi \
+
+
+echo $outname
