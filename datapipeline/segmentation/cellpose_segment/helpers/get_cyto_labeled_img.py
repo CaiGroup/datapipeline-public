@@ -92,7 +92,7 @@ def get_labeled_cyto_cellpose(tiff_path, dst=None):
     print(f'{labeled_img=}')
     
     # labeled_img = expand_img(labeled_img)
-    resize_script = os.path.join(os.getcwd(), 'segmentation/cellpose_segment/helpers/nucsmoothresize')
+    resize_script = os.path.join(os.path.dirname(__file__), 'nucsmoothresize')
     
 
     if dst == None:

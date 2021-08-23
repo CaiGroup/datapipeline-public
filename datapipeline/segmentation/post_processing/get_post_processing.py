@@ -262,8 +262,7 @@ def post_process(edge_delete_dist, dist_between_nuclei, label_img_src, labeled_c
     
     #Get Post Process Directory
     #-------------------------------------------------------------
-    cwd = os.getcwd()
-    post_process_dir = os.path.join(cwd, 'segmentation/post_processing')
+    post_process_dir = os.path.dirname(__file__)
     #-------------------------------------------------------------
     
     #Make distance between nuclei
@@ -309,8 +308,7 @@ def save_labeled_img(tiff_dir, segment_results_path, position, edge_delete_dist,
     
     #Get Post Process Dir and tiff
     #-------------------------------------------------------------
-    cwd = os.getcwd()
-    post_process_dir = os.path.join(cwd, 'segmentation/post_processing')
+    post_process_dir = os.path.dirname(__file__)
     
     tiff_for_segment = get_tiff_for_segment(tiff_dir, position, num_z)
     #-------------------------------------------------------------

@@ -140,7 +140,7 @@ def expand_img(masked_file_path, tiff, dst):
 
     #Create and run resize script
     #---------------------------------------------------------------------------
-    resize_script = os.path.join(os.getcwd(), 'segmentation/cellpose_segment/helpers/nucsmoothresize')
+    resize_script = os.path.join(os.path.dirname(__file__), 'nucsmoothresize')
     cmd = ' '.join(['sh', resize_script, masked_file_path, str(tiff.shape[2]), dst])
     print(f'{cmd=}')
     os.system(cmd)
