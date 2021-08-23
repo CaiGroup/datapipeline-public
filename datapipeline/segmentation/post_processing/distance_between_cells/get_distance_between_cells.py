@@ -15,7 +15,7 @@ def make_distance_between_cells(label_img_src, dist_between_nuclei, post_process
     print("Making Distance Between Cells")
     print(f'{label_img_src=}')
     out_names = subprocess.check_output(
-        ['sh', nuctouchresize_file_path, label_img_src, str(dist_between_nuclei)],
+        [nuctouchresize_file_path, label_img_src, str(dist_between_nuclei)],
     )
     out_names = out_names.decode().split('\n')
     #-------------------------------------------------------------

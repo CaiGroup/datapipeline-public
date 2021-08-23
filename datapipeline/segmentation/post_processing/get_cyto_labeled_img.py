@@ -110,7 +110,7 @@ def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, d
     #----------------------------------------------
 
 
-    subprocess.call(['sh', resize_script, masked_file_path, str(tiff.shape[2]), dst])
+    subprocess.call([resize_script, masked_file_path, str(tiff.shape[2]), dst])
     labeled_img = imageio.imread(dst) 
     
 

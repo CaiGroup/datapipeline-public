@@ -14,7 +14,7 @@ def delete_edges(label_img_src, edge_delete_dist, post_process_dir):
     #-------------------------------------------------------------
     print("Deleting Edges")
     out_names = subprocess.check_output(
-        ['sh', nucboundzap_file_path, label_img_src, str(edge_delete_dist)]
+        [nucboundzap_file_path, label_img_src, str(edge_delete_dist)]
     )
     out_names = out_names.decode().split('\n')
     #-------------------------------------------------------------
