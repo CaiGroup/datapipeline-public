@@ -1,4 +1,5 @@
 import os
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -301,8 +302,6 @@ def hist_jump_threshed_3d(tiff_3d, strictness, tiff_src, analysis_name, nbins, t
 
 
 if __name__ == '__main__':
-
-    import sys
 
     if sys.argv[1] == 'debug_jump_helper':
         tiff_src = '/groups/CaiLab/personal/nrezaee/raw/linus_data/HybCycle_9/MMStack_Pos0.ome.tif'
