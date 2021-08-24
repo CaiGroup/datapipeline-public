@@ -50,7 +50,7 @@ from .dot_detection.dot_detection_class12 import Dot_Detection
 
 #Barcode Script
 #----------------------------
-from read_barcode import read_barcode
+from .read_barcode import read_barcode
 #----------------------------
 
 #Decoding Script
