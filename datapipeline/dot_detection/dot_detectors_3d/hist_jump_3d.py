@@ -26,7 +26,10 @@ def add_hyb_and_ch_to_df(dots_in_channel, tiff_src, channel):
     Add channel dataframe of dots to tiff dataframe of dots
         add channel and hyb columns in process
     """
+    columns_ordered = ['hyb', 'ch', 'x', 'y', 'z', 'int']
 
+    if len(dots_in_channel[0]) == 0:
+        return pd.DataFrame(columns=columns_ordered)
     # Get hybs and channel columns
     # ----------------------------------------------------------
     channel_array = np.full((len(dots_in_channel[1])), channel + 1)
