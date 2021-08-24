@@ -12,7 +12,7 @@ module load matlab/r2019a
 
 #Activate conda environment to get correct packages
 #----------------------------------------------
-source /groups/CaiLab/personal/python_env/bin/activate
+source /groups/CaiLab/personal/python_env/bin/activate_batch
 #conda activate data-pipeline
 #----------------------------------------------
 
