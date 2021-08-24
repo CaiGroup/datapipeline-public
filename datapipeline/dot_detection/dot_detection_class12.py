@@ -389,7 +389,7 @@ class Dot_Detection:
         #Get CWD
         #-------------------------------------------------------------------
         folder = os.path.dirname(__file__)
-        dot_detection_dir = os.path.join(folder, 'dot_detection', 'dot_detectors_3d')
+        dot_detection_dir = os.path.join(folder, 'dot_detectors_3d')
         #-------------------------------------------------------------------
 
 
