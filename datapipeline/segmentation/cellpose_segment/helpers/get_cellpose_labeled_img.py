@@ -87,7 +87,10 @@ def submit_seg_job(rand_dir, rand_list, num_z, nuclei_radius, flow_threshold, ce
 
     #Set command and default params
     #---------------------------------------------------------------------------
-    bind_paths = f'/central/scratch/{USER},/groups/CaiLab/personal/temp,/groups/CaiLab/personal/singularity/lib/python3.6/site-packages:/usr/lib/python3.6/site-packages'
+    bind_paths = f'/central/scratch/{USER},' \
+                 f'/groups/CaiLab/personal/temp,' \
+                 f'/groups/CaiLab/personal/singularity/lib/python3.6/site-packages' \
+                 f':/usr/lib/python3.6/site-packages'
     sing_and_cellpose_cmd = f'singularity  exec --bind {bind_paths} --nv /groups/CaiLab/personal/singularity/tensorflow-20.02-tf1-py3.sif python -m cellpose '
     default_params = ' --img_filter dapi_channel --pretrained_model cyto --use_gpu --no_npy --save_tif --dir '
     import time; time.sleep(1)

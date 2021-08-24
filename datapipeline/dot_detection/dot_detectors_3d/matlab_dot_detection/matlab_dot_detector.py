@@ -45,15 +45,10 @@ def get_matlab_detected_dots(tiff_src, channel, strictness, nbins, threshold):
     
     #Create Paths to add
     #-------------------------------------------------------------------
-    if 'ipykernel' not in sys.argv[0]:
-        cwd = os.getcwd()
-    else:
-        cwd = '/home/nrezaee/data-pipeline'
-    
+    folder = os.path.dirname(__file__)
 
-    
-    bfmatlab_dir = os.path.join(cwd, 'dot_detection', 'dot_detectors_3d', 'matlab_dot_detection', 'bfmatlab')
-    functions_dir = os.path.join(cwd, 'dot_detection', 'dot_detectors_3d', 'matlab_dot_detection')
+    bfmatlab_dir = os.path.join(folder, 'bfmatlab')
+    functions_dir = folder
     print(f'{bfmatlab_dir=}')
     #-------------------------------------------------------------------
     

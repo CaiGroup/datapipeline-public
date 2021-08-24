@@ -71,8 +71,8 @@ def get_adcg_dots(tiff_2d, min_weight, final_loss):
     #Set and Make rand dir
     #-------------------------------------------------------------------
     rand = get_random_list(1)[0]
-    temp_dir = os.path.join('/groups/CaiLab/personal/nrezaee/temp/temp_adcg', rand)
-    os.mkdir(temp_dir)
+    temp_dir = os.path.join('/groups/CaiLab/personal/temp/temp_adcg', rand)
+    os.makedirs(temp_dir, exist_ok=True)
     #-------------------------------------------------------------------
     
     #Set and save paths

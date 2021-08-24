@@ -193,11 +193,17 @@ def run_inflect_all_channels(dots_in_tiff):
         #--------------------------------------------------------
         
 
-        
+
     #Run intensity vairables in command
     #--------------------------------------------------------
-    cmd = """  matlab -r "addpath('/home/nrezaee/test_cronjob/dot_detection/dot_detectors_3d/inflection');knee_pt({0}, {1}, '{2}');knee_pt({3}, {4}, '{5}');knee_pt({6}, {7}, '{8}');quit"; """ 
-                
+    path = os.path.join(os.path.dirname(__file__), 'inflection')
+    cmd = "matlab -r " \
+          "\"addpath('" + path + "');" \
+          "knee_pt({0}, {1}, '{2}'); " \
+          "knee_pt({3}, {4}, '{5}'); " \
+          "knee_pt({6}, {7}, '{8}'); " \
+          "quit\"; "
+
     cmd = cmd.format(locals()['intensity_0_y'], locals()['intensity_0_x'], locals()['intensity_0_path'], \
                      locals()['intensity_1_y'], locals()['intensity_1_x'], locals()['intensity_1_path'], \
                      locals()['intensity_2_y'], locals()['intensity_2_x'], locals()['intensity_2_path'] )       

@@ -4,7 +4,6 @@ import glob
 import sys
 import os
 
-sys.path.insert(0, '/home/nrezaee/test_cronjob_multi_dot')
 from ...load_tiff import tiffy
 
 

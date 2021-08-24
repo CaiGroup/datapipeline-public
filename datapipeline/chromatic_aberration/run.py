@@ -26,10 +26,13 @@ def run_beads(beads_dir, t_forms_dest):
     num_channels = 4
     
     assert len(pos_array) != 0, "There must be a beads directory located at /persona/<user>/raw/<exp_name>/beads/"
-    
+
+    path = os.path.join(os.path.dirname(__file__), 'scripts')
     #Creating Matlab Command
     #------------------------------------------------------------------
-    cmd = """  matlab -r "addpath('/home/nrezaee/test_cronjob/chromatic_aberration/scripts'); beadtformglobal( '{0}' , {1}, {2}, '{3}'); quit"; """
+    cmd = "  matlab -r \"addpath('" \
+          + path \
+          + "'); beadtformglobal( '{0}' , {1}, {2}, '{3}'); quit\"; "
 
     cmd = cmd.format(beads_dir, num_channels, pos_array, t_forms_dest)
     #------------------------------------------------------------------

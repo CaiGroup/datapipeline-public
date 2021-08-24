@@ -12,11 +12,12 @@ import sys
 import time
 import imageio
 
-sys.path.insert(0, os.getcwd())
 from ...helpers.rand_list import get_random_list, are_jobs_finished
 
 
 from ...load_tiff import tiffy
+
+USER = os.getenv('USER')
 
 def max_intensity_projection(cyto_3d):
     IM_MAX= np.max(cyto_3d, axis=0)
@@ -50,7 +51,7 @@ def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, d
     
     #Save to temp directory
     #----------------------------------------------
-    dst_dir = '/home/nrezaee/temp'
+    dst_dir = '/groups/CaiLab/personal/temp/temp_seg'
     rand_list = get_random_list(1)
     rand_dir = os.path.join(dst_dir, rand_list[0])
     os.mkdir(rand_dir)
@@ -61,7 +62,15 @@ def get_labeled_cyto_cellpose(tiff_path, num_wav, dst=None, cyto_channel = -2, d
 
     #Commands to be run for cellpose
     #----------------------------------------------
-    sing_and_cellpose_cmd = 'singularity  exec --bind /central/scratch/$USER --nv /home/nrezaee/sandbox/cellpose/gpu/tensorflow-20.02-tf1-py3.sif python -m cellpose '
+    bind_paths = f'/central/scratch/{USER},' \
+                 f'/groups/CaiLab/personal/temp,' \
+                 f'/groups/CaiLab/personal/singularity/lib/python3.6/site-packages' \
+                 f':/usr/lib/python3.6/site-packages'
+
+    sing_and_cellpose_cmd = f'singularity  exec --bind {bind_paths} ' \
+                            f'--nv /groups/CaiLab/personal/singularity/tensorflow-20.02-tf1-py3.sif' \
+                            f' python -m cellpose '
+
     persistent_params = ' --img_filter dapi_channel_2d --pretrained_model cyto --use_gpu --no_npy --save_png '
     cyto_cell_prob_thresh_cmd = ' --cellprob_threshold ' + str(cell_prob_threshold)
     cyto_flow_thresh_cmd = ' --flow_threshold ' + str(cell_flow_threshold) 

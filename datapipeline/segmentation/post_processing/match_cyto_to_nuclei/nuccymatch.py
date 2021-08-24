@@ -58,7 +58,7 @@ def get_temp_dir():
     #Make Temp Dir name
     #------------------------------------------------
     rand = ''.join(random.choice(string.ascii_lowercase) for i in range(10)) 
-    temp_dir = os.path.join('/home/nrezaee/temp', rand)
+    temp_dir = os.path.join('/groups/CaiLab/personal/temp/temp_seg', rand)
     print(f'{temp_dir=}')
     #------------------------------------------------
     

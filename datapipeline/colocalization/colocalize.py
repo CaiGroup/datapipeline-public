@@ -3,10 +3,15 @@ from scipy.io import loadmat
 
 def colocalize(locations_src, dest):
 
-    
+    dirname = os.path.dirname(__file__)
+    path2 = os.path.join(dirname, 'matlab')
     #Create Matlab Command
     #-------------------------------------------------------------------
-    cmd = """  matlab -r "addpath('/home/nrezaee/test_cronjob/colocalization/');addpath('/home/nrezaee/test_cronjob/colocalization/matlab');main_coloc('{0}', '{1}', {2}); quit"; """ 
+    cmd = "matlab -r \"addpath('/" \
+          + dirname \
+          + "'); addpath('" \
+          + path2 \
+          + "'); main_coloc('{0}', '{1}', {2}); quit\"; "
   
     radius = 2
     

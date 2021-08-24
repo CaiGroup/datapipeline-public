@@ -12,12 +12,12 @@ import sys
 import time
 import imageio
 
-sys.path.insert(0, os.getcwd())
 from ....helpers.rand_list import get_random_list, are_jobs_finished
 
 
 from ....load_tiff import tiffy
 
+USER = os.getenv('USER')
 
 
 def get_labeled_cyto_cellpose(tiff_path, dst=None):
@@ -49,7 +49,7 @@ def get_labeled_cyto_cellpose(tiff_path, dst=None):
     
     #Save to temp directory
     #----------------------------------------------
-    dst_dir = '/home/nrezaee/temp'
+    dst_dir = '/groups/CaiLab/personal/temp/temp_seg'
     rand_list = get_random_list(1)
     rand_dir = os.path.join(dst_dir, rand_list[0])
     os.mkdir(rand_dir)
@@ -61,8 +61,16 @@ def get_labeled_cyto_cellpose(tiff_path, dst=None):
     #Save Command to file and run
     #----------------------------------------------
     print("Running Segmentation with SLURM GPU's")
+    bind_paths = f'/central/scratch/{USER},' \
+                 f'/groups/CaiLab/personal/temp,' \
+                 f'/groups/CaiLab/personal/singularity/lib/python3.6/site-packages' \
+                 f':/usr/lib/python3.6/site-packages'
 
-    command_for_cellpose= 'singularity  exec --bind /central/scratch/$USER --nv /home/nrezaee/sandbox/cellpose/gpu/tensorflow-20.02-tf1-py3.sif python -m cellpose  --img_filter dapi_channel_2d --pretrained_model cyto --diameter 0 --use_gpu --no_npy --save_png --dir '
+    command_for_cellpose= 'singularity  exec --bind {bind_paths} ' \
+                          '--nv /groups/CaiLab/personal/singularity/tensorflow-20.02-tf1-py3.sif' \
+                          ' python -m cellpose  --img_filter dapi_channel_2d --pretrained_model cyto ' \
+                          '--diameter 0 --use_gpu --no_npy --save_png --dir '
+
     command_for_cellpose_with_dir = command_for_cellpose + rand_dir
     print(f'{command_for_cellpose_with_dir=}')
     script_name = os.path.join(rand_dir, 'seg.sh')
