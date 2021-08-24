@@ -22,11 +22,7 @@ def read_barcode(barcode_src, barcode_dst, bool_fake_barcodes):
     
     #Get Current working directory
     #------------------------------------------------------------------
-    cwd = os.getcwd()
-    
-    cwd = cwd[cwd.find('/home'):]
-
-    read_barcode_dir = os.path.join(cwd, 'read_barcode')
+    read_barcode_dir = os.path.dirname(__file__)
     
     print(f'{read_barcode_dir=}')
     #------------------------------------------------------------------

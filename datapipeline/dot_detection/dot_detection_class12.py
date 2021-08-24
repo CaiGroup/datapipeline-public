@@ -20,8 +20,6 @@ import shutil
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-sys.path.insert(0, os.getcwd())
-
 
 #Import some helpers
 #--------------------------------------------------------------------------------
@@ -390,8 +388,8 @@ class Dot_Detection:
         
         #Get CWD
         #-------------------------------------------------------------------
-        cwd = os.getcwd()
-        dot_detection_dir = os.path.join(cwd, 'dot_detection', 'dot_detectors_3d')
+        folder = os.path.dirname(__file__)
+        dot_detection_dir = os.path.join(folder, 'dot_detection', 'dot_detectors_3d')
         #-------------------------------------------------------------------
 
 

@@ -9,8 +9,6 @@ from scipy.io import savemat
 import tifffile as tf
 import sys
 
-sys.path.insert(0, os.getcwd())
-
 from ...load_tiff import tiffy
 from ..helpers.visualize_dots import get_visuals_3d
 from ..reorder_hybs import get_and_sort_hybs

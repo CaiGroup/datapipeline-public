@@ -52,21 +52,8 @@ def run_matlab_decoding(rand, barcode_src, locations_cell_path, dest, num_of_rou
     #-------------------------------------------------------------------
     cmd = """  matlab -r "addpath('{0}');main_decoding('{1}', '{2}', '{3}', {4}, {5}, {6}, {7}, {8}, '{9}'); quit"; """
 
-    cwd = os.getcwd()
-
-    print(f'{cwd=}')
-
-
-    cwd = cwd[cwd.find('/home'):]
-    print(f'{cwd=}')
-
-    if debug:
-        decoding_dir = os.path.join(cwd, 'helpers')
-    else:
-        decoding_dir = os.path.join(cwd, 'decoding', 'helpers')
-
-
-
+    folder = os.path.dirname(__file__)
+    decoding_dir = os.path.join(folder, 'helpers')
 
     if channel_index == None and number_of_individual_channels_for_decoding == None:
 

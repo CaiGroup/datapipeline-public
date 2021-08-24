@@ -6,9 +6,6 @@ from scipy.io import loadmat
 import pandas as pd
 import sys
 
-
-
-sys.path.insert(0, os.getcwd())
 from .helpers.get_cellpose_labeled_img import get_labeled_img_cellpose
 from .helpers import cellpose_segment_funcs
 from .helpers.reorder_hybs import get_and_sort_hybs

@@ -101,13 +101,10 @@ def get_gaussian_fitted_dots(tiff_src, channel,points):
     
     #Create Paths to add
     #-------------------------------------------------------------------
-    cwd = os.getcwd()
+    folder = os.path.dirname(__file__)
     
-    cwd = cwd[cwd.find('/home'):]
-    print(f'{cwd=}')
-    
-    bfmatlab_dir = os.path.join(cwd,'dot_detection', 'gaussian_fitting_better',  'bfmatlab')
-    helpers_dir = os.path.join(cwd,'dot_detection', 'gaussian_fitting_better', 'helpers')
+    bfmatlab_dir = os.path.join(folder, 'bfmatlab')
+    helpers_dir = os.path.join(folder, 'helpers')
     #-------------------------------------------------------------------
     
     print('=========================')

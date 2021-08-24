@@ -6,8 +6,6 @@ import numpy as np
 import glob
 import pandas as pd
 import tifffile as tf
-sys.path.insert(0, os.getcwd())
-
 
 #Segmentation Script
 #----------------------------

@@ -200,7 +200,7 @@ def run_syndrome_decoding(locations_src, barcode_src, dst_dir, bool_fake_barcode
     
     #Run julia code for syndrome decoding
     #---------------------------------------------------------------
-    julia_script_path = os.path.join(os.getcwd(), 'decoding', 'syndrome_helpers', 'decode.jl')
+    julia_script_path = os.path.join(os.path.dirname(__file__), 'syndrome_helpers', 'decode.jl')
     cmd = 'julia '+ julia_script_path + ' ' + locs_path + ' ' + barcode_path + ' ' + dst_dir + \
             ' ' + str(lat_var_factor) + ' ' + str(z_var_factor) + ' ' + str(lw_var_factor)
     print(f'{cmd=}')

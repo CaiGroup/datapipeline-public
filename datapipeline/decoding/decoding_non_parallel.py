@@ -32,10 +32,8 @@ def decoding(barcode_src ,locations_src, dest, allowed_diff, min_seeds, channel_
     
     #Get current working directory to put in command
     #-------------------------------------------------------------------
-    cwd = os.getcwd()
-    cwd = cwd[cwd.find('/home'):]
-    print(f'{cwd=}')
-    decoding_dir = os.path.join(cwd, 'decoding', 'helpers')
+    folder = os.path.dirname(__file__)
+    decoding_dir = os.path.join(folder, 'helpers')
     #-------------------------------------------------------------------
     
     

@@ -29,17 +29,10 @@ def decoding(barcode_src , locations_src, dest, allowed_diff, min_seeds):
     
     #Create Matlab Command
     #-------------------------------------------------------------------
-    cmd = """  matlab -r "addpath('{0}');main_previous_locations_decoding('{1}', '{2}', '{3}', {4}, {5}, {6}, '{7}'); quit"; """ 
-    
-    cwd = os.getcwd()
-    
-    print(f'{cwd=}')
-   
-    cwd = cwd[cwd.find('/home'):]
-    print(f'{cwd=}')
-    
-    decoding_dir = os.path.join(cwd, 'decoding', 'helpers')
+    cmd = """  matlab -r "addpath('{0}');main_previous_locations_decoding('{1}', '{2}', '{3}', {4}, {5}, {6}, '{7}'); quit"; """
 
+    folder = os.path.dirname(__file__)
+    decoding_dir = os.path.join(folder, 'helpers')
     
     cmd = cmd.format(decoding_dir, barcode_src, locations_src, dest, num_of_rounds, total_number_of_channels, allowed_diff, min_seeds)
     

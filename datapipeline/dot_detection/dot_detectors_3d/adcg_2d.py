@@ -23,11 +23,6 @@ import ast
 import pandas as pd
 import shutil
 
-
-
-sys.path.append(os.getcwd())
-
-
 from ...load_tiff import tiffy
 from ..helpers.visualize_dots import plot_and_save_locations, get_visuals
 from ..reorder_hybs import get_and_sort_hybs
@@ -85,7 +80,7 @@ def get_adcg_dots(tiff_2d, min_weight, final_loss):
     
     #Set and run cmd
     #-------------------------------------------------------------------
-    adcg_wrap_path = os.path.join(os.getcwd(), 'dot_detection/dot_detectors_3d/adcg', 'adcg_wrapper.sh')
+    adcg_wrap_path = os.path.join(os.path.dirname(__file__), 'adcg', 'adcg_wrapper.sh')
     cmd = 'sbatch --wait ' + '--output ' + output_path  + ' ' + adcg_wrap_path + ' ' + tiff_txt_path  \
             + ' ' + locs_result_path + ' ' + min_weight + ' ' + final_loss
     print(f'{cmd=}')

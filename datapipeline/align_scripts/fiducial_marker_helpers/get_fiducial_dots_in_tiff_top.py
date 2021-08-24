@@ -7,7 +7,6 @@ import pandas as pd
 import scipy 
 import cv2
 import matplotlib.pyplot as plt
-sys.path.append(os.getcwd())
 
 from ...load_tiff import tiffy
 

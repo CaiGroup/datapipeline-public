@@ -109,8 +109,7 @@ def run_alignment(exp_name, personal, position, align_function, num_wav, start_t
     
     #Get the directory with alignment scripts
     #-------------------------------------------------
-    cwd = os.getcwd()
-    align_dir = os.path.join(cwd, 'align_scripts')
+    align_dir = os.path.dirname(__file__)
     #-------------------------------------------------
     
     #If no alignment set to "no_align"

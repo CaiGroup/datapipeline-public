@@ -25,9 +25,6 @@ from scipy.io import loadmat
 import sys
 import ast
 
-
-sys.path.append(os.getcwd())
-
 from ...load_tiff import tiffy
 from ..helpers.visualize_dots import plot_and_save_locations, get_visuals_3d
 from ..reorder_hybs import get_and_sort_hybs

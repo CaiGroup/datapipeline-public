@@ -6,8 +6,6 @@ import sys
 import pandas as pd
 import scipy 
 
-sys.path.append(os.getcwd())
-
 from ...load_tiff import tiffy
 from ..helpers.visualize_dots import get_visuals_3d
 from ..helpers.shift_locations import shift_locations

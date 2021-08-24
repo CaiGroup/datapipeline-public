@@ -15,7 +15,7 @@ import shutil
 import tifffile as tf
 
 USER = os.getenv('USER')
-sys.path.insert(0, os.getcwd())
+
 from ....helpers.rand_list import get_random_list, are_jobs_finished
 from ....load_tiff import tiffy
 

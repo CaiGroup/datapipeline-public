@@ -11,8 +11,6 @@ import glob
 import tifffile as tf
 import tempfile
 
-sys.path.insert(0, os.getcwd())
-
 #Import Functions for getting labeled images
 #-------------------------------------------------------------
 from ..cellpose_segment.helpers.get_cellpose_labeled_img import get_labeled_img_cellpose

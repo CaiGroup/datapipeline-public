@@ -30,12 +30,8 @@ def get_radial_centered_dots(tiff_src, channel, points):
     
     #Create Paths to add
     #-------------------------------------------------------------------
-    cwd = os.getcwd()
     
-    cwd = cwd[cwd.find('/home'):]
-    print(f'{cwd=}')
-    
-    rad_dir = os.path.join(cwd, 'dot_detection', 'radial_center')
+    rad_dir = os.path.dirname(__file__)
     
     bfmatlab_dir = os.path.join(rad_dir, 'bfmatlab')
     helpers_dir = os.path.join(rad_dir, 'helpers')
