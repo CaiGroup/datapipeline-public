@@ -5,11 +5,13 @@ import pandas as pd
 from scipy.io import loadmat
 import pandas as pd
 
-from .fiducial_marker_helpers.get_fiducial_dots_in_tiff import get_dots_for_tiff
-from .fiducial_marker_helpers.get_fiducial_dots_in_tiff_top import get_dots_for_tiff_top
-from .fiducial_marker_helpers.FMAligner import FMAligner
-from .fiducial_marker_helpers.colocalize_dots import get_colocs
-from .fiducial_marker_helpers.fid_alignment_check import plot_hyb_locs_on_fids
+import datapipeline.align_scripts.fiducial_marker_helpers as fm_help
+
+from fm_help.get_fiducial_dots_in_tiff import get_dots_for_tiff
+from fm_help.get_fiducial_dots_in_tiff_top import get_dots_for_tiff_top
+from fm_help.FMAligner import FMAligner
+from fm_help.colocalize_dots import get_colocs
+from fm_help.fid_alignment_check import plot_hyb_locs_on_fids
 
 
 

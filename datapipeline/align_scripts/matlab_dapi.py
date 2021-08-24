@@ -5,10 +5,14 @@ import numpy as np
 import sys
 import pickle
 
-from ..load_tiff import tiffy
-from .helpers.saving_offset import save_offset
-from .align_errors import get_align_errors
-from .helpers.saving_align_errors import save_align_errors
+# Nonrelative imports because this is called as a standalone script.
+# As long as we are in the shared env (datapipeline in the PATH), this works
+from datapipeline.load_tiff import tiffy
+from datapipeline.align_scripts.helpers.saving_offset import save_offset
+# There is align_**scripts**.align_errors.get_align_errors and
+# align_**errors**.align_errors.get_align_errors. We want the former as it takes 3 arguments.
+from datapipeline.align_scripts.align_errors import get_align_errors
+from datapipeline.align_scripts.helpers.saving_align_errors import save_align_errors
 
 def matlab_dapi(fixed_image_src, moving_image_src, num_wav, rand_dir):
 

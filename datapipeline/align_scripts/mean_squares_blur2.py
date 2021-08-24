@@ -3,7 +3,7 @@ import SimpleITK as sitk
 import os
 import glob
 import numpy as np
-from ..load_tiff import tiffy
+from datapipeline.load_tiff import tiffy
 import cv2
 
 def crop_center(img,cropx=1000,cropy=1000):

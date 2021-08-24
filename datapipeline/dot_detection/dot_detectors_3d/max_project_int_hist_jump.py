@@ -6,13 +6,13 @@ import sys
 import pandas as pd
 import scipy 
 
-from ...load_tiff import tiffy
-from ..helpers.visualize_dots import get_visuals_3d
-from ..helpers.shift_locations import shift_locations
-from ..helpers.background_subtraction import get_background
-from ..dot_detectors_3d.hist_jump_helpers.jump_helpers import hist_jump_threshed_3d
-from ..gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
-from ..radial_center.radial_center_fitting import get_radial_centered_dots
+from datapipeline.load_tiff import tiffy
+from datapipeline.dot_detection.helpers.visualize_dots import get_visuals_3d
+from datapipeline.dot_detection.helpers.shift_locations import shift_locations
+from datapipeline.dot_detection.helpers.background_subtraction import get_background
+from datapipeline.dot_detection.dot_detectors_3d.hist_jump_helpers.jump_helpers import hist_jump_threshed_3d
+from datapipeline.dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
+from datapipeline.dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
 
 
 def run_back_sub(background, tiff_3d, channel, offset):

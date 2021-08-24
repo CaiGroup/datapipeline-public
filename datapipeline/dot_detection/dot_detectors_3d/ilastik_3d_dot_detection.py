@@ -25,11 +25,11 @@ import h5py
 import shutil
 from cv2 import createCLAHE
 
-from ...load_tiff import tiffy
-from ..visualize_dots.tiff_visuals import plot_and_save_locations
-from ..reorder_hybs import get_and_sort_hybs
-from ..dot_detectors_2d.dot_detector_2d import find_dots
-from ..helpers.shift_locations import shift_locations
+from datapipeline.load_tiff import tiffy
+from datapipeline.dot_detection.visualize_dots.tiff_visuals import plot_and_save_locations
+from datapipeline.dot_detection.reorder_hybs import get_and_sort_hybs
+from datapipeline.dot_detection.dot_detectors_2d.dot_detector_2d import find_dots
+from datapipeline.dot_detection.helpers.shift_locations import shift_locations
 
 warnings.filterwarnings("ignore")
 

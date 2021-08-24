@@ -2,7 +2,7 @@ import SimpleITK as sitk
 import os
 import glob
 import numpy as np
-from ..load_tiff import tiffy
+from datapipeline.load_tiff import tiffy
 
 def phase_correlation(fixed_image_src, moving_image_src, return_dict):
     fixed_np = tiffy.load(fixed_image_src)

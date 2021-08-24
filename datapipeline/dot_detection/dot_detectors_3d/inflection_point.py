@@ -23,16 +23,16 @@ import matplotlib.pyplot as plt
 import tempfile
 from scipy.io import loadmat
 
-from ...load_tiff import tiffy
-from ..helpers.visualize_dots import plot_and_save_locations, get_visuals
-from ..reorder_hybs import get_and_sort_hybs
-from ..helpers.shift_locations import shift_locations
-from ..helpers.background_subtraction import apply_background_subtraction
-from ..helpers.background_subtraction import get_background
-from ..helpers.add_z import add_z_col
-from ..helpers.threshold import apply_thresh
-from ..helpers.compile_dots import add_to_dots_in_channel
-from ..dot_detectors_3d.ilastik_3d_by_channel import run_back_sub
+from datapipeline.load_tiff import tiffy
+from datapipeline.dot_detection.helpers.visualize_dots import plot_and_save_locations, get_visuals
+from datapipeline.dot_detection.reorder_hybs import get_and_sort_hybs
+from datapipeline.dot_detection.helpers.shift_locations import shift_locations
+from datapipeline.dot_detection.helpers.background_subtraction import apply_background_subtraction
+from datapipeline.dot_detection.helpers.background_subtraction import get_background
+from datapipeline.dot_detection.helpers.add_z import add_z_col
+from datapipeline.dot_detection.helpers.threshold import apply_thresh
+from datapipeline.dot_detection.helpers.compile_dots import add_to_dots_in_channel
+from datapipeline.dot_detection.dot_detectors_3d.ilastik_3d_by_channel import run_back_sub
 
 warnings.filterwarnings("ignore")
 

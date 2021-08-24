@@ -2,7 +2,7 @@ import SimpleITK as sitk
 import os
 import glob
 import numpy as np
-from ..load_tiff import tiffy
+from datapipeline.load_tiff import tiffy
 import cv2
 
 def preprocess_align(img, three_d=True):

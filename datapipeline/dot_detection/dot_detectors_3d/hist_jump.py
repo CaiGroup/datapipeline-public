@@ -25,20 +25,20 @@ from scipy.io import loadmat
 import sys
 import ast
 
-from ...load_tiff import tiffy
-from ..helpers.visualize_dots import plot_and_save_locations, get_visuals_3d
-from ..reorder_hybs import get_and_sort_hybs
-from ..helpers.shift_locations import shift_locations
-from ..helpers.background_subtraction import apply_background_subtraction
-from ..helpers.background_subtraction import get_background
-from ..helpers.add_z import add_z_col
-from ..helpers.threshold import apply_thresh
-from ..helpers.compile_dots import add_to_dots_in_channel
-from ..helpers.hist_jump_helpers import get_hist_threshed_dots
-from ..helpers.remove_extra_dots import take_out_extra_dots
+from datapipeline.load_tiff import tiffy
+from datapipeline.dot_detection.helpers.visualize_dots import plot_and_save_locations, get_visuals_3d
+from datapipeline.dot_detection.reorder_hybs import get_and_sort_hybs
+from datapipeline.dot_detection.helpers.shift_locations import shift_locations
+from datapipeline.dot_detection.helpers.background_subtraction import apply_background_subtraction
+from datapipeline.dot_detection.helpers.background_subtraction import get_background
+from datapipeline.dot_detection.helpers.add_z import add_z_col
+from datapipeline.dot_detection.helpers.threshold import apply_thresh
+from datapipeline.dot_detection.helpers.compile_dots import add_to_dots_in_channel
+from datapipeline.dot_detection.helpers.hist_jump_helpers import get_hist_threshed_dots
+from datapipeline.dot_detection.helpers.remove_extra_dots import take_out_extra_dots
 
-from ..gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
-from ..radial_center.radial_center_fitting import get_radial_centered_dots
+from datapipeline.dot_detection.gaussian_fitting_better.gaussian_fitting import get_gaussian_fitted_dots
+from datapipeline.dot_detection.radial_center.radial_center_fitting import get_radial_centered_dots
 
 
 def run_back_sub(background, tiff_3d, channel, offset):

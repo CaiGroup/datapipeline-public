@@ -5,11 +5,11 @@ import numpy as np
 import sys
 import pickle
 
-from ..load_tiff import tiffy
-from .align_errors import get_align_errors
-from .helpers.saving_offset import save_offset
-from .helpers.saving_align_errors import save_align_errors
-from ..timer import timer_tools
+from datapipeline.load_tiff import tiffy
+from datapipeline.align_scripts.align_errors import get_align_errors
+from datapipeline.align_scripts.helpers.saving_offset import save_offset
+from datapipeline.align_scripts.helpers.saving_align_errors import save_align_errors
+from datapipeline.timer import timer_tools
 
 def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir, num_wav, start_time):
     
