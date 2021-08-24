@@ -1,23 +1,14 @@
 from __future__ import annotations
-import numpy as np
-import imageio
-import skimage
-import tifffile
-import os
-import glob
+
+import warnings
 from typing import Tuple
-import numpy as np
-from scipy import ndimage
-import scipy.ndimage
-from skimage.exposure import rescale_intensity
-from skimage.feature import blob_log
-from skimage.filters import difference_of_gaussians
-from scipy.ndimage._ni_support import _normalize_sequence
-import scipy.ndimage as ndi
+
 import cv2
-import warnings
-import json
-import warnings
+import numpy as np
+import scipy.ndimage as ndi
+from scipy import ndimage
+from scipy.ndimage._ni_support import _normalize_sequence
+from skimage.feature import blob_log
 
 
 def find_dots(chan_img: np.ndimage) -> Tuple[np.ndarray, np.ndarray, int]:
@@ -65,9 +56,9 @@ def find_dots(chan_img: np.ndimage) -> Tuple[np.ndarray, np.ndarray, int]:
     intensities = chan_img.transpose()[points[:, 1], points[:, 0]]
 
     # Suggest dots brighter than 15th percentile of dot intensities
-    #suggested_threshold = int(np.percentile(intensities, 15))
+    # suggested_threshold = int(np.percentile(intensities, 15))
 
-    return points, intensities #, suggested_threshold
+    return points, intensities  # , suggested_threshold
 
 
 def find_dots_faster(chan_img: np.ndimage) -> Tuple[np.ndarray, np.ndarray, int]:
@@ -90,7 +81,7 @@ def find_dots_faster(chan_img: np.ndimage) -> Tuple[np.ndarray, np.ndarray, int]
     sigma = 2
 
     # Background subtraction with rolling ball radius of 3
-    #subtracted = rolling_ball_filter(chan_img, 3, spacing=None, top=False)
+    # subtracted = rolling_ball_filter(chan_img, 3, spacing=None, top=False)
 
     # Scaled Laplacian over which blob_log maximizes to find dots
     laplacian = -ndimage.gaussian_laplace(chan_img, sigma) * sigma ** 2
@@ -115,15 +106,16 @@ def find_dots_faster(chan_img: np.ndimage) -> Tuple[np.ndarray, np.ndarray, int]
     intensities = chan_img.transpose()[points[:, 1], points[:, 0]]
 
     # Suggest dots brighter than 15th percentile of dot intensities
-    #suggested_threshold = int(np.percentile(intensities, 15))
+    # suggested_threshold = int(np.percentile(intensities, 15))
 
-    return points, intensities 
+    return points, intensities
+
 
 def rolling_ball_filter(
-    data: np.ndarray,
-    ball_radius: float,
-    spacing: Optional[Union[int, Sequence]] = None,
-    top: bool = False,
+        data: np.ndarray,
+        ball_radius: float,
+        spacing: Optional[Union[int, Sequence]] = None,
+        top: bool = False,
 ) -> np.ndarray:
     """Rolling ball filter implemented with morphology operations.
 

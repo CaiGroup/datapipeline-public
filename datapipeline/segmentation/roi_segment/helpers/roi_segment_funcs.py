@@ -2,12 +2,10 @@
 Utilities to output dataframes for points using segmentation
 
 """
-from numpy.core.multiarray import ndarray
-from skimage.draw import polygon
-from skimage.measure import regionprops_table
-
 import numpy as np
 import pandas as pd
+from skimage.draw import polygon
+from skimage.measure import regionprops_table
 
 
 def roi2mask(roi: dict, num_z=1):

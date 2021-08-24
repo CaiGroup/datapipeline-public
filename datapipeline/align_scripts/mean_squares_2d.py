@@ -1,79 +1,79 @@
-import SimpleITK as sitk
 import os
-import glob
-import numpy as np
 import sys
-import pickle
 
-from datapipeline.load_tiff import tiffy
+import SimpleITK as sitk
+import numpy as np
+
 from datapipeline.align_scripts.align_errors import get_align_errors
-from datapipeline.align_scripts.helpers.saving_offset import save_offset
 from datapipeline.align_scripts.helpers.saving_align_errors import save_align_errors
-from datapipeline.timer import timer_tools
+from datapipeline.align_scripts.helpers.saving_offset import save_offset
+from datapipeline.load_tiff import tiffy
+
 
 def mean_squares_2d(fixed_image_src, moving_image_src, rand_dir, num_wav, start_time):
-    
     print(f'{type(num_wav)=}')
-    #Get Images from sources
-    #---------------------------------------------------
+    # Get Images from sources
+    # ---------------------------------------------------
     fixed_np = tiffy.load(fixed_image_src, num_wav)
     moving_np = tiffy.load(moving_image_src, num_wav)
-    median_z = fixed_np.shape[0]//2
-    fixed_dapi_np = fixed_np[median_z, -1,:,:]
-    moving_dapi_np = moving_np[median_z, -1,:,:]
-    #---------------------------------------------------
-    
-    #Set image into proper variable
-    #---------------------------------------------------
+    median_z = fixed_np.shape[0] // 2
+    fixed_dapi_np = fixed_np[median_z, -1, :, :]
+    moving_dapi_np = moving_np[median_z, -1, :, :]
+    # ---------------------------------------------------
+
+    # Set image into proper variable
+    # ---------------------------------------------------
     moving_image = sitk.GetImageFromArray(moving_dapi_np)
     fixed_image = sitk.GetImageFromArray(fixed_dapi_np)
-    #---------------------------------------------------
-    
-    #Run Simpleitk registration
-    #---------------------------------------------------
+    # ---------------------------------------------------
+
+    # Run Simpleitk registration
+    # ---------------------------------------------------
     print('Running Mean Squares 2D Alignment')
-    initial_transform = sitk.CenteredTransformInitializer(sitk.Cast(fixed_image,moving_image.GetPixelID()), 
-                                                      moving_image, 
-                                                      sitk.Euler2DTransform(), 
-                                                      sitk.CenteredTransformInitializerFilter.GEOMETRY)
+    initial_transform = sitk.CenteredTransformInitializer(sitk.Cast(fixed_image, moving_image.GetPixelID()),
+                                                          moving_image,
+                                                          sitk.Euler2DTransform(),
+                                                          sitk.CenteredTransformInitializerFilter.GEOMETRY)
     registration_method = sitk.ImageRegistrationMethod()
     registration_method.SetMetricAsMeanSquares()
     registration_method.SetMetricSamplingStrategy(registration_method.RANDOM)
     registration_method.SetMetricSamplingPercentage(0.1)
     registration_method.SetInterpolator(sitk.sitkLinear)
-    registration_method.SetOptimizerAsGradientDescent(learningRate=3, numberOfIterations=20, convergenceMinimumValue=1e-100, convergenceWindowSize=200)
+    registration_method.SetOptimizerAsGradientDescent(learningRate=3, numberOfIterations=20,
+                                                      convergenceMinimumValue=1e-100, convergenceWindowSize=200)
     registration_method.SetOptimizerScalesFromPhysicalShift()
     registration_method.SetInitialTransform(initial_transform, inPlace=False)
-    #---------------------------------------------------
+    # ---------------------------------------------------
 
-    #Result from SimpleITK
-    #---------------------------------------------------
-    final_transform = registration_method.Execute(sitk.Cast(fixed_image, sitk.sitkFloat32), 
-                                                   sitk.Cast(moving_image, sitk.sitkFloat32))
+    # Result from SimpleITK
+    # ---------------------------------------------------
+    final_transform = registration_method.Execute(sitk.Cast(fixed_image, sitk.sitkFloat32),
+                                                  sitk.Cast(moving_image, sitk.sitkFloat32))
     print(f'{str(final_transform)=}')
-    #---------------------------------------------------
-    
-    #Get offset from result
-    #---------------------------------------------------
-    offset_str = str(final_transform).split('Offset: ')[1].split('Center:')[0].split(']')[0] 
-    offset_list = (offset_str + ']').strip('][').split(', ') 
+    # ---------------------------------------------------
+
+    # Get offset from result
+    # ---------------------------------------------------
+    offset_str = str(final_transform).split('Offset: ')[1].split('Center:')[0].split(']')[0]
+    offset_list = (offset_str + ']').strip('][').split(', ')
     offset_list_int = [float(i) for i in offset_list]
     offset_flip = np.flip(offset_list_int)
     offset_neg = np.negative(offset_flip)
-    #---------------------------------------------------
-    
-    #Save the offset
-    #---------------------------------------------------
+    # ---------------------------------------------------
+
+    # Save the offset
+    # ---------------------------------------------------
     save_offset(moving_image_src, offset_neg, rand_dir)
-    #---------------------------------------------------
-    
+    # ---------------------------------------------------
+
     print(f'{offset_neg=}')
-    
-    #Get the alignment error
-    #---------------------------------------------------
+
+    # Get the alignment error
+    # ---------------------------------------------------
     align_error = get_align_errors(fixed_np, moving_np, offset_neg)
     save_align_errors(moving_image_src, align_error, rand_dir)
-    #---------------------------------------------------
+    # ---------------------------------------------------
+
 
 if __name__ == '__main__':
 
@@ -102,4 +102,3 @@ if __name__ == '__main__':
         start_time = None
 
         mean_squares_2d(fixed_src, moving_src, rand_dir, num_wav, start_time)
-    

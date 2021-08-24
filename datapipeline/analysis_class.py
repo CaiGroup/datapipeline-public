@@ -1,140 +1,130 @@
-import os
 import json
+import os
 import sys
-import scipy.io as sio
-import numpy as np
-import glob
-import logging
-import time
-from datetime import datetime
+
 from .load_tiff import tiffy
-import shutil
+
 # sys.path.insert(0, os.getcwd())
 
 print('Current Directory:', os.getcwd())
 
-
-#Import things to be done after all positions
-#-----------------------------------------------------
+# Import things to be done after all positions
+# -----------------------------------------------------
 from .helpers.send_email_notif import send_finished_notif, are_logs_finished
 from .helpers.combine_position_results.combine_all_pos_locs import combine_locs_csv_s
 from .helpers.combine_position_results.combine_decoded_genes_all_pos import combine_pos_genes
 from .helpers.combine_position_results.combine_count_matrices import get_combined_count_matrix
-from .helpers.sync_specific_analysis import send_analysis_to_onedrive
-from .helpers.get_correlation_plots import get_correlated_positions
 from .helpers.combine_position_results.get_false_pos_metrics import show_norm_false_pos_metrics
 from .helpers.combine_position_results.all_pos_count_matrix_analytics import get_genes_per_cell_for_all_pos_plot
 from .helpers.combine_position_results.on_off_barcode_plot_all_pos import get_on_off_barcode_plot_all_pos
 from .post_analyses.gene_to_gene_corr_matrix import get_gene_to_gene_correlations
 from .helpers.combine_position_results.combine_percentage_of_dots_used import comb_percentage_of_dots_used_and_get_plot
-#-----------------------------------------------------
+# -----------------------------------------------------
 
-#Alignment Scripts
-#----------------------------
+# Alignment Scripts
+# ----------------------------
 from .align_scripts import run_alignment
 from .align_scripts import fiducial_alignment
 from .align_scripts.dapi_visual_check.dapi_visual_check import get_stacked_dapi_s_align_check
 from .align_scripts.helpers.alignment_errors_plot import get_alignment_errors_plot
-#----------------------------
+# ----------------------------
 
-#Align Error Script
-#----------------------------
+# Align Error Script
+# ----------------------------
 from .align_errors import align_errors
-#----------------------------
 
-#Dot Detection Script
-#----------------------------
+# ----------------------------
+
+# Dot Detection Script
+# ----------------------------
 print('Current Directory:', os.getcwd())
 from .dot_detection.dot_detection_class12 import Dot_Detection
-#----------------------------
+# ----------------------------
 
-#Barcode Script
-#----------------------------
-from .read_barcode import read_barcode
-#----------------------------
+# Barcode Script
+# ----------------------------
+# ----------------------------
 
-#Decoding Script
-#----------------------------
+# Decoding Script
+# ----------------------------
 from .decoding.decoding_class import Decoding
-#----------------------------
+# ----------------------------
 
-#Segmentation Script
-#----------------------------
-from .segmentation.roi_segment import run_roi
+# Segmentation Script
+# ----------------------------
 from .segmentation.seg_class import Segmentation
-#----------------------------
+# ----------------------------
 
 
-#Colcalization Test Scripts
-#----------------------------
+# Colcalization Test Scripts
+# ----------------------------
 from .colocalization import colocalize
-#----------------------------
+# ----------------------------
 
-#Chromatic Aberration Scripts
-#----------------------------
-from .chromatic_aberration import run
-#----------------------------
+# Chromatic Aberration Scripts
+# ----------------------------
+# ----------------------------
 
-#Post Analyses
-#----------------------------
+# Post Analyses
+# ----------------------------
 from .post_analyses.post_analysis_class import Post_Analyses
-#----------------------------
+# ----------------------------
 
-#LOgging Time
-#----------------------------
+# LOgging Time
+# ----------------------------
 from .timer import timer_tools
-#----------------------------
+# ----------------------------
 
-#Import Analysis Warnings
-#----------------------------
+# Import Analysis Warnings
+# ----------------------------
 from .analysis_warnings.all_warnings import get_all_warnings
-#----------------------------
+# ----------------------------
 
-#Import opening tiff check
-#----------------------------
+# Import opening tiff check
+# ----------------------------
 from .helpers.opening_tiff_check.check_for_opening_tiff_files import get_opening_tiff_check
-#----------------------------
+
+# ----------------------------
 
 
 main_dir = '/groups/CaiLab'
 
 
-
-#Analysis Class to set and run parameters for analyses
-#=====================================================================================
+# Analysis Class to set and run parameters for analyses
+# =====================================================================================
 class Analysis:
     def __init__(self, experiment_name, analysis_name, personal, position, email):
 
-        #Set Basic Information
-        #--------------------------------------------------------------
+        # Set Basic Information
+        # --------------------------------------------------------------
         self.experiment_name = experiment_name
         self.personal = personal
         self.analysis_name = analysis_name
         self.position = position
         self.email = email
-        #--------------------------------------------------------------
+        # --------------------------------------------------------------
 
-        #Set Parameters
-        #--------------------------------------------------------------
+        # Set Parameters
+        # --------------------------------------------------------------
         self.align = None
-        self.chromatic_aberration =False
-        self.normalization=False
-        self.deconvolution=False
+        self.chromatic_aberration = False
+        self.normalization = False
+        self.deconvolution = False
         self.get_align_errors = False
         self.dot_detection = False
         self.decoding_across = False
         self.visualize_dots = False
         self.colocalize = False
         self.background_subtraction = False
-        self.decoding_with_previous_dots  = False
+        self.decoding_with_previous_dots = False
         self.segmentation = False
-        self.decoding_with_previous_locations  = False
+        self.decoding_with_previous_locations = False
         self.fake_barcodes = False
         self.num_zslices = None
         self.on_off_barcode_analysis = False
         self.false_positive_rate_analysis = False
         self.gaussian_fitting = False
-        self.radial_center= False
+        self.radial_center = False
         self.hamming_analysis = False
         self.allowed_diff = 1
         self.strictness_dot_detection = 5
@@ -144,7 +134,7 @@ class Analysis:
         self.labeled_img = None
         self.edge_dist = 0
         self.dist_between_nuclei = 0
-        self.bool_cyto_match= False
+        self.bool_cyto_match = False
         self.nuclei_erode = 0
         self.cyto_erode = 0
         self.decode_only_cells = False
@@ -159,7 +149,7 @@ class Analysis:
         self.num_z = None
         self.dot_radius = 1
         self.decoding_non_barcoded = False
-        self.overlap=1
+        self.overlap = 1
         self.num_radii = 2
         self.radius_step = 1
         self.debug_dot_detection = False
@@ -196,11 +186,10 @@ class Analysis:
         self.num_sigma_dot_detection = 2
         self.bool_remove_bright_dots = True
         self.dilate_background_kernel = 0
-        #--------------------------------------------------------------
+        # --------------------------------------------------------------
 
-
-        #Set Directories
-        #--------------------------------------------------------------
+        # Set Directories
+        # --------------------------------------------------------------
         self.analysis_dir = os.path.join(main_dir, 'analyses', self.personal, self.experiment_name, self.analysis_name)
         self.position_dir = os.path.join(self.analysis_dir, self.position.split('.ome')[0])
         self.logging_pos = os.path.join(self.position_dir, 'Logging.txt')
@@ -217,12 +206,10 @@ class Analysis:
         self.barcode_key_src = os.path.join(self.data_dir, 'barcode_key')
         self.seg_data_dir = os.path.join(self.data_dir, 'segmentation')
         self.locations_data_dir = os.path.join(self.data_dir, 'locations')
-        #--------------------------------------------------------------
+        # --------------------------------------------------------------
 
-
-    #Set Parameters
-    #--------------------------------------------------------------------------------
-
+    # Set Parameters
+    # --------------------------------------------------------------------------------
 
     def set_alignment_arg(self, align_arg):
         self.align = align_arg.replace(" ", "_")
@@ -235,8 +222,9 @@ class Analysis:
 
     def set_background_subtraction_true(self):
         self.background_subtraction = True
-        background_file = os.path.join(self.data_dir, 'final_background',self.position)
-        assert os.path.isfile(background_file), "The background file for subtraction is missing at " + str(background_file)
+        background_file = os.path.join(self.data_dir, 'final_background', self.position)
+        assert os.path.isfile(background_file), "The background file for subtraction is missing at " + str(
+            background_file)
         print("    Set Background Subtraction", flush=True)
 
     def set_chromatic_aberration_true(self):
@@ -248,7 +236,7 @@ class Analysis:
         print("    Set Normalization", flush=True)
 
     def set_deconvolution_true(self):
-        self.deconvolution=True
+        self.deconvolution = True
         print("    Set Deconvolution", flush=True)
 
     def set_dot_detection_arg(self, detection_arg):
@@ -266,11 +254,11 @@ class Analysis:
         print("    Set Decoding Non Barcoded", flush=True)
 
     def set_decoding_with_previous_dots_true(self):
-        self.decoding_with_previous_dots  = True
+        self.decoding_with_previous_dots = True
         print("    Set Decoding Channels with Previous Points", flush=True)
 
     def set_decoding_with_previous_locations_true(self):
-        self.decoding_with_previous_locations  = True
+        self.decoding_with_previous_locations = True
         print("    Set Decoding Channels with Previous Locations", flush=True)
 
     def set_decoding_individual(self, individual_arg):
@@ -288,9 +276,8 @@ class Analysis:
         self.colocalize = True
         print("    Set Colocalization", flush=True)
 
-
     def set_segmentation_arg(self, segment_arg):
-        self.segmentation =segment_arg
+        self.segmentation = segment_arg
         print("    Set Segmentation", flush=True)
 
     def set_fake_barcodes_true(self):
@@ -310,17 +297,17 @@ class Analysis:
         print("    Set Hamming")
 
     def set_gaussian_fitting_true(self):
-        self.gaussian_fitting= True
+        self.gaussian_fitting = True
         print("    Set Gaussian Fitting True")
 
     def set_radial_center_true(self):
-        self.radial_center= True
+        self.radial_center = True
         print("    Set Radial Center True")
 
     def set_allowed_diff_arg(self, allowed_diff_arg):
         self.allowed_diff = int(allowed_diff_arg)
 
-        assert self.allowed_diff >=0, "Allowed Diff must be greater than zero."
+        assert self.allowed_diff >= 0, "Allowed Diff must be greater than zero."
         assert self.allowed_diff < 10, "Allowed Diff may be to large (greater than 10)."
 
         print("    Set Allowed Diff to", str(self.allowed_diff))
@@ -328,14 +315,14 @@ class Analysis:
     def set_strictness_arg(self, strictness_arg):
         self.strictness_dot_detection = int(strictness_arg)
 
-     #   assert self.strictness_dot_detection >=0, "Strictness must be greater than zero."
+        #   assert self.strictness_dot_detection >=0, "Strictness must be greater than zero."
 
         print("    Set Strictness to", str(self.strictness_dot_detection))
 
     def set_min_seeds_arg(self, min_seeds_arg):
         self.min_seeds = int(min_seeds_arg)
 
-        assert self.min_seeds >=0, "Min Seeds must be greater than zero."
+        assert self.min_seeds >= 0, "Min Seeds must be greater than zero."
 
         print("    Set Min Seeds to", str(self.min_seeds))
 
@@ -370,11 +357,11 @@ class Analysis:
         print("    Set Cytoplasm Erode to", str(self.cyto_erode))
 
     def set_nuclei_cyto_match_true(self):
-        self.bool_cyto_match= True
+        self.bool_cyto_match = True
         print("    Set Nuclei Cytoplasm Matching to True")
 
     def set_decode_only_cells_true(self):
-        self.decode_only_cells= True
+        self.decode_only_cells = True
         print("    Set Decode Only Cells to True")
 
     def set_nbins_arg(self, nbins_arg):
@@ -447,7 +434,7 @@ class Analysis:
         print("    Set Debug Dot Dotection to True")
 
     def set_syndrome_decoding_true(self):
-        self.synd_decoding= True
+        self.synd_decoding = True
         print("    Set Syndrome Decoding to True")
 
     def set_lateral_variance_factor(self, lvf):
@@ -465,7 +452,6 @@ class Analysis:
     def set_parity_check_path(self, Hpath):
         self.parity_check_path = Hpath
         print("    Set Hstr to", str(self.parity_check_path))
-
 
     def set_lampfish_decoding_true(self):
         self.lampfish_decoding = True
@@ -594,8 +580,9 @@ class Analysis:
         self.dilate_background_kernel = float(dilate_background_kernel)
 
         print("    Set Dilate Background Kernel to", str(self.dilate_background_kernel))
-    #--------------------------------------------------------------------
-    #Finished Setting Parameters
+
+    # --------------------------------------------------------------------
+    # Finished Setting Parameters
 
     def move_directory_contents(self, src, dest):
         """
@@ -605,13 +592,11 @@ class Analysis:
         src_with_asterisk = os.path.join(src, '*')
         os.system('cp ' + src_with_asterisk + ' ' + dest)
 
-
-
-    #Set functions for analysis
-    #--------------------------------------------------------------------
+    # Set functions for analysis
+    # --------------------------------------------------------------------
     def run_dot_detection(self):
 
-        #print(f'{Dot_Detection=}')
+        # print(f'{Dot_Detection=}')
         dot_detector = Dot_Detection(
             self.experiment_name, self.personal, self.position, self.locations_dir,
             self.analysis_name, self.visualize_dots, self.normalization, self.background_subtraction,
@@ -628,13 +613,10 @@ class Analysis:
 
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
 
-
         if self.dimensions == 2:
-
             locs_src = dot_detector.run_dot_detection_2d()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
             return locs_src
-
 
         locs_src = dot_detector.run_dot_detection()
         timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
@@ -643,33 +625,31 @@ class Analysis:
 
     def run_alignment_errors(self):
 
-        #Get alignment errors
-        #--------------------------------------------------------------------
+        # Get alignment errors
+        # --------------------------------------------------------------------
         print("    Getting Alignment Errors", flush=True)
 
-        errors = align_errors.get_align_errors(self.personal, self.experiment_name, self.position, self.analysis_name, dims_to_align = self.dimensions)
-        #--------------------------------------------------------------------
+        errors = align_errors.get_align_errors(self.personal, self.experiment_name, self.position, self.analysis_name,
+                                               dims_to_align=self.dimensions)
+        # --------------------------------------------------------------------
 
-
-        #Write Results to Path
-        #-----------------------------------------------------
-        errors_path  = os.path.join(self.position_dir, 'errors_for_alignment.json')
+        # Write Results to Path
+        # -----------------------------------------------------
+        errors_path = os.path.join(self.position_dir, 'errors_for_alignment.json')
 
         print("        Saving alignment errors to", errors_path, flush=True)
         with open(errors_path, 'w') as jsonfile:
             json.dump(errors, jsonfile)
-        #-----------------------------------------------------
+        # -----------------------------------------------------
 
     def run_colocalization(self):
 
-        #Make directories for colocalization
-        #--------------------------------------------------------------------
+        # Make directories for colocalization
+        # --------------------------------------------------------------------
         print("Running Colocalization Test")
-
 
         if not os.path.exists(self.locations_dir):
             os.makedirs(self.locations_dir)
-
 
         locations_path = os.path.join(self.locations_dir, 'locations.mat')
 
@@ -677,19 +657,19 @@ class Analysis:
 
         if not os.path.exists(coloc_dir):
             os.makedirs(coloc_dir)
-        #--------------------------------------------------------------------
+        # --------------------------------------------------------------------
 
-        #Run Colocalization
-        #--------------------------------------------------------------------
+        # Run Colocalization
+        # --------------------------------------------------------------------
         colocalize.colocalize(locations_path, coloc_dir)
-        #--------------------------------------------------------------------
+        # --------------------------------------------------------------------
 
     def run_chromatic_aberration(self):
 
         beads_src = os.path.join(self.data_dir, 'beads')
 
         t_form_dest = os.path.join(self.analysis_dir, \
-                        'Chromatic_Aberration_Correction')
+                                   'Chromatic_Aberration_Correction')
 
         if not os.path.exists(t_form_dest):
             os.makedirs(t_form_dest)
@@ -698,70 +678,72 @@ class Analysis:
 
     def run_algorithms_for_all_pos(self):
 
-        #Get Warnings file
-        #--------------------------------------------------------------------------------
+        # Get Warnings file
+        # --------------------------------------------------------------------------------
         warnings_dst = os.path.join(self.analysis_dir, 'Warnings.txt')
         get_all_warnings(warnings_dst, self.analysis_dir)
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-        #Combine all dots
-        #--------------------------------------------------------------------------------
+        # Combine all dots
+        # --------------------------------------------------------------------------------
         if self.dot_detection:
             combine_locs_csv_s(self.analysis_dir)
 
-        #Combine all decoded genes
-        #--------------------------------------------------------------------------------
+        # Combine all decoded genes
+        # --------------------------------------------------------------------------------
         if not self.decoding_individual == 'all':
             for channel in self.decoding_individual:
                 combine_pos_genes(self.analysis_dir, channel)
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-        #If Individual decoding and segmentation
-        #--------------------------------------------------------------------------------
+        # If Individual decoding and segmentation
+        # --------------------------------------------------------------------------------
         if self.decoding_individual != 'all' and self.segmentation != False:
             print('Did Indiv Decoding and Segmentation')
 
-            #Get Percentage of dots used for all positions
-            #--------------------------------------------------------------------------------
-            comb_percent_of_dots_dst = os.path.join(self.all_positions_dir, 'Percentage_of_Dots_Used', 'percentage_of_dots_used_plot.png')
+            # Get Percentage of dots used for all positions
+            # --------------------------------------------------------------------------------
+            comb_percent_of_dots_dst = os.path.join(self.all_positions_dir, 'Percentage_of_Dots_Used',
+                                                    'percentage_of_dots_used_plot.png')
             comb_percentage_of_dots_used_and_get_plot(self.analysis_dir, comb_percent_of_dots_dst)
-            #--------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------------
 
-            #Combine count matrices
-            #--------------------------------------------------------------------------------
-            combined_count_matrices_dst = os.path.join(self.all_positions_dir, 'Segmentation', 'count_matrix_all_pos.csv')
+            # Combine count matrices
+            # --------------------------------------------------------------------------------
+            combined_count_matrices_dst = os.path.join(self.all_positions_dir, 'Segmentation',
+                                                       'count_matrix_all_pos.csv')
             get_combined_count_matrix(self.analysis_dir, combined_count_matrices_dst)
-            #--------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------------
 
-            #Get Gene to Gene correlation Matrix
-            #--------------------------------------------------------------------------------
+            # Get Gene to Gene correlation Matrix
+            # --------------------------------------------------------------------------------
             gene_corr_dst_dir = os.path.join(self.all_positions_dir, 'Gene_Correlations')
             get_gene_to_gene_correlations(combined_count_matrices_dst, gene_corr_dst_dir)
-            #--------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------------
 
-            #Get False Positive Metrics
-            #--------------------------------------------------------------------------------
+            # Get False Positive Metrics
+            # --------------------------------------------------------------------------------
             all_false_pos_dst = os.path.join(self.all_positions_dir, 'False_Positive_Rate_Analysis')
             show_norm_false_pos_metrics(self.analysis_dir, all_false_pos_dst)
-            #--------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------------
 
-            #Get Genes per cell plot
-            #--------------------------------------------------------------------------------
+            # Get Genes per cell plot
+            # --------------------------------------------------------------------------------
             genes_per_cell_plot_dst = os.path.join(self.all_positions_dir, 'Segmentation', 'Genes_per_cell_all_pos.png')
             get_genes_per_cell_for_all_pos_plot(self.analysis_dir, genes_per_cell_plot_dst)
-            #--------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------------
 
-            #Get On/off barcode plot for all positions
-            #--------------------------------------------------------------------------------
-            on_off_barcode_plot_all_pos_dst = os.path.join(self.all_positions_dir, 'On_Off_Barcode_Plot', 'on_off_barcode_plot_all_pos.png')
+            # Get On/off barcode plot for all positions
+            # --------------------------------------------------------------------------------
+            on_off_barcode_plot_all_pos_dst = os.path.join(self.all_positions_dir, 'On_Off_Barcode_Plot',
+                                                           'on_off_barcode_plot_all_pos.png')
             get_on_off_barcode_plot_all_pos(combined_count_matrices_dst, on_off_barcode_plot_all_pos_dst)
-            #--------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------------
 
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-
-    #Runs the Parameters and functions
-    #--------------------------------------------------------------------------------
+    # Runs the Parameters and functions
+    # --------------------------------------------------------------------------------
     def write_results(self, path):
         """
         write_results
@@ -770,28 +752,24 @@ class Analysis:
         Called from json_analysis.py at the end of function run_analysis
         """
 
-        #Start Logging
-        #--------------------------------------------------------------------------------
+        # Start Logging
+        # --------------------------------------------------------------------------------
         self.start_time = timer_tools.start_logging(self.logging_pos)
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-
-        #Get Opening tiff Check
-        #--------------------------------------------------------------------------------
+        # Get Opening tiff Check
+        # --------------------------------------------------------------------------------
         timer_tools.logg_elapsed_time(self.start_time, 'Starting Open Tiff Check')
         dest = os.path.join(self.position_dir, 'Open_Tiff_Check', 'Plots_of_all_tiff_slices.png')
         get_opening_tiff_check(self.data_dir, self.position, self.num_wav, dest)
         timer_tools.logg_elapsed_time(self.start_time, 'Ending Open Tiff Check')
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-
-        #Declare Segmentation
-        #--------------------------------------------------------------------------------
+        # Declare Segmentation
+        # --------------------------------------------------------------------------------
         if self.segmentation:
-
-
-            #Get Number of Z slices
-            #--------------------------------------------------------------------------------
+            # Get Number of Z slices
+            # --------------------------------------------------------------------------------
             subdirs = os.listdir(self.data_dir)
             hyb_dirs = [sub_dir for sub_dir in subdirs if 'Hyb' in sub_dir]
             assert len(hyb_dirs) > 0, "There are not HybCycle Directories in the experiment directory."
@@ -799,7 +777,7 @@ class Analysis:
             sample_tiff_src = os.path.join(self.data_dir, hyb_dir, self.position)
             sample_tiff = tiffy.load(sample_tiff_src, self.num_wav, self.num_z)
             num_zslices = sample_tiff.shape[0]
-            #--------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------------
 
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Segmentation')
             segmenter = Segmentation(
@@ -813,14 +791,14 @@ class Analysis:
             )
 
             self.labeled_img = segmenter.retrieve_labeled_img()
-            print('Shape after Seg in Analysis Class: ' +  str(self.labeled_img.shape))
+            print('Shape after Seg in Analysis Class: ' + str(self.labeled_img.shape))
 
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Segmentation')
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-        #Get Z slices if two dimensional
-        #--------------------------------------------------------------------------------
-        #if self.dimensions == 2:
+        # Get Z slices if two dimensional
+        # --------------------------------------------------------------------------------
+        # if self.dimensions == 2:
         if not self.decoding_with_previous_locations:
             exp_dir = os.path.join(main_dir, 'personal', self.personal, 'raw', self.experiment_name)
 
@@ -837,99 +815,93 @@ class Analysis:
             sample_tiff = tiffy.load(sample_tiff_src, self.num_wav, self.num_z)
 
             self.num_zslices = sample_tiff.shape[0]
-        #--------------------------------------------------------------------------------
-
+        # --------------------------------------------------------------------------------
 
         print(f'{self.align=}')
-        #Alignment
-        #--------------------------------------------------------------------------------
+        # Alignment
+        # --------------------------------------------------------------------------------
         if self.align is not None or self.dot_detection or self.decoding_across or \
-            self.decoding_individual != 'all':
+                self.decoding_individual != 'all':
 
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Alignment')
             if not self.decoding_with_previous_dots and not self.decoding_with_previous_locations:
 
+                timer_tools.logg_elapsed_time(self.start_time, 'Starting Alignment')
+                if self.align is None or self.align == 'fiducial_markers':
 
-                    timer_tools.logg_elapsed_time(self.start_time, 'Starting Alignment')
-                    if self.align is None or self.align == 'fiducial_markers':
+                    offset = run_alignment.run_alignment(
+                        self.experiment_name, self.personal, self.position,
+                        'no_align', self.num_wav, self.start_time
+                    )
 
+                else:
 
-
-                        offset = run_alignment.run_alignment(
-                            self.experiment_name, self.personal, self.position,
-                            'no_align', self.num_wav, self.start_time
-                        )
-
-                    else:
-
-                        offset, align_errors_dict = run_alignment.run_alignment(
-                            self.experiment_name, self.personal, self.position,
-                            self.align, self.num_wav, self.start_time
-                        )
-                        offsets_path = os.path.join(path, 'offsets.json')
-                        print("        Saving to", offsets_path, flush=True)
-
-                        #Save Alignment Errors
-                        #------------------------------------------------
-                        align_errors_path = os.path.join(path, 'align_errors.json')
-                        with open(align_errors_path, 'w') as jsonfile:
-                            json.dump(align_errors_dict, jsonfile)
-                        #------------------------------------------------
-
-                        #Get Align Errors Plot
-                        #------------------------------------------------
-                        align_error_check_dir = os.path.join(self.position_dir, 'Alignment_Checks')
-                        os.makedirs(align_error_check_dir, exist_ok = True)
-                        align_errors_plot_dst = os.path.join(align_error_check_dir, 'Align_Errors_Plot.png')
-                        get_alignment_errors_plot(align_errors_path, align_errors_plot_dst)
-                        #------------------------------------------------
-
-                    #Write Results to Path
-                    #-----------------------------------------------------
+                    offset, align_errors_dict = run_alignment.run_alignment(
+                        self.experiment_name, self.personal, self.position,
+                        self.align, self.num_wav, self.start_time
+                    )
                     offsets_path = os.path.join(path, 'offsets.json')
-                    with open(offsets_path, 'w') as jsonfile:
-                        json.dump(offset, jsonfile)
-                    #-----------------------------------------------------
+                    print("        Saving to", offsets_path, flush=True)
 
-                    if self.align is not None:
-                        #Get Visual Check for DAPI
-                        #-------------------------------------------------
-                        dapi_check_dir = os.path.join(self.position_dir, 'Alignment_Checks')
-                        os.makedirs(dapi_check_dir, exist_ok=True)
-                        dapi_check_dst = os.path.join(dapi_check_dir, 'Aligned_and_Stacked_DAPI_S.tif')
-                        get_stacked_dapi_s_align_check(offsets_path, dapi_check_dst, self.num_wav)
-                        #-------------------------------------------------
+                    # Save Alignment Errors
+                    # ------------------------------------------------
+                    align_errors_path = os.path.join(path, 'align_errors.json')
+                    with open(align_errors_path, 'w') as jsonfile:
+                        json.dump(align_errors_dict, jsonfile)
+                    # ------------------------------------------------
 
-                    timer_tools.logg_elapsed_time(self.start_time, 'Ending Alignment')
-            #--------------------------------------------------------------------------------
-            #End of Alignement
+                    # Get Align Errors Plot
+                    # ------------------------------------------------
+                    align_error_check_dir = os.path.join(self.position_dir, 'Alignment_Checks')
+                    os.makedirs(align_error_check_dir, exist_ok=True)
+                    align_errors_plot_dst = os.path.join(align_error_check_dir, 'Align_Errors_Plot.png')
+                    get_alignment_errors_plot(align_errors_path, align_errors_plot_dst)
+                    # ------------------------------------------------
 
+                # Write Results to Path
+                # -----------------------------------------------------
+                offsets_path = os.path.join(path, 'offsets.json')
+                with open(offsets_path, 'w') as jsonfile:
+                    json.dump(offset, jsonfile)
+                # -----------------------------------------------------
 
-        #Get Errors for Alignment
-        #--------------------------------------------------------------------------------
+                if self.align is not None:
+                    # Get Visual Check for DAPI
+                    # -------------------------------------------------
+                    dapi_check_dir = os.path.join(self.position_dir, 'Alignment_Checks')
+                    os.makedirs(dapi_check_dir, exist_ok=True)
+                    dapi_check_dst = os.path.join(dapi_check_dir, 'Aligned_and_Stacked_DAPI_S.tif')
+                    get_stacked_dapi_s_align_check(offsets_path, dapi_check_dst, self.num_wav)
+                    # -------------------------------------------------
+
+                timer_tools.logg_elapsed_time(self.start_time, 'Ending Alignment')
+            # --------------------------------------------------------------------------------
+            # End of Alignement
+
+        # Get Errors for Alignment
+        # --------------------------------------------------------------------------------
         if self.get_align_errors:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Alignment Errors')
             self.run_alignment_errors()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Alignment Errors')
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-
-        #Get Chromatic Aberration
-        #--------------------------------------------------------------------------------
+        # Get Chromatic Aberration
+        # --------------------------------------------------------------------------------
         if self.chromatic_aberration:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Chromatic Aberration')
             self.run_chromatic_aberration()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Chromatic Aberration')
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-        #Run Dot Detection
-        #--------------------------------------------------------------------------------
+        # Run Dot Detection
+        # --------------------------------------------------------------------------------
         if self.dot_detection:
             self.locs_src = self.run_dot_detection()
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-        #Run Fiducial Alignment
-        #--------------------------------------------------------------------------------
+        # Run Fiducial Alignment
+        # --------------------------------------------------------------------------------
         if self.align == 'fiducial_markers':
             dst_fiducials_dir = os.path.join(self.position_dir, 'Alignment')
             try:
@@ -937,19 +909,19 @@ class Analysis:
             except:
                 pass
 
-            fiducial_alignment.get_fiducial_offset(self.data_dir, self.position, dst_fiducials_dir, self.locs_src, self.num_wav)
-        #--------------------------------------------------------------------------------
+            fiducial_alignment.get_fiducial_offset(self.data_dir, self.position, dst_fiducials_dir, self.locs_src,
+                                                   self.num_wav)
+        # --------------------------------------------------------------------------------
 
-        #Declare Decoding Class if needed
-        #--------------------------------------------------------------------------------
+        # Declare Decoding Class if needed
+        # --------------------------------------------------------------------------------
         if (self.decoding_across
-            or (self.decoding_individual != 'all')
-            or self.decoding_with_previous_dots
-            or self.decoding_with_previous_locations
-            or self.decoding_non_barcoded
-            or self.lampfish_decoding
+                or (self.decoding_individual != 'all')
+                or self.decoding_with_previous_dots
+                or self.decoding_with_previous_locations
+                or self.decoding_non_barcoded
+                or self.lampfish_decoding
         ):
-
             self.move_directory_contents(self.barcode_key_src, self.barcode_dst)
 
             self.barcode_key_src = self.barcode_dst
@@ -959,11 +931,12 @@ class Analysis:
                 self.position_dir, self.barcode_dst, self.barcode_key_src, self.decoding_with_previous_dots,
                 self.decoding_with_previous_locations, self.fake_barcodes, self.decoding_individual,
                 self.min_seeds, self.allowed_diff, self.dimensions, self.num_zslices, self.segmentation,
-                self.decode_only_cells, self.labeled_img, self.num_wav, self.synd_decoding, self. lateral_variance_factor,
-                self.z_variance_factor, self. log_weight_variance_factor, self.parity_check_path, self.lampfish_pixel, self.start_time
+                self.decode_only_cells, self.labeled_img, self.num_wav, self.synd_decoding,
+                self.lateral_variance_factor,
+                self.z_variance_factor, self.log_weight_variance_factor, self.parity_check_path, self.lampfish_pixel,
+                self.start_time
             )
-        #--------------------------------------------------------------------------------
-
+        # --------------------------------------------------------------------------------
 
         if self.lampfish_decoding:
             if not self.dot_detection:
@@ -976,8 +949,8 @@ class Analysis:
             timer_tools.logg_elapsed_time(self.start_time, 'Ending LampFISH Decoding')
 
         if self.synd_decoding:
-            #Run Decoding Individual
-            #--------------------------------------------------------------------------------
+            # Run Decoding Individual
+            # --------------------------------------------------------------------------------
             if not self.decoding_individual == 'all':
                 if not self.dot_detection:
                     timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
@@ -987,28 +960,26 @@ class Analysis:
                 timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Individual')
                 decoder.run_synd_decoding_individual()
                 timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Individual')
-            #--------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------------
         else:
-            #Run Decoding with previous dots
-            #--------------------------------------------------------------------------------
+            # Run Decoding with previous dots
+            # --------------------------------------------------------------------------------
             if self.decoding_with_previous_dots:
                 timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding With Previous Points')
                 decoder.run_decoding_with_previous_dots()
                 timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding With Previous Points')
-            #--------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------------
 
-            #Run Decoding with previous locations
-            #--------------------------------------------------------------------------------
+            # Run Decoding with previous locations
+            # --------------------------------------------------------------------------------
             if self.decoding_with_previous_locations:
-
                 timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding With Previous Locations')
                 decoder.run_decoding_with_previous_locations()
                 timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding With Previous Locations')
-            #--------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------------
 
-
-            #Run Decoding Individual
-            #--------------------------------------------------------------------------------
+            # Run Decoding Individual
+            # --------------------------------------------------------------------------------
             if not self.decoding_individual == 'all':
                 if not self.dot_detection:
                     timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
@@ -1018,23 +989,22 @@ class Analysis:
                 timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Individual')
                 decoder.run_decoding_individual()
                 timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Individual')
-            #--------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------------
 
-            #Run Decoding Across
-            #--------------------------------------------------------------------------------
+            # Run Decoding Across
+            # --------------------------------------------------------------------------------
             if self.decoding_across:
                 if not self.dot_detection:
                     timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
                     self.run_dot_detection()
                     timer_tools.logg_elapsed_time(self.start_time, 'Ending Dot Detection')
 
-
                 timer_tools.logg_elapsed_time(self.start_time, 'Starting Decoding Across')
                 decoder.run_decoding_across()
                 timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Across')
 
-            #Run Decoding non barcoded
-            #--------------------------------------------------------------------------------
+            # Run Decoding non barcoded
+            # --------------------------------------------------------------------------------
             if self.decoding_non_barcoded:
                 if not self.dot_detection:
                     timer_tools.logg_elapsed_time(self.start_time, 'Starting Dot Detection')
@@ -1045,11 +1015,10 @@ class Analysis:
                 decoder.run_non_barcoded_decoding()
                 timer_tools.logg_elapsed_time(self.start_time, 'Ending Decoding Non-Barcoded')
 
-            #--------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------------
 
-
-        #Declare Segmentation
-        #--------------------------------------------------------------------------------
+        # Declare Segmentation
+        # --------------------------------------------------------------------------------
         if self.segmentation:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting Segmentation')
             segmenter = Segmentation(
@@ -1058,14 +1027,15 @@ class Analysis:
                 self.num_zslices, self.segmentation, self.seg_data_dir, self.dimensions, self.num_zslices,
                 self.labeled_img, self.edge_dist, self.dist_between_nuclei, self.bool_cyto_match,
                 self.area_tol, self.cyto_channel_num, self.get_nuclei_seg, self.get_cyto_seg,
-                self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold, self.nuclei_channel_num,
+                self.num_wav, self.nuclei_radius, self.flow_threshold, self.cell_prob_threshold,
+                self.nuclei_channel_num,
                 self.cyto_flow_threshold, self.cyto_cell_prob_threshold, self.cyto_radius
             )
 
             print(f'{self.labeled_img.shape=}')
             if self.decoding_across == True or \
-                self.decoding_with_previous_dots == True or \
-                self.decoding_with_previous_locations == True:
+                    self.decoding_with_previous_dots == True or \
+                    self.decoding_with_previous_locations == True:
 
                 segmenter.run_segmentation_across()
 
@@ -1080,86 +1050,77 @@ class Analysis:
                 segmenter.run_segmentation_non_barcoded()
 
             timer_tools.logg_elapsed_time(self.start_time, 'Ending Segmentation')
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-
-        #Make Post Analysis
-        #--------------------------------------------------------------------------------
-        if self.segmentation != False and (self.on_off_barcode_analysis or self.false_positive_rate_analysis or self.hamming_analysis):
+        # Make Post Analysis
+        # --------------------------------------------------------------------------------
+        if self.segmentation != False and (
+                self.on_off_barcode_analysis or self.false_positive_rate_analysis or self.hamming_analysis):
             post_analysis = Post_Analyses(
                 self.position_dir, self.false_pos_dir, self.seg_dir,
                 self.hamming_dir, self.fake_barcodes, self.barcode_key_src,
                 self.num_zslices, self.segmentation, self.decoding_individual
             )
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-
-        #Run On Off Barcode Analysis
-        #--------------------------------------------------------------------------------
+        # Run On Off Barcode Analysis
+        # --------------------------------------------------------------------------------
         if self.segmentation != False and self.on_off_barcode_analysis == True:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting On Off Barcode Plot Analysis')
             if self.decoding_across:
                 post_analysis.run_on_off_barcode_analysis_across()
-            elif self.decoding_individual!='all':
+            elif self.decoding_individual != 'all':
                 post_analysis.run_on_off_barcode_analysis_indiv()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending  On Off Barcode Plot Analysis')
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-
-        #Run False Positive Rate Analysis
-        #--------------------------------------------------------------------------------
+        # Run False Positive Rate Analysis
+        # --------------------------------------------------------------------------------
         if self.segmentation != False and self.false_positive_rate_analysis == True:
             timer_tools.logg_elapsed_time(self.start_time, 'Starting False Positive Rate')
             if self.decoding_across:
                 post_analysis.run_false_positive_rate_analysis_across()
-            elif self.decoding_individual!='all':
+            elif self.decoding_individual != 'all':
                 post_analysis.run_false_positive_rate_analysis_indiv()
             timer_tools.logg_elapsed_time(self.start_time, 'Ending False Positive Rate')
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-        #Label analysis as finished
-        #--------------------------------------------------------------------------------
+        # Label analysis as finished
+        # --------------------------------------------------------------------------------
         timer_tools.logg_elapsed_time(self.start_time, 'Finished with Analysis of Position')
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-
-        #Send email for finished analysis
-        #--------------------------------------------------------------------------------
+        # Send email for finished analysis
+        # --------------------------------------------------------------------------------
         print(f'{self.email=}')
         if self.email != 'none':
             send_finished_notif(self.analysis_dir, self.email)
-        #--------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------
 
-        #Check if all positions are finished and combine results
-        #--------------------------------------------------------------------------------
+        # Check if all positions are finished and combine results
+        # --------------------------------------------------------------------------------
         if are_logs_finished(self.analysis_dir):
             self.run_algorithms_for_all_pos()
 
-                # #Get pearson correlation of positions
-                # get_correlated_positions(self.analysis_dir)
-        #--------------------------------------------------------------------------------
+            # #Get pearson correlation of positions
+            # get_correlated_positions(self.analysis_dir)
+        # --------------------------------------------------------------------------------
 
-        #Send Analysis to onedrive
+        # Send Analysis to onedrive
 
+    # --------------------------------------------------------------------------------
+    # End of running the parameters
 
-    #--------------------------------------------------------------------------------
-    #End of running the parameters
 
 if __name__ == '__main__':
     if sys.argv[1] == 'debug_analysis_class_all_pos':
-
-        analysis = Analysis(experiment_name = 'jina_1_pseudos_4_corrected',
-                            analysis_name = 'jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60',
-                            personal ='nrezaee',
-                            position = 'MMStack_Pos0.ome.tif',
-                            email = None)
+        analysis = Analysis(experiment_name='jina_1_pseudos_4_corrected',
+                            analysis_name='jina_pseudos_4_corrected_all_pos_all_chs_pil_load_strict_2_only_blur_thresh_60',
+                            personal='nrezaee',
+                            position='MMStack_Pos0.ome.tif',
+                            email=None)
 
         analysis.set_segmentation_arg("cellpose")
-        analysis.set_decoding_individual([1,2])
+        analysis.set_decoding_individual([1, 2])
 
         analysis.run_algorithms_for_all_pos()
-
-
-
-
-

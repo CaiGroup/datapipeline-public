@@ -1,9 +1,10 @@
-import os 
+import os
+import tempfile
+
 import numpy as np
 from scipy.io import loadmat, savemat
 from scipy.optimize import least_squares
 from webfish_tools.util import pil_imread
-import tempfile
 
 
 def get_region_around(im, center, size, normalize=True, edge='raise'):
@@ -24,8 +25,8 @@ def get_region_around(im, center, size, normalize=True, edge='raise'):
     else:
         return region
 
-def get_gaussian_fitted_dots_python(tiff_src, channel, points, region_size=7):
 
+def get_gaussian_fitted_dots_python(tiff_src, channel, points, region_size=7):
     if region_size % 2 == 0:
         region_size += 1
 
@@ -54,11 +55,11 @@ def get_gaussian_fitted_dots_python(tiff_src, channel, points, region_size=7):
         zint = int(z)
         xint, yint = int(x), int(y)
 
-        mag = image[zint-1, xint, yint]
+        mag = image[zint - 1, xint, yint]
         mags.append(mag)
 
         try:
-            im_data = get_region_around(image[zint-1], [xint, yint], region_size, )
+            im_data = get_region_around(image[zint - 1], [xint, yint], region_size, )
         except IndexError:
             opts.append(cand)
             continue
@@ -78,68 +79,64 @@ def get_gaussian_fitted_dots_python(tiff_src, channel, points, region_size=7):
     return [np.array(opts), np.array(mags)]
 
 
-def get_gaussian_fitted_dots(tiff_src, channel,points):
-    
-    #Save Points to path
-    #-------------------------------------------------------------------
+def get_gaussian_fitted_dots(tiff_src, channel, points):
+    # Save Points to path
+    # -------------------------------------------------------------------
     temp_dir = tempfile.TemporaryDirectory()
     print(temp_dir.name)
-    
+
     points_saved_path = os.path.join(temp_dir.name, 'points.mat')
-    #points_saved_path = 'saved_locs.mat'
+    # points_saved_path = 'saved_locs.mat'
     savemat(points_saved_path, {'points': points})
-    #-------------------------------------------------------------------
-    
-    #Get temp dir
-    #-------------------------------------------------------------------
-    #temp_dir = tempfile.TemporaryDirectory()
-    
+    # -------------------------------------------------------------------
+
+    # Get temp dir
+    # -------------------------------------------------------------------
+    # temp_dir = tempfile.TemporaryDirectory()
+
     gauss_fitted_dots_path = os.path.join(temp_dir.name, 'gauss_points.mat')
-    #gauss_fitted_dots_path ='gauss_points.mat'
-    
-    #-------------------------------------------------------------------
-    
-    #Create Paths to add
-    #-------------------------------------------------------------------
+    # gauss_fitted_dots_path ='gauss_points.mat'
+
+    # -------------------------------------------------------------------
+
+    # Create Paths to add
+    # -------------------------------------------------------------------
     folder = os.path.dirname(__file__)
-    
+
     bfmatlab_dir = os.path.join(folder, 'bfmatlab')
     helpers_dir = os.path.join(folder, 'helpers')
-    #-------------------------------------------------------------------
-    
+    # -------------------------------------------------------------------
+
     print('=========================')
-    #Create Matlab Command
-    #-------------------------------------------------------------------
-    cmd = """  matlab -r "addpath('{0}');addpath('{1}'); getgaussian_wrap('{2}', {3}, '{4}', '{5}'); quit"; """ 
-    
-    gauss_fitted_dots_path ='gauss_points.mat'
+    # Create Matlab Command
+    # -------------------------------------------------------------------
+    cmd = """  matlab -r "addpath('{0}');addpath('{1}'); getgaussian_wrap('{2}', {3}, '{4}', '{5}'); quit"; """
+
+    gauss_fitted_dots_path = 'gauss_points.mat'
     cmd = cmd.format(bfmatlab_dir, helpers_dir, tiff_src, channel, points_saved_path, gauss_fitted_dots_path)
-    #-------------------------------------------------------------------
-    
-    
-    #Run Matlab Command
-    #-------------------------------------------------------------------
+    # -------------------------------------------------------------------
+
+    # Run Matlab Command
+    # -------------------------------------------------------------------
     print('Running Command')
-    
+
     print(f'{cmd=}')
     os.system(cmd)
- 
+
     print('After command')
-    #-------------------------------------------------------------------
-    
-    
-    #Load Results from Matlab
-    #-------------------------------------------------------------------
+    # -------------------------------------------------------------------
+
+    # Load Results from Matlab
+    # -------------------------------------------------------------------
     mat_results = loadmat(gauss_fitted_dots_path)
     gauss_points = mat_results['gaussPoints']
     gauss_ints = mat_results['gaussInt']
-    
+
     gauss_dot_analysis = [gauss_points, gauss_ints]
-    #-------------------------------------------------------------------
-    
+    # -------------------------------------------------------------------
+
     return gauss_dot_analysis
-    
-    
+
 # tiff_src = 'MMStack_Pos0.ome.tif'
 # channel = 1
 # points = np.random.randint(8,10, size=(100, 3))

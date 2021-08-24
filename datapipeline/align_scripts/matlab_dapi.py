@@ -1,93 +1,89 @@
-import tempfile
 import os
-from scipy.io import loadmat, savemat
-import numpy as np
 import sys
-import pickle
+import tempfile
 
-# Nonrelative imports because this is called as a standalone script.
-# As long as we are in the shared env (datapipeline in the PATH), this works
-from datapipeline.load_tiff import tiffy
-from datapipeline.align_scripts.helpers.saving_offset import save_offset
+from scipy.io import savemat
+
 # There is align_**scripts**.align_errors.get_align_errors and
 # align_**errors**.align_errors.get_align_errors. We want the former as it takes 3 arguments.
 from datapipeline.align_scripts.align_errors import get_align_errors
 from datapipeline.align_scripts.helpers.saving_align_errors import save_align_errors
+from datapipeline.align_scripts.helpers.saving_offset import save_offset
+# Nonrelative imports because this is called as a standalone script.
+# As long as we are in the shared env (datapipeline in the PATH), this works
+from datapipeline.load_tiff import tiffy
+
 
 def matlab_dapi(fixed_image_src, moving_image_src, num_wav, rand_dir):
-
-    #Create Dest
-    #-------------------------------------------------------------------
+    # Create Dest
+    # -------------------------------------------------------------------
     temp_dir = tempfile.TemporaryDirectory()
     dest = os.path.join(temp_dir.name, 'offset')
-    #-------------------------------------------------------------------
-    
-    #Create Paths to add
-    #-------------------------------------------------------------------
+    # -------------------------------------------------------------------
+
+    # Create Paths to add
+    # -------------------------------------------------------------------
     folder = os.path.dirname(__file__)
     matlab_dapi_dir = os.path.join(folder, 'matlab_dapi')
     bfmatlab_dir = os.path.join(matlab_dapi_dir, 'bfmatlab')
-    #-------------------------------------------------------------------
-    
-    #Open tiff files and get DAPI Channel
-    #-------------------------------------------------------------------
+    # -------------------------------------------------------------------
+
+    # Open tiff files and get DAPI Channel
+    # -------------------------------------------------------------------
     fixed_tiff = tiffy.load(fixed_image_src)
     moving_tiff = tiffy.load(moving_image_src)
     print(f'{fixed_tiff.shape=}')
     print(f'{moving_tiff.shape=}')
-    
-    
+
     fixed_dapi = fixed_tiff[:, -1]
     moving_dapi = moving_tiff[:, -1]
-    #-------------------------------------------------------------------
-    
-    #Save dapi's to mat file
-    #-------------------------------------------------------------------
+    # -------------------------------------------------------------------
+
+    # Save dapi's to mat file
+    # -------------------------------------------------------------------
     mat_dst = os.path.join(temp_dir.name, 'dapi_s.mat')
     savemat(mat_dst, {'fixed_dapi': fixed_dapi, 'moving_dapi': moving_dapi})
-    #-------------------------------------------------------------------
-    
+    # -------------------------------------------------------------------
+
     print(f'{os.getcwd()=}')
-    #Create Matlab Command and Call it
-    #-------------------------------------------------------------------
-    cmd = """  matlab -r "addpath('{0}');addpath('{1}');full_wrap_alignment('{2}', '{3}'); quit"; """ 
-    
+    # Create Matlab Command and Call it
+    # -------------------------------------------------------------------
+    cmd = """  matlab -r "addpath('{0}');addpath('{1}');full_wrap_alignment('{2}', '{3}'); quit"; """
+
     cmd = cmd.format(matlab_dapi_dir, bfmatlab_dir, mat_dst, dest)
-    
+
     os.system(cmd)
-    #-------------------------------------------------------------------
-    
-    
+    # -------------------------------------------------------------------
+
     print(f'{os.listdir(temp_dir.name)=}')
-    
-    #Get offset from mat file 
-    #------------------------------------------------------------------
-    f = open(dest+'.txt', "r")
+
+    # Get offset from mat file
+    # ------------------------------------------------------------------
+    f = open(dest + '.txt', "r")
     offset = f.read()
     temp_dir.cleanup()
-    
 
     offset = offset.split(',')
-    offset = [round(float(off),5) for off in offset ]
-    
-    if offset[2] ==0:
+    offset = [round(float(off), 5) for off in offset]
+
+    if offset[2] == 0:
         offset.pop()
-    #------------------------------------------------------------------
-    
-    #Save Offset
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
+
+    # Save Offset
+    # ------------------------------------------------------------------
     save_offset(moving_image_src, offset, rand_dir)
-    #------------------------------------------------------------------
-    
-    #Save Alignment Error
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
+
+    # Save Alignment Error
+    # ------------------------------------------------------------------
     fixed_tiff = tiffy.load(fixed_image_src, num_wav)
     moving_tiff = tiffy.load(moving_image_src, num_wav)
-    
+
     align_error = get_align_errors(fixed_tiff, moving_tiff, offset)
     save_align_errors(moving_image_src, align_error, rand_dir)
-    #------------------------------------------------------------------
-    
+    # ------------------------------------------------------------------
+
 
 if __name__ == '__main__':
     if 'debug' not in sys.argv[1]:
@@ -138,4 +134,3 @@ if __name__ == '__main__':
         start_time = None
 
         matlab_dapi(fixed_src, moving_src, num_wav, rand_dir)
-    

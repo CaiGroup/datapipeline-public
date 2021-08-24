@@ -1,14 +1,16 @@
-import pandas as pd
-import numpy as np
-from multiprocessing import Pool
-from scipy.spatial import cKDTree as KDTree
 from copy import copy, deepcopy
+
+import numpy as np
+import pandas as pd
+from scipy.spatial import cKDTree as KDTree
+
 
 class FMAligner:
     """
     This Class aligns dots in a seqFISH experiment image containing fiducial markers, to a reference image containing
     only the fiducial markers
     """
+
     def __init__(self, ro, ref, ref_final=None):
         """
         Initialize RefAligner object. Save pandas DataFrames of reference and readout points
@@ -42,8 +44,9 @@ class FMAligner:
         self.n_ambiguous = 0
         self.n_trav_matched = 0
         self.offsets = None
-        self.matchesDF = pd.DataFrame(columns=('ref_x', 'ref_y', 'ref_z', 'hyb', 'comp_x', 'comp_y', 'comp_z', 'comp_int',
-                                               'aligned_x', 'aligned_y', 'aligned_z'))
+        self.matchesDF = pd.DataFrame(
+            columns=('ref_x', 'ref_y', 'ref_z', 'hyb', 'comp_x', 'comp_y', 'comp_z', 'comp_int',
+                     'aligned_x', 'aligned_y', 'aligned_z'))
         self.averaged_ref = pd.DataFrame(columns=("ref_y", "hyb", "x", "y", "z", "int"))
 
         # define threshold parameters set by their own methods
@@ -60,8 +63,7 @@ class FMAligner:
         self.max_lat_offset = None
         self.max_z_offset = None
         self.outlier_sd_thresh = 3
-        self.min_fm_hyb_matches = int((max(self.ro.index)-min(self.ro.index))/2)
-
+        self.min_fm_hyb_matches = int((max(self.ro.index) - min(self.ro.index)) / 2)
 
     def auto_set_params(self):
         """
@@ -71,10 +73,11 @@ class FMAligner:
         :return:
         """
         if type(self.ref_final) != pd.DataFrame:
-            raise(Exception("Both initial and final fiducial marker locations must be provided to automatically set parameters."))
+            raise (Exception(
+                "Both initial and final fiducial marker locations must be provided to automatically set parameters."))
 
         # set search errors
-        lat_errors = np.arange(0.4,2,0.2)
+        lat_errors = np.arange(0.4, 2, 0.2)
         z_errors = np.arange(0.2, 2, 0.2)
         matches = np.zeros([len(lat_errors), len(z_errors)])
         max_matches = 0
@@ -102,7 +105,7 @@ class FMAligner:
                 ral.set_xy_search_error(lat_error)
                 ral.set_z_search_error(z_error)
                 ral._match_hyb_fiducial_markers(1)
-                matches[i,j] = len(ral.matchesDF.index)
+                matches[i, j] = len(ral.matchesDF.index)
                 if len(ral.matchesDF.index) > max_matches:
                     mm_lt = lat_error
                     mm_zt = z_error
@@ -111,29 +114,29 @@ class FMAligner:
         opt_matches["x_diff"] = opt_matches["aligned_x"] - opt_matches["ref_x"]
         opt_matches["y_diff"] = opt_matches["aligned_y"] - opt_matches["ref_y"]
 
-        opt_matches["lat_diff"] = np.sqrt(opt_matches["x_diff"]**2 + opt_matches["y_diff"]**2)
+        opt_matches["lat_diff"] = np.sqrt(opt_matches["x_diff"] ** 2 + opt_matches["y_diff"] ** 2)
         opt_matches["z_diff"] = opt_matches["aligned_z"] - opt_matches["ref_z"]
-        opt_matches["int_diff"]= opt_matches["comp_int"]-opt_matches["ref_int"]
+        opt_matches["int_diff"] = opt_matches["comp_int"] - opt_matches["ref_int"]
 
-        x_offset = np.mean(opt_matches["comp_x"]-opt_matches["ref_x"])
-        y_offset = np.mean(opt_matches["comp_y"]-opt_matches["ref_y"])
-        z_offset = np.mean(opt_matches["comp_z"]-opt_matches["ref_z"])
-        lat_offset = np.sqrt(x_offset**2 + y_offset**2)
+        x_offset = np.mean(opt_matches["comp_x"] - opt_matches["ref_x"])
+        y_offset = np.mean(opt_matches["comp_y"] - opt_matches["ref_y"])
+        z_offset = np.mean(opt_matches["comp_z"] - opt_matches["ref_z"])
+        lat_offset = np.sqrt(x_offset ** 2 + y_offset ** 2)
 
         self.set_z_search_error(np.quantile(np.abs(opt_matches["z_diff"]), 0.9))
         self.set_xy_search_error(np.quantile(opt_matches["lat_diff"], 0.9))
 
-        dfactors = opt_matches["ref_int"]/opt_matches["comp_int"]
+        dfactors = opt_matches["ref_int"] / opt_matches["comp_int"]
 
-        self.set_min_bright_prop(np.min(dfactors/1.5))
-        self.set_max_bright_prop(np.max(1/dfactors))
+        self.set_min_bright_prop(np.min(dfactors / 1.5))
+        self.set_max_bright_prop(np.max(1 / dfactors))
 
-        if len(opt_matches["ref_y"]) > self.min_dot_matches*2:
-            self.min_dot_matches = np.round(len(opt_matches["ref_y"])/2)
+        if len(opt_matches["ref_y"]) > self.min_dot_matches * 2:
+            self.min_dot_matches = np.round(len(opt_matches["ref_y"]) / 2)
 
-            if len(opt_matches["ref_y"]) > self.min_edge_matches*8:
-                self.min_edge_matches = np.round(len(opt_matches["ref_y"])/8)
-        
+            if len(opt_matches["ref_y"]) > self.min_edge_matches * 8:
+                self.min_edge_matches = np.round(len(opt_matches["ref_y"]) / 8)
+
         print(matches)
         return (opt_matches, mm_lt, mm_zt, x_offset, y_offset, z_offset, lat_offset)
 
@@ -144,7 +147,7 @@ class FMAligner:
 
     def set_xy_search_error(self, xyse):
         self.xyse = xyse
-        self.xyse_sq = xyse**2
+        self.xyse_sq = xyse ** 2
 
     def set_z_search_error(self, zse):
         self.zse = zse
@@ -161,12 +164,12 @@ class FMAligner:
     def set_n_unmatch_give_up(self, nugu):
         self.n_unmatch_give_up = nugu
 
-    def set_min_dot_matches(self,mdm):
+    def set_min_dot_matches(self, mdm):
         self.min_dot_matches = mdm
-        
+
     def set_max_lat_offset(self, mlo):
         self.max_lat_offset = mlo
-        
+
     def set_max_z_offset(self, mzo):
         self.max_z_offset = mzo
 
@@ -175,7 +178,7 @@ class FMAligner:
 
     def set_min_fm_hyb_matches(self, mfhm):
         self.min_fm_hyb_matches = mfhm
-    
+
     def align(self, hybs=None):
         """
         aligns hybridizations in the readout points to the reference
@@ -190,19 +193,19 @@ class FMAligner:
             hyb_offsets = self._match_hyb_fiducial_markers(hyb)
             hyb_offsets = [hyb] + hyb_offsets
             offsets.append(hyb_offsets)
-        
+
         self.unfiltered_matches = deepcopy(self.matchesDF)
         self.matchesDF = self._filter_matches(self.matchesDF)
-        self.unaveraged_offsets = pd.DataFrame(offsets, columns=('hyb', 'x', 'y', 'z', 'x_SE', 'y_SE', 'z_SE', 'n_matches'))
+        self.unaveraged_offsets = pd.DataFrame(offsets,
+                                               columns=('hyb', 'x', 'y', 'z', 'x_SE', 'y_SE', 'z_SE', 'n_matches'))
         self.offsets = self._est_offsets_all_matches(self.matchesDF)
         self.loocv_alignment_errors = self._est_error_loocv(self.matchesDF)
 
-
-        #return self.ref_aved_offsets #.unaveraged_offsets
-        #self.offsets.set_index('hyb')
-        #if __name__ == '__main__':
-            #pool = Pool(n_processes)
-            #pool.map(self.align_hyb, hybs)
+        # return self.ref_aved_offsets #.unaveraged_offsets
+        # self.offsets.set_index('hyb')
+        # if __name__ == '__main__':
+        # pool = Pool(n_processes)
+        # pool.map(self.align_hyb, hybs)
         return self.offsets, self.loocv_alignment_errors
 
     def save_offsets(self, filename):
@@ -238,9 +241,9 @@ class FMAligner:
         """
 
         matches = _matches.set_index(["ref_x", "ref_y", "ref_z", "ref_int"], drop=False)
-        loocv_alignments = pd.DataFrame(columns=[ "ref_x", "ref_y", "ref_z", "ref_int", "hyb",
-                                                "loocv_align_x", "loocv_align_y", "loocv_align_z", "comp_int",
-                                               "x_diff", "y_diff", "z_diff"])
+        loocv_alignments = pd.DataFrame(columns=["ref_x", "ref_y", "ref_z", "ref_int", "hyb",
+                                                 "loocv_align_x", "loocv_align_y", "loocv_align_z", "comp_int",
+                                                 "x_diff", "y_diff", "z_diff"])
 
         for fm_ref in np.unique(matches.index):
             drop_fm_matches = matches.drop(fm_ref)
@@ -257,12 +260,13 @@ class FMAligner:
             drpd_fm["z_diff"] = drpd_fm["loocv_align_z"] - drpd_fm["ref_z"]
 
             loocv_alignments = loocv_alignments.append(drpd_fm[["ref_x", "ref_y", "ref_z", "ref_int", "hyb",
-                                               "loocv_align_x", "loocv_align_y", "loocv_align_z", "comp_int",
-                                                "x_diff", "y_diff", "z_diff"]])
+                                                                "loocv_align_x", "loocv_align_y", "loocv_align_z",
+                                                                "comp_int",
+                                                                "x_diff", "y_diff", "z_diff"]])
 
         return loocv_alignments
 
-    def _find_ref_edges(self, n_longest, ref_df = None):
+    def _find_ref_edges(self, n_longest, ref_df=None):
         """
         Returns the n_longest edges (position separation vectors) in the graph of reference dots.
         :param n_longest: the number of longest edges to report
@@ -281,19 +285,19 @@ class FMAligner:
         ref_dists['bl_dist'] = 0
         ref_dists['br_dist'] = 0
 
-        #find distances the distance between each dot and each of the four corners of the image
+        # find distances the distance between each dot and each of the four corners of the image
         for i, dot in self.ref.iterrows():
-            ref_dists['ul_dist'].loc[i] = dot.x**2 + dot.y**2
-            ref_dists['ur_dist'].loc[i] = (2048 - dot.x)**2 + dot.y**2
-            ref_dists['bl_dist'].loc[i] = dot.x**2 + (2048 - dot.y)**2
-            ref_dists['br_dist'].loc[i] = (2048 - dot.x)**2 + (2048 - dot.y)**2
+            ref_dists['ul_dist'].loc[i] = dot.x ** 2 + dot.y ** 2
+            ref_dists['ur_dist'].loc[i] = (2048 - dot.x) ** 2 + dot.y ** 2
+            ref_dists['bl_dist'].loc[i] = dot.x ** 2 + (2048 - dot.y) ** 2
+            ref_dists['br_dist'].loc[i] = (2048 - dot.x) ** 2 + (2048 - dot.y) ** 2
 
         ul_dots = ref_dists.sort_values(by='ul_dist').iloc[:n_corner]
         ur_dots = ref_dists.sort_values(by='ur_dist').iloc[:n_corner]
         bl_dots = ref_dists.sort_values(by='bl_dist').iloc[:n_corner]
         br_dots = ref_dists.sort_values(by='br_dist').iloc[:n_corner]
 
-        edges_array = np.zeros([2*n_corner**2, 12])
+        edges_array = np.zeros([2 * n_corner ** 2, 12])
         i = 0
         for j, ul_dot in ul_dots.iterrows():
             for k, br_dot in br_dots.iterrows():
@@ -322,8 +326,8 @@ class FMAligner:
                 i += 1
 
         edges_df = pd.DataFrame(data=edges_array,
-                              columns=['u_x','u_y',  'u_z', 'u_int', 'v_x', 'v_y', 'v_z', 'v_int',
-                                    'x_dist', 'y_dist', 'z_dist', 'length'])
+                                columns=['u_x', 'u_y', 'u_z', 'u_int', 'v_x', 'v_y', 'v_z', 'v_int',
+                                         'x_dist', 'y_dist', 'z_dist', 'length'])
         edges_df.sort_values(by='length', ascending=False, inplace=True)
 
         edges_df = edges_df.iloc[:n_longest]
@@ -346,8 +350,8 @@ class FMAligner:
         # find a pair of dots in the hybridization readout that match a pair of the reference fiducial markers
         i = 0
         for edge_ind, edge in self.ref_edges.iterrows():
-            #print(edge)
-            #print('edge number:', edge_ind)
+            # print(edge)
+            # print('edge number:', edge_ind)
             if self._find_ro_matching_pair(edge):
                 break
             i += 1
@@ -368,7 +372,7 @@ class FMAligner:
         'u_z', 'u_int', 'x_dist', 'y_dist', 'length'
         :return:
         """
-        #print('subsetting readout...')
+        # print('subsetting readout...')
         # ToDo: in C or Cython, subset with a single for loop checking each element for each threshold, and passing if one is failed
 
         # subset points in read out image to search through by excluding dots with y values that preclude
@@ -381,8 +385,10 @@ class FMAligner:
         ro_v_candidates = self.ro_hyb.iloc[list(self.ro_hyb['y'] > v_r_min)]
 
         if self.max_lat_offset:
-            u_allowed = list((edge['u_x'] - ro_u_candidates['x'])**2 + (edge['u_y'] - ro_u_candidates['y'])**2 < self.max_lat_offset**2)
-            v_allowed = list((edge['v_x'] - ro_v_candidates['x'])**2 + (edge['v_y'] - ro_v_candidates['y'])**2 < self.max_lat_offset**2)
+            u_allowed = list((edge['u_x'] - ro_u_candidates['x']) ** 2 + (
+                        edge['u_y'] - ro_u_candidates['y']) ** 2 < self.max_lat_offset ** 2)
+            v_allowed = list((edge['v_x'] - ro_v_candidates['x']) ** 2 + (
+                        edge['v_y'] - ro_v_candidates['y']) ** 2 < self.max_lat_offset ** 2)
             ro_u_candidates = ro_u_candidates.iloc[u_allowed]
             ro_v_candidates = ro_v_candidates.iloc[v_allowed]
 
@@ -417,7 +423,7 @@ class FMAligner:
         v_cands_int_gt_lbnd = np.greater(np.array(ro_v_candidates['int']), float(edge['v_int']) * self.min_bright_prop)
         v_cands_int_lt_ubnd = np.less(np.array(ro_v_candidates['int']), float(edge['v_int']) * self.max_bright_prop)
         ro_v_candidates = ro_v_candidates.loc[list(np.logical_and(v_cands_int_gt_lbnd, v_cands_int_lt_ubnd))]
-        
+
         ro_u_candidates.sort_values(by='x', axis='index', inplace=True)
         ro_v_candidates.sort_values(by='x', axis='index', inplace=True)
 
@@ -442,7 +448,7 @@ class FMAligner:
                     # print('rdist to vcand out of bounds. Break')
                     break
 
-                elif (xdist - edge['x_dist'])**2 + (ydist - edge['y_dist'])**2 < self.xyse_sq and \
+                elif (xdist - edge['x_dist']) ** 2 + (ydist - edge['y_dist']) ** 2 < self.xyse_sq and \
                         np.abs(zdist - edge['z_dist']) < self.zse:
                     # found match! run graph traversal
                     done = self._traverse_reference(edge, udot, ro_v_candidates.iloc[j])
@@ -462,7 +468,7 @@ class FMAligner:
         :param ro_v: Pandas series representing v dot matched to reference edge. Has parameters: x, y, z, int
         :return:
         """
-        #print("Starting Traversal")
+        # print("Starting Traversal")
 
         # clear match Dict and edge matches
         self.matchDict = {}
@@ -490,7 +496,7 @@ class FMAligner:
             if tuple(matched_dot[0][:4]) in self.ref_dots.index:
                 self.ref_dots.drop(tuple(matched_dot[0][:4]), inplace=True)
                 self._find_ro_neighbors(matched_dot)
-            
+
             matched_dot_key = _to_tuples(matched_dot)
             if matched_dot_key in self.matchDict and self.matchDict[matched_dot_key] < self.min_edge_matches:
                 self.ref_dots.append(matched_dot[0])
@@ -515,7 +521,7 @@ class FMAligner:
         self.dot_neighbor_unmatched = 0
         matched_dot_key = _to_tuples(matched_dot)
 
-        #print('Searching through', len(self.ref_dots), 'neighbors in reference.')
+        # print('Searching through', len(self.ref_dots), 'neighbors in reference.')
         i = 0
         keep_going = True
         while i < len(self.ref_dots):
@@ -555,7 +561,8 @@ class FMAligner:
 
         # search for two closest dots because it is faster than doing a ball search
         nn_dists, nn_inds = self.ro_lat_tree.query(search_point, 2)
-        within_error_inds = [nn_inds[i] for i in (0, 1) if nn_dists[i] < self.xyse and np.abs(self.ro_hyb.iloc[nn_inds[i]]['z'] - zdist - matched_dot[1].z) < self.zse]
+        within_error_inds = [nn_inds[i] for i in (0, 1) if nn_dists[i] < self.xyse and np.abs(
+            self.ro_hyb.iloc[nn_inds[i]]['z'] - zdist - matched_dot[1].z) < self.zse]
         matches = self.ro_hyb.iloc[within_error_inds]
 
         if len(matches) == 1:  # we found a match!
@@ -582,9 +589,10 @@ class FMAligner:
                 try:
                     no_matches = np.equal(np.array(self.ref_dots.loc[ref_neighbor_key, 'n_trav_matched']), 0)[0]
                 except:
-                    no_matches = np.equal(self.ref_dots.loc[ref_neighbor_key, 'n_trav_matched'], 0)#
+                    no_matches = np.equal(self.ref_dots.loc[ref_neighbor_key, 'n_trav_matched'], 0)  #
                 try:
-                    too_many_failed_searches = np.equal(np.array(self.ref_dots.loc[ref_neighbor_key, 'n_unmatched']), self.n_unmatch_give_up)[0]
+                    too_many_failed_searches = \
+                    np.equal(np.array(self.ref_dots.loc[ref_neighbor_key, 'n_unmatched']), self.n_unmatch_give_up)[0]
                 except:
                     too_many_failed_searches = np.equal(self.ref_dots.loc[ref_neighbor_key, 'n_unmatched'],
                                                         self.n_unmatch_give_up)
@@ -633,10 +641,10 @@ class FMAligner:
         :param reserved: Set to true if processing a match found by looking through reserve dots
         :return: True if drops neighbor upon neighbor reaching min_edge_matches
         """
-        
+
         new_match_key = _to_tuples(new_match)
         old_match_key = _to_tuples(old_match)
-        
+
         # if match has reached this point, is within traveral error; add to traveral queue is not
         if new_match_key not in self.trav_matches:
             self.traversal_queue.append(new_match)
@@ -654,7 +662,8 @@ class FMAligner:
             self.edgeMatches |= {(old_match_key[0], new_match_key[0]), (new_match_key[0], old_match_key[0])}
 
             # remove from ref_dots dataframe if reached minimum number of matches to save time searching later
-            if self.matchDict[old_match_key] >= self.min_edge_matches and old_match_key[0] in self.ref_dots.index and not reserved:
+            if self.matchDict[old_match_key] >= self.min_edge_matches and old_match_key[
+                0] in self.ref_dots.index and not reserved:
                 self.reserved_ref_dots = self.reserved_ref_dots.append(self.ref_dots.loc[old_match[0]])
                 drop_ind = self.ref_dots.index.get_loc(old_match_key[0])
                 if type(drop_ind) == slice:
@@ -662,7 +671,8 @@ class FMAligner:
                 self.ref_dots = self.ref_dots.drop(old_match_key[0])
                 if drop_ind < self.trav_ind:
                     self.trav_ind -= 1
-            if self.matchDict[new_match_key] >= self.min_edge_matches and new_match_key[0] in self.ref_dots.index and not reserved:
+            if self.matchDict[new_match_key] >= self.min_edge_matches and new_match_key[
+                0] in self.ref_dots.index and not reserved:
                 self.reserved_ref_dots = self.reserved_ref_dots.append(self.ref_dots.loc[new_match_key[0]])
                 try:
                     drop_ind = self.ref_dots.index.get_loc(new_match_key[0])
@@ -706,7 +716,6 @@ class FMAligner:
 
         return matches_filtered
 
-
     def _est_offsets(self):
         """
         Estimates offsets for a hybridization using all fiducial markers matched in that hybridization.
@@ -723,7 +732,6 @@ class FMAligner:
         z_mean_se = zstdv / np.sqrt(len(dot_z_offsets))
 
         return [x_mean, y_mean, z_mean, x_mean_se, y_mean_se, z_mean_se, len(dot_y_offsets)]
-
 
     def _get_match_coords(self):
         """
@@ -757,7 +765,8 @@ class FMAligner:
             ystdv = np.std(dot_y_offsets)
 
             # check if there are lateral outliers
-            outliers = np.logical_or(abs(dot_y_offsets - y_mean) > self.outlier_sd_thresh * ystdv, abs(dot_x_offsets - x_mean) > self.outlier_sd_thresh * xstdv)
+            outliers = np.logical_or(abs(dot_y_offsets - y_mean) > self.outlier_sd_thresh * ystdv,
+                                     abs(dot_x_offsets - x_mean) > self.outlier_sd_thresh * xstdv)
             outlier = np.any(outliers)
 
             # remove outliers

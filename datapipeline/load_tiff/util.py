@@ -1,12 +1,13 @@
-import tifffile as tif
-import numpy as np
-import pandas as pd
 import json
-import re
 import os
+import re
 import string
 from pathlib import Path, PurePath
+
 import jmespath
+import numpy as np
+import pandas as pd
+import tifffile as tif
 from PIL import Image, ImageSequence, UnidentifiedImageError
 
 
@@ -20,12 +21,12 @@ def pil_imopen(fname, metadata=False):
 
 
 def pil_imread(
-    fname,
-    metadata=False,
-    swapaxes=False,
-    ensure_4d=True,
-    backup=tif.imread,
-    **kwargs
+        fname,
+        metadata=False,
+        swapaxes=False,
+        ensure_4d=True,
+        backup=tif.imread,
+        **kwargs
 ):
     md = None
 
@@ -72,16 +73,16 @@ def pil_getmetadata(im, relevant_keys=None):
 
         relevant_keys = [
             'Andor sCMOS Camera-Exposure',  # Exposure time (ms)
-            'Channel',                      # Channel name (wavelength)
-            'ChannelIndex',                 # Channel index (number)
-            'Frame',                        # Time slice (usually not used)
-            'FrameIndex',                   # Time slice index (usually not used)
-            'PixelSizeUm',                  # XY pixel size in microns
-            'Position',                     # Position 
-            'PositionIndex',                # Position index (MMStack_PosX)
-            'PositionName',                 # Position name
-            'Slice',                        # Z slice
-            'SliceIndex'                    # Z slice index (same as Slice)
+            'Channel',  # Channel name (wavelength)
+            'ChannelIndex',  # Channel index (number)
+            'Frame',  # Time slice (usually not used)
+            'FrameIndex',  # Time slice index (usually not used)
+            'PixelSizeUm',  # XY pixel size in microns
+            'Position',  # Position
+            'PositionIndex',  # Position index (MMStack_PosX)
+            'PositionName',  # Position name
+            'Slice',  # Z slice
+            'SliceIndex'  # Z slice index (same as Slice)
         ]
 
     frame_metadata = []
@@ -110,7 +111,6 @@ def pil_getmetadata(im, relevant_keys=None):
 
 
 def pil2numpy(im, dtype=np.uint16):
-
     return np.frombuffer(im.tobytes(), dtype=dtype).reshape(im.size)
 
 
@@ -130,8 +130,8 @@ def pil_frames_to_ndarray(im, dtype=np.uint16):
 
     if not metadata:
         raise ValueError('Supplied image lacks metadata used for '
-            'forming the correct image shape. Was the image not '
-            'taken from ImageJ/MicroManager?')
+                         'forming the correct image shape. Was the image not '
+                         'taken from ImageJ/MicroManager?')
 
     # Gives a list of ChannelIndex for each frame
     cinds = jmespath.search('[].ChannelIndex', metadata)
@@ -139,8 +139,8 @@ def pil_frames_to_ndarray(im, dtype=np.uint16):
     zinds = jmespath.search('[].SliceIndex', metadata)
 
     if (len(cinds) != len(zinds)
-        or any([c is None for c in cinds])
-        or any([z is None for z in zinds])
+            or any([c is None for c in cinds])
+            or any([z is None for z in zinds])
     ):
         raise ValueError('SuppliedImage lacks `ChannelIndex` or '
                          '`SliceIndex` metadata required to form '
@@ -162,7 +162,6 @@ def pil_frames_to_ndarray(im, dtype=np.uint16):
     # Loop in a nested fashion over channel first then Z slice
     for c in range(ncs):
         for z in range(nzs):
-
             # Find the frame whose ChannelIndex and SliceIndex
             # match the current c and z values
             entry = jmespath.search(
@@ -192,11 +191,11 @@ def safe_imread(fname, is_ome=False, is_imagej=True):
 
 
 def safe_imwrite(
-    arr,
-    fname,
-    compression='DEFLATE',
-    ome=False,
-    imagej=True
+        arr,
+        fname,
+        compression='DEFLATE',
+        ome=False,
+        imagej=True
 ):
     arr = arr.copy()
     try:
@@ -324,7 +323,7 @@ def fmt2regex(fmt, delim=os.path.sep):
         globstr.append(part_glob)
         regex.append(part_regex)
 
-    reg = re.compile('^'+re_delim.join(regex))
+    reg = re.compile('^' + re_delim.join(regex))
     globstr = delim.join(globstr)
 
     return reg, globstr
@@ -381,24 +380,24 @@ def fmts2file(*fmts, fields={}):
 
 
 def k2f(
-    k,
-    delimiter='/'
+        k,
+        delimiter='/'
 ):
     return PurePath(str(k).replace(delimiter, os.sep))
 
 
 def f2k(
-    f,
-    delimiter='/'
+        f,
+        delimiter='/'
 ):
     return str(f).replace(os.sep, delimiter)
 
 
 def sanitize(
-    k,
-    delimiter='/',
-    delimiter_allowed=True,
-    raiseonfailure=False
+        k,
+        delimiter='/',
+        delimiter_allowed=True,
+        raiseonfailure=False
 ):
     badchars = '\\[]{}^%#` <>~|'
 
@@ -436,18 +435,18 @@ def ls_recursive(root='.', level=1, ignore=[], dirsonly=True, flat=False):
         raise ValueError('level must be an integer')
 
     def _ls_recursive(
-        contents=None,
-        folder='.',
-        root='',
-        maxlevel=level,
-        curlevel=0,
-        dirsonly=dirsonly,
-        flat=flat
+            contents=None,
+            folder='.',
+            root='',
+            maxlevel=level,
+            curlevel=0,
+            dirsonly=dirsonly,
+            flat=flat
     ):
         if curlevel == maxlevel:
             if flat:
                 contents.extend([f.relative_to(root) for f in Path(folder).iterdir()
-                        if f.is_dir() or not dirsonly])
+                                 if f.is_dir() or not dirsonly])
                 return contents
             else:
                 return [f.name for f in Path(folder).iterdir()
@@ -457,13 +456,13 @@ def ls_recursive(root='.', level=1, ignore=[], dirsonly=True, flat=False):
             contents=contents,
             root=root,
             maxlevel=level,
-            curlevel=curlevel+1,
+            curlevel=curlevel + 1,
             dirsonly=dirsonly,
             flat=flat
         )
 
-        subfolders =[f for f in Path(folder).iterdir() if (
-            f.is_dir() and not any([f.match(p) for p in ignore]))]
+        subfolders = [f for f in Path(folder).iterdir() if (
+                f.is_dir() and not any([f.match(p) for p in ignore]))]
 
         if flat:
             [_ls_recursive(folder=f, **args) for f in subfolders]
@@ -570,4 +569,3 @@ def sort_as_num_or_str(coll, numtype=int):
         result = np.sort(np_coll.astype(str))
 
     return result
-

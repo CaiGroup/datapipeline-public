@@ -1,49 +1,37 @@
 from __future__ import annotations
-import numpy as np
-import imageio
-import skimage
-import tifffile
-import os
-import glob
+
+import warnings
 from typing import Tuple
-import numpy as np
-from scipy import ndimage
-import scipy.ndimage
-from skimage.exposure import rescale_intensity
-from skimage.feature import blob_log
-from skimage.filters import difference_of_gaussians
-from scipy.ndimage._ni_support import _normalize_sequence
-import scipy.ndimage as ndi
+
 import cv2
-import warnings
-import json
-import warnings
-import math
 import matplotlib.pyplot as plt
-import tempfile
-from scipy.io import loadmat
-
+import numpy as np
+import scipy.ndimage as ndi
 from dot_detection.helpers.add_z import add_z_col
-from dot_detection.helpers.threshold import apply_thresh
 from dot_detection.helpers.compile_dots import add_to_dots_in_channel
+from dot_detection.helpers.threshold import apply_thresh
+from scipy import ndimage
+from scipy.ndimage._ni_support import _normalize_sequence
+from skimage.feature import blob_log
 
-def match_thresh_to_diff_stricter(y_hist, x_hist, strictness =1):
-    
+
+def match_thresh_to_diff_stricter(y_hist, x_hist, strictness=1):
     hist_diffs = get_diff_in_hist(y_hist)
     index_of_max_diff = hist_diffs.index(max(hist_diffs)) + strictness
-    
+
     if index_of_max_diff >= len(x_hist) - 2:
         index_of_max_diff = len(x_hist) - 2
-    
+
     thresh = x_hist[index_of_max_diff]
 
     return thresh
 
+
 def rolling_ball_filter(
-    data: np.ndarray,
-    ball_radius: float,
-    spacing: Optional[Union[int, Sequence]] = None,
-    top: bool = False,
+        data: np.ndarray,
+        ball_radius: float,
+        spacing: Optional[Union[int, Sequence]] = None,
+        top: bool = False,
 ) -> np.ndarray:
     """Rolling ball filter implemented with morphology operations.
 
@@ -100,66 +88,65 @@ def rolling_ball_filter(
 
 def get_diff_in_hist(y_hist):
     hist_diffs = []
-    for i in range(len(y_hist)-1):
-        diff = y_hist[i] - y_hist[i+1]
+    for i in range(len(y_hist) - 1):
+        diff = y_hist[i] - y_hist[i + 1]
         hist_diffs.append(diff)
-        
+
     return hist_diffs
 
+
 def match_thresh_to_diff(y_hist, x_hist):
-    
     hist_diffs = get_diff_in_hist(y_hist)
     index_of_max_diff = hist_diffs.index(max(hist_diffs))
-    
+
     thresh = x_hist[index_of_max_diff]
 
     return thresh
-    
+
+
 def get_hist(intense):
     num_bins = 100
-    plt.figure(figsize=(10,10))
-    bins = np.arange(np.min(intense), np.max(intense), (np.max(intense) - np.min(intense))//num_bins)
+    plt.figure(figsize=(10, 10))
+    bins = np.arange(np.min(intense), np.max(intense), (np.max(intense) - np.min(intense)) // num_bins)
     y, x, ignore = plt.hist(intense, bins=bins, cumulative=-1)
-    return y,x
+    return y, x
 
 
 def blur_back_subtract(tiff_2d, num_tiles):
-    blur_kernel  = tuple(np.array(tiff_2d.shape)//num_tiles)
-    #print(f'{blur_kernel=}')
-    blurry_img = cv2.blur(tiff_2d,blur_kernel)
+    blur_kernel = tuple(np.array(tiff_2d.shape) // num_tiles)
+    # print(f'{blur_kernel=}')
+    blurry_img = cv2.blur(tiff_2d, blur_kernel)
     tiff_2d = cv2.subtract(tiff_2d, blurry_img)
-    
+
     return tiff_2d
 
-    
+
 def blur_back_subtract_3d(tiff, num_tiles):
-    
     print(f'{tiff.shape=}')
     for i in range(tiff.shape[0]):
-        tiff[i,:,:] = blur_back_subtract(tiff[i,:,:], num_tiles)
+        tiff[i, :, :] = blur_back_subtract(tiff[i, :, :], num_tiles)
     return tiff
 
+
 def tophat_3d(tiff_3d):
-    kernel = np.full((2,2), 100)
+    kernel = np.full((2, 2), 100)
     for i in range(tiff_3d.shape[0]):
-        tiff_3d[i] = cv2.morphologyEx(tiff_3d[i], cv2.MORPH_TOPHAT, kernel) 
-        
+        tiff_3d[i] = cv2.morphologyEx(tiff_3d[i], cv2.MORPH_TOPHAT, kernel)
+
     return tiff_3d
-    
 
 
 def process_3d(tiff_3d, tile_split=5):
-    
     tiff_3d = blur_back_subtract_3d(tiff_3d, tile_split)
-    
+
     tiff_3d = tophat_3d(tiff_3d)
-    #tiff_3d = blur_back_subtract_3d(tiff_3d, num_tiles=2)
-    
+    # tiff_3d = blur_back_subtract_3d(tiff_3d, num_tiles=2)
+
     print(' Image Processing Done!')
     return tiff_3d
 
-def find_dots(chan_img: np.ndimage) -> Tuple[np.ndarray, np.ndarray, int]:
 
+def find_dots(chan_img: np.ndimage) -> Tuple[np.ndarray, np.ndarray, int]:
     # Corresponds to a dot radius of sqrt(2)
     sigma = 2
 
@@ -188,55 +175,54 @@ def find_dots(chan_img: np.ndimage) -> Tuple[np.ndarray, np.ndarray, int]:
     points = log_result[:, :2].astype(np.int64)
     intensities = chan_img.transpose()[points[:, 1], points[:, 0]]
 
-
-    return points, intensities #, suggested_threshold
-
+    return points, intensities  # , suggested_threshold
 
 
-def find_dots_3d(tiff_3d, min_sigma=2, max_sigma=2, sigma_std =1, overlap=.2):
-    #intens_img = get_tile_norms(tiff_3d, intens=True)
-    #tiff_3d = blur_back_subtract_3d(tiff_3d, num_tiles=2)
-    #tiff_3d_norm = cv2.normalize(tiff_3d, None, 0, 10, norm_type=cv2.NORM_MINMAX).astype(np.int16)
+def find_dots_3d(tiff_3d, min_sigma=2, max_sigma=2, sigma_std=1, overlap=.2):
+    # intens_img = get_tile_norms(tiff_3d, intens=True)
+    # tiff_3d = blur_back_subtract_3d(tiff_3d, num_tiles=2)
+    # tiff_3d_norm = cv2.normalize(tiff_3d, None, 0, 10, norm_type=cv2.NORM_MINMAX).astype(np.int16)
     dots_in_channel = None
     for z in range(tiff_3d.shape[0]):
         print(' ' + str(z), end='')
         tiff_2d = tiff_3d[z, :, :]
 
-        #Get dots from 2d image
-        #---------------------------------------------------------------------
+        # Get dots from 2d image
+        # ---------------------------------------------------------------------
         dot_analysis = list(find_dots(tiff_2d))
-        #---------------------------------------------------------------------
+        # ---------------------------------------------------------------------
 
-        #Add Z column to dot locations
-        #---------------------------------------------------------------------
+        # Add Z column to dot locations
+        # ---------------------------------------------------------------------
         dot_analysis = add_z_col(dot_analysis, z)
-        #---------------------------------------------------------------------
+        # ---------------------------------------------------------------------
 
-        #Switch [y, x, z] to [x, y, z]
-        #---------------------------------------------------------------------
-        dot_analysis[0][:,[0,1]] = dot_analysis[0][:,[1,0]]
-        #---------------------------------------------------------------------
-        
+        # Switch [y, x, z] to [x, y, z]
+        # ---------------------------------------------------------------------
+        dot_analysis[0][:, [0, 1]] = dot_analysis[0][:, [1, 0]]
+        # ---------------------------------------------------------------------
+
         dots_in_channel = add_to_dots_in_channel(dots_in_channel, dot_analysis)
 
     return dots_in_channel[0], dots_in_channel[1]
-    
+
+
 def get_hist_threshed_dots(tiff_3d, strictness=10):
-        #Process and get dots on image
+    # Process and get dots on image
     processed_img_3d = process_3d(tiff_3d, tile_split=90)
-    
+
     dot_analysis = find_dots_3d(processed_img_3d)
-    
-    assert len(dot_analysis[1]) >0
+
+    assert len(dot_analysis[1]) > 0
     # Get histogram
     intensities = dot_analysis[1]
-    
+
     y, x = get_hist(intensities)
-    
+
     # Threshold dots
     thresh = match_thresh_to_diff_stricter(y, x, strictness=strictness)
     print(f'{thresh=}')
     print("Applying thresh")
     points, intense = apply_thresh(list(dot_analysis), thresh)
-    
+
     return points, intense

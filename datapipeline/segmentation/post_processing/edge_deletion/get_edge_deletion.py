@@ -2,28 +2,29 @@ import os
 import subprocess
 import sys
 
-def delete_edges(label_img_src, edge_delete_dist, post_process_dir):
 
-    #Specify directory and files
-    #-------------------------------------------------------------
+def delete_edges(label_img_src, edge_delete_dist, post_process_dir):
+    # Specify directory and files
+    # -------------------------------------------------------------
     label_img_dir = os.path.dirname(label_img_src)
-    nucboundzap_file_path = os.path.join(post_process_dir, 'edge_deletion', 'nucboundzap')    
-    #-------------------------------------------------------------
-    
-    #Run the edge deleter
-    #-------------------------------------------------------------
+    nucboundzap_file_path = os.path.join(post_process_dir, 'edge_deletion', 'nucboundzap')
+    # -------------------------------------------------------------
+
+    # Run the edge deleter
+    # -------------------------------------------------------------
     print("Deleting Edges")
     out_names = subprocess.check_output(
         [nucboundzap_file_path, label_img_src, str(edge_delete_dist)]
     )
     out_names = out_names.decode().split('\n')
-    #-------------------------------------------------------------
-    
-    #Return dst of labeled image
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
+
+    # Return dst of labeled image
+    # -------------------------------------------------------------
     print(f'{out_names=}')
     return out_names[0]
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
+
 
 if __name__ == '__main__':
 
