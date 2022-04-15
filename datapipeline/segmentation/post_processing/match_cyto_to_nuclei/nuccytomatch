@@ -1,0 +1,191 @@
+#!/bin/bash
+#
+# nuccytomatch <nuclei_labels> <cyto_labels> <output_prefix> [area tolerance]
+#
+#
+
+errcode=0
+quiet=false
+gmicverbose=-1
+
+function msg()
+{
+    if [ $quiet == false ]; then
+        printf "\t$(basename "$0"): %s\n" "$1" >&2
+    fi
+}
+
+function errmsg()
+{
+    printf "\t[$(basename "$0")]: error ($errcode): %s\n" "$1" >&2
+    exit $errcode
+}
+
+function usage()
+{
+    local msg=""
+
+    msg="$msg \n\t\033[1m usage: "$(basename "$0")" <nuclei_labels> <cyto_labels> <output_prefix> [area tolerance (0.9)] \033[0m  \n\n"
+    msg="$msg Cleans up and matches nuclei and cytoplasm label ids. Cytoplasm having none or more than one nucleus are removed \n"
+    msg="$msg as well as nuclei not in a single or crossing multiple cytoplasms.\n"
+    msg="$msg Cytoplasm labels are inherited from nuclei labels and they are not necessarily contiguous.\n\n"
+    msg="$msg 'nuclei_labels' must be a single slice labeled image with segmented connected components.\n"
+    msg="$msg 'cyto_labels' must be a single slice labeled image with segmented connected components.\n\n"
+
+    msg="$msg An 'area tolerance' is applied to discard nuclei whose area inside cytoplasms is below a percentage value.\n"
+    msg="$msg For example, if tolerance is 0.9 only nuclei with 90% of their body inside cytoplasm is kept.\n"
+    msg="$msg Decrease(increase) this value to be more(less) tolerant to nuclei jumping out of cytoplasm.\n\n"
+
+    msg="$msg Common image formats (tif, png, bmp, etc.) are accepted. Error handling is limited.\n"
+
+    printf "%b\n" "$msg"
+}
+
+function check_programs()
+{
+    # make sure needed programs are available
+
+    err=0
+    
+    command -v gmic >/dev/null 2>&1 || { msg "gmic not found. make sure gmic is installed."; ((err |= 1)); }
+    
+    if [ $err -eq 1 ]; then
+        errcode=127
+        errmsg "one or more essential programs are missing."
+    fi
+}
+
+# make sure needed programs are available
+check_programs
+
+nuclei=${1:-""}
+cyto=${2:-""}
+outprefix=${3:-""}
+area_ratio=${4:-0.9}
+
+#
+# interpret command line
+#
+if [[ "$#" -lt 3 ]]; then
+    usage
+    exit 1
+fi
+
+if [[ ! -r "${nuclei}" || ! -r "${cyto}" ]]; then
+  errcode=1
+  errmsg "cannot read one or more label files ($nuclei, $cyto)"
+fi
+
+if [[ "${#outprefix}" -eq 0 ]]; then
+  errcode=1
+  errmsg "Need to provide an output file name prefix"
+fi
+
+#
+# output file name
+#
+outname="${outprefix}"_ncmatch
+
+
+#
+# process input labels
+#
+
+tic=$(date +%s%3N)
+
+echo "processing nuclei ($nuclei) and cytoplasm ($cyto) images with area tolerance of $area_ratio"
+
+gmic -v $gmicverbose \
+\
+eps=$area_ratio \
+srand 179 \
+\
+$cyto $nuclei \
+\
+name[0] cyto \
+name[1] nuclei \
+\
+echo_stdout "identifying nuclei satisfying area tolerance" \
+\
+`# compute area of each nucleus` \
+\
++area_fg[nuclei] 0,1 \
+name[-1] nucarea \
+\
+`# determine the portions of each nucleus within and out of cytoplasms` \
+\
++mul[cyto] -1 \
+name[-1] negcyto \
++mul[negcyto] [nuclei] \
+\
+`# compute the percentage of nuclei in and out of cytoplasms` \
+\
++area_fg[-1] 0,1 \
+div[-1] [nucarea] \
+replace_nan[-1] 0 \
+\
+`# select only those nuclei and their portions which are above the area threshold` \
+\
++gt[-1] {\$eps} \
++mul[nuclei] [-1] \
+name[-1] nucvalid \
+\
+echo_stdout "cleaning up and matching labels in input images" \
+\
+`# erase those cytoplasms containing none or more than one nuclei` \
+\
+repeat {iM#0} \
+  c={\$\>+1} 			`# index of segmented cytoplasm` \
+  +eq[negcyto] {-\$c}		`# mask of c-th cytoplasm, if it exists` \
+  if {iM#-1}\>0 \
+    mul[-1] [nucvalid]		`# get valid nuclei in this mask, if any` \
+    if {iM#-1}\<1		`# remove cytoplasm if it has no valid nucleus` \
+      replace[negcyto] {-\$c},0 \
+    else			`# remove cytoplasm if it has more than one nucleus` \
+      autocrop[-1] \
+      nucid={iM#-1} \
+      replace[-1] \$nucid,0 \
+      if {iM#-1}\>0		`# more than one nuclei within this cytoplasm, erase all` \
+        replace[negcyto] {-\$c},0 \
+        do \
+	  replace[nucvalid] \$nucid,0 \
+	  replace[-1] \$nucid,0 \
+	  nucid={iM#-1} \
+	while \$nucid\>0 \
+      else 			`# match cytoplasm and its nucleus labels` \
+        replace[negcyto] {-\$c},\$nucid \
+      endif \
+    endif \
+  endif \
+  rm[-1] \
+done \
+\
+`# remove invalid nuclei, those not satisfying area tolerance` \
+\
+echo_stdout "erasing remaining invalid nuclei labels" \
+\
+repeat {iM#1} \
+  n={\$\>+1} 			`# index of segmented nucleus` \
+  +eq[nuclei] {\$n}		`# mask of n-th nucleus, if any` \
+  if {iM#-1}\>0 \
+    mul[-1] [nucvalid]		`# get corresponding valid nucleus, if any` \
+    if {iM#-1}==0 \
+      replace[nuclei] \$n,0	`# not a valid nucleus, erase it` \
+    endif \
+  endif \
+  rm[-1] \
+done \
+\
+keep[negcyto,nuclei] \
+append z \
+if {iM}\>255 \
+    output. "${outname}".tif,ushort,lzw \
+else \
+    output. "${outname}".tif,uchar,lzw \
+endif
+
+toc=$(date +%s%3N)
+elapsed=$(expr $toc - $tic)
+echo "done in $elapsed miliseconds. results saved in $outname.tif"
+
+echo $outname

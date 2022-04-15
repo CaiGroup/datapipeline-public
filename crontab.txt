@@ -1,0 +1,13 @@
+MAILTO="lombelets@caltech.edu"
+
+DATA_PIPELINE_DIR="/home/lombelet/data-pipeline-1"
+JSON_ANALYSES_DIR="/groups/CaiLab/json_analyses_lincoln"
+PYTHON_BIN_DIR="/groups/CaiLab/personal/python_env/bin"
+
+#*/100 * * * * rclone sync /groups/CaiLab/analyses/ onedrive_caltech:Analyses/ > /dev/null
+
+*/5 * * * * srun -t 00:01:00 --mem=10G -N 1 ${DATA_PIPELINE_DIR}/run_cron.sh $DATA_PIPELINE_DIR $JSON_ANALYSES_DIR 2>&1 ${DATA_PIPELINE_DIR}/cron.log
+
+#* * * * * python /home/lombelet/sandbox/aws_sync_dir_struct/sync_dir_structs.py > /dev/null
+#* * * * * rm /groups/CaiLab/personal/lombelet/raw/2020-08-08-takei/segmentation -r | tee  /home/lombelet/data-pipeline/foo.txt
+#00,30 * * * * pkill -f rclone

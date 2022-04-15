@@ -1,0 +1,47 @@
+import os
+
+import numpy as np
+from scipy.io import loadmat
+
+
+def decoding(barcode_src, locations_src, dest, allowed_diff, min_seeds):
+    # Get rounds and channels of experiment
+    # -------------------------------------------------------------------
+    barcodes = loadmat(barcode_src)["barcodekey"]
+
+    num_of_rounds = barcodes[0][0][0].shape[1]
+
+    channels_per_round = np.max(barcodes[0][0][0])
+
+    print(f'{channels_per_round=}')
+
+    total_number_of_channels = num_of_rounds * channels_per_round
+    # -------------------------------------------------------------------
+
+    print(f'{total_number_of_channels=}')
+    print(f'{num_of_rounds=}')
+    # Check if total channels is divisible by rounds
+    # -------------------------------------------------------------------
+    assert total_number_of_channels % num_of_rounds == 0
+    # -------------------------------------------------------------------
+
+    # Create Matlab Command
+    # -------------------------------------------------------------------
+    cmd = """  matlab -r "addpath('{0}');main_previous_locations_decoding('{1}', '{2}', '{3}', {4}, {5}, {6}, '{7}'); quit"; """
+
+    folder = os.path.dirname(__file__)
+    decoding_dir = os.path.join(folder, 'helpers')
+
+    cmd = cmd.format(decoding_dir, barcode_src, locations_src, dest, num_of_rounds, total_number_of_channels,
+                     allowed_diff, min_seeds)
+
+    print(f'{cmd=}')
+
+    # -------------------------------------------------------------------
+
+    # Run Matlab Command
+    # -------------------------------------------------------------------
+    os.system(cmd)
+    # -------------------------------------------------------------------
+
+    return None

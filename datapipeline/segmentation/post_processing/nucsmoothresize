@@ -1,0 +1,131 @@
+#!/bin/bash
+#
+# nucsmoothresize <stack> <target_size | Nx | tstack> [output]
+#
+# uniformly resize input 'stack' upwards along x and y directions to a
+# 'target_size' or 'N' times (Nx) or to match the size of target stack
+# 'tstack' while keeping same number of slices, i.e. no resize along
+# z; resizing is done to preserve the same number of labels from the
+# input (same connected components as before just larger
+# ones). Resized stack is written out to 'output' file, if provided,
+# otherwise to 'stack_resized.tif'.
+#
+
+errcode=0
+quiet=false
+
+function msg()
+{
+    if [ $quiet == false ]; then
+        printf "\t$(basename "$0"): %s\n" "$1" >&2
+    fi
+}
+
+function errmsg()
+{
+    printf "\t[$(basename "$0")]: error ($errcode): %s\n" "$1" >&2
+    exit $errcode
+}
+
+function usage()
+{
+    local msg=""
+
+    msg="$msg \n\t\033[1m usage: "$(basename "$0")" <stack> <target_size | Nx | tsatck> \033[0m  \n\n"
+    msg="$msg smoothly resizes input 'stack' upwards along x and y directions to a \n"
+    msg="$msg 'target_size' or 'N' times (Nx) or to match the size of target stack 'tstack' keeping \n"
+    msg="$msg the same number of slices, i.e. no resize along z; resizing is done to \n"
+    msg="$msg preserve the same number of labels from the input (same connected components \n" 
+    msg="$msg as before just larger ones). Resized stack is written out to 'output' file, \n"
+    msg="$msg if provided, otherwise to 'stack_resize.tif'. \n\n"
+
+    printf "%b\n" "$msg"
+}
+
+function check_programs()
+{
+    # make sure needed programs are available
+
+    err=0
+    
+    command -v gmic >/dev/null 2>&1 || { msg "gmic not found. make sure gmic is installed."; ((err |= 1)); }
+    
+    if [ $err -eq 1 ]; then
+        errcode=127
+        errmsg "one or more essential programs are missing."
+    fi
+}
+
+# make sure needed programs are available
+check_programs
+
+stack=${1:-""}
+target_size=${2:-0}
+nx=${2:-0}
+tstack=${2:-""}
+outname=${3:-""}
+
+#
+# interpret command line
+#
+if [[ "$#" -lt 2 ]]; then
+    usage
+    exit 1
+fi
+
+if [[ ! -r "${stack}" ]]; then
+    errcode=1
+    errmsg "cannot read stack $stack for resizing"
+fi
+
+input_size=$(gmic -v -1 $stack echo_stdout {w})
+if [[ -r "${tstack}" ]]; then
+    target_size=$(gmic -v -1 $tstack echo_stdout {w})
+else
+    if [[ "${nx:~0}" == 'x' ]]; then
+	x="${nx%x*}"
+	target_size=$((x * input_size))
+    fi
+fi  
+
+if [[ "${#target_size}" -eq 0 || $target_size -lt 1 || $target_size -lt $input_size ]]; then
+  errcode=1
+  errmsg "invalid resize value or target stack."
+fi
+
+#
+# output file names
+#
+if [[ "${#outname}" -eq 0 ]]; then
+    outname="${stack%.*}"_resized.tif
+fi
+
+#
+# resize input
+#
+
+x2=$((target_size / input_size / 2))
+rem=$((target_size % input_size))
+
+gmic -v -1 "${stack}" \
+  append z \
+  \
+  `# scale2x as many times as needed` \
+  \
+  repeat $x2 \
+    scale2x \
+  done \
+  if "$rem"\>0 \
+    resize $target_size,$target_size,100%,100%,1 \
+  fi \
+  \
+  `# write out resized stack` \
+  \
+  if {iM#0}\>255 \
+    output[0] "${outname}",ushort,lzw \
+  else \
+    output[0] "${outname}",uchar,lzw \
+  fi \
+
+
+echo $outname

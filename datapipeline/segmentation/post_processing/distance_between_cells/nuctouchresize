@@ -1,0 +1,122 @@
+#!/bin/bash
+#
+# nucresize <stack> [size]
+#
+# removes pixels from labeled touching regions in 'stack'
+#
+
+errcode=0
+quiet=false
+
+function msg()
+{
+    if [ $quiet == false ]; then
+        printf "\t$(basename "$0"): %s\n" "$1" >&2
+    fi
+}
+
+function errmsg()
+{
+    printf "\t[$(basename "$0")]: error ($errcode): %s\n" "$1" >&2
+    exit $errcode
+}
+
+function usage()
+{
+    local msg=""
+
+    msg="$msg \n\t\033[1m usage: "$(basename "$0")" <stack> [size ($bsize)] \033[0m  \n\n"
+    msg="$msg reduces size of labeled touching regions in 'stack' by 'size' pixels.\n"
+    msg="$msg 'stack' must be a labeled image with segmented connected components in \n"
+    msg="$msg common image format (tif, png, etc.).\n\n"
+
+    printf "%b\n" "$msg"
+}
+
+function check_programs()
+{
+    # make sure needed programs are available
+
+    err=0
+    
+    command -v gmic >/dev/null 2>&1 || { msg "gmic not found. make sure gmic is installed."; ((err |= 1)); }
+    
+    if [ $err -eq 1 ]; then
+        errcode=127
+        errmsg "one or more essential programs are missing."
+    fi
+}
+
+
+# make sure needed programs are available
+check_programs
+
+stack=${1:-""}
+bsize=${2:-8}
+esize=3
+
+#
+# interpret command line
+#
+if [[ "$#" -lt 1 ]]; then
+    usage
+    exit 1
+fi
+
+if [[ ! -r "${stack}" ]]; then
+  errcode=1
+  errmsg "cannot read stack $stack"
+fi
+
+if [[ $bsize -lt 1 ]]; then
+  errcode=1
+  errmsg "invalid size $bsize."
+fi
+
+#
+# output file names: input appended with _rX.tif and _removed_rX.tif
+#
+outname="${stack%.*}"_r$bsize.tif
+removed="${stack%.*}"_removed_r$bsize.tif
+
+#
+# process input labels
+#
+gmic -v -1 "${stack}" \
+  append z \
+  \
+  `# detect touching strips only between adjacent regions` \
+  \
+  +dilate $esize \
+  xor. .. \
+  +neq[0] 0 \
+  mul. .. \
+  neq. 0 \
+  rm.. \
+  \
+  `# remove dilated strips from their adjacent regions` \
+  \
+  dilate. $bsize \
+  negate. \
+  mul.. . \
+  \
+  `# write out resized labels` \
+  \
+  if {iM#0}\>255 \
+    output[0] "${outname}",ushort,lzw \
+  else \
+    output[0] "${outname}",uchar,lzw \
+  fi \
+  \
+  `# write out resized labels with removed strips` \
+  \
+  mul[1] 255 \
+  negate[1] \
+  neq[0] 0 \
+  mul[0] 255 \
+  {w},{h},{d},{1} \
+  append c \
+  output "${removed}",uchar,lzw
+
+echo $outname
+echo $removed
